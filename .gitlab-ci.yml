@@ -5,7 +5,7 @@ test:dev: &test
   image: sagemath/sagemath-dev:develop
   script:
     - sudo apt update
-    - sudo apt install texlive -qy
+    - sudo apt install texlive texlive-latex-extra -qy
     - sudo apt install graphviz imagemagick -y
     - sage -c 'import sage.env; print(sage.env.SAGE_VERSION)'
     - sage -c "print(sage.features.Executable(name='pdflatex',executable='pdflatex').is_present())"
@@ -28,9 +28,9 @@ test:dev: &test
 #  << : *test
 #  image: sagemath/sagemath-dev:9.1.rc5
 
-test:9.0:
-  << : *test
-  image: sagemath/sagemath-dev:9.0
+#test:9.0:
+#  << : *test
+#  image: sagemath/sagemath-dev:9.0
 
 # NOTE: 8.9-dev image is absent or misconfigured in docker hub...
 # We just disable it for now
