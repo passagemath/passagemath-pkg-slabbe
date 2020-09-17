@@ -44,4 +44,4 @@ clean: clean-doc
 clean-doc:
 	cd docs && sage -sh -c "make clean"
 
-.PHONY: all install develop test coverage clean clean-doc doc doc-pdf dist register upload
+.PHONY: all install develop test coverage clean clean-doc doc doc-pdf dist upload
