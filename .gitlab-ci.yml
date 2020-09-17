@@ -4,14 +4,26 @@ before_script:
 test:dev: &test
   image: sagemath/sagemath-dev:develop
   script:
+    - sudo apt update
+    - sudo apt install texlive graphviz imagemagick -qy
     - sage -c 'import sage.env; print(sage.env.SAGE_VERSION)'
     - sage -pip install .
-    - sage -t --force-lib --long .
+    - export DIRECTORY=`pwd`
+    - cd
+    - sage -t --force-lib --long ${DIRECTORY}
 
-# les images qui sont sur https://hub.docker.com/r/sagemath/sagemath/
-test:9.1:
-  << : *test
-  image: sagemath/sagemath-dev:9.1
+#- make testdemos
+#- make doc
+#- make doc-pdf
+
+## les images qui sont sur https://hub.docker.com/r/sagemath/sagemath-dev/
+#test:9.1.rc5-py3:
+#  << : *test
+#  image: sagemath/sagemath-dev:9.1.rc5-py3
+#
+#test:9.1.rc5:
+#  << : *test
+#  image: sagemath/sagemath-dev:9.1.rc5
 
 test:9.0:
   << : *test
@@ -19,19 +31,19 @@ test:9.0:
 
 # NOTE: 8.9-dev image is absent or misconfigured in docker hub...
 # We just disable it for now
-test:8.9:
-  << : *test
-  image: sagemath/sagemath-dev:8.9
+#test:8.9:
+#  << : *test
+#  image: sagemath/sagemath-dev:8.9
 
-test:8.8:
-  << : *test
-  image: sagemath/sagemath-dev:8.8
-
-test:8.7:
-  << : *test
-  image: sagemath/sagemath-dev:8.7
-
-test:8.6:
-  << : *test
-  image: sagemath/sagemath-dev:8.6
+#test:8.8:
+#  << : *test
+#  image: sagemath/sagemath-dev:8.8
+#
+#test:8.7:
+#  << : *test
+#  image: sagemath/sagemath-dev:8.7
+#
+#test:8.6:
+#  << : *test
+#  image: sagemath/sagemath-dev:8.6
 
