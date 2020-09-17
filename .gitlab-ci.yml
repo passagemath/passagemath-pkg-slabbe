@@ -5,8 +5,11 @@ test:dev: &test
   image: sagemath/sagemath-dev:develop
   script:
     - sudo apt update
-    - sudo apt install texlive graphviz imagemagick -qy
+    - sudo apt install texlive -qy
+    - sudo apt install graphviz imagemagick -y
     - sage -c 'import sage.env; print(sage.env.SAGE_VERSION)'
+    - sage -c "print(sage.features.Executable(name='pdflatex',executable='pdflatex').is_present())"
+    - sage -i dot2tex
     - sage -pip install .
     - export DIRECTORY=`pwd`
     - cd
