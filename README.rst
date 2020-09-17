@@ -32,7 +32,7 @@ Links:
 
  - documentation: http://www.slabbe.org/docs/
  - PyPI: http://pypi.python.org/pypi/slabbe
- - github: http://github.com/seblabbe/slabbe
+ - gitlab: http://gitlab.com/seblabbe/slabbe
  - www: http://www.slabbe.org/Sage/
 
 Prerequisites
@@ -83,7 +83,7 @@ rights)::
 
 To install the most recent development version::
 
-    sage -pip install --upgrade git+https://github.com/seblabbe/slabbe
+    sage -pip install --upgrade git+https://gitlab.com/seblabbe/slabbe
 
 Usage::
 

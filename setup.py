@@ -45,7 +45,7 @@ setup(name='slabbe',
     #install_requires=['cython','cysignals'], # this causes update of cysignals
                                               # which forces recompilation of all cython files!
     #url='http://www.slabbe.org/Sage',
-    url='http://github.com/seblabbe/slabbe',
+    url='http://gitlab.com/seblabbe/slabbe',
     license = "GPLv2+",
     packages=['slabbe'],
     ext_modules=cythonize(ext_modules),
