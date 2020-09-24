@@ -1313,14 +1313,14 @@ class DiscreteSubset(SageObject):
             ....:      (-1,0,1), (0,1,1)]
             sage: s = DiscreteSubset.from_subset(V)
             sage: s.tikz_points()
-            \node[circle,fill=black,draw=black,minimum size=0.8mm,inner sep=0pt,] at (-2, 1, 0) {};
-            \node[circle,fill=black,draw=black,minimum size=0.8mm,inner sep=0pt,] at (1, 1, 0) {};
-            \node[circle,fill=black,draw=black,minimum size=0.8mm,inner sep=0pt,] at (0, 1, 1) {};
-            \node[circle,fill=black,draw=black,minimum size=0.8mm,inner sep=0pt,] at (-1, 2, 0) {};
-            \node[circle,fill=black,draw=black,minimum size=0.8mm,inner sep=0pt,] at (-1, 0, 1) {};
-            \node[circle,fill=black,draw=black,minimum size=0.8mm,inner sep=0pt,] at (0, 0, 0) {};
-            \node[circle,fill=black,draw=black,minimum size=0.8mm,inner sep=0pt,] at (1, -1, 1) {};
-            \node[circle,fill=black,draw=black,minimum size=0.8mm,inner sep=0pt,] at (2, 0, 1) {};
+            \node[circle,fill=black,draw=black,minimum size=0.8mm,inner sep=0pt,] at ... {};
+            \node[circle,fill=black,draw=black,minimum size=0.8mm,inner sep=0pt,] at ... {};
+            \node[circle,fill=black,draw=black,minimum size=0.8mm,inner sep=0pt,] at ... {};
+            \node[circle,fill=black,draw=black,minimum size=0.8mm,inner sep=0pt,] at ... {};
+            \node[circle,fill=black,draw=black,minimum size=0.8mm,inner sep=0pt,] at ... {};
+            \node[circle,fill=black,draw=black,minimum size=0.8mm,inner sep=0pt,] at ... {};
+            \node[circle,fill=black,draw=black,minimum size=0.8mm,inner sep=0pt,] at ... {};
+            \node[circle,fill=black,draw=black,minimum size=0.8mm,inner sep=0pt,] at ... {};
         """
         it = iter(self)
         if filter:

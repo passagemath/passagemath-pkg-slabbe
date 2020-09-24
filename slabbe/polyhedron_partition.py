@@ -306,9 +306,9 @@ class PolyhedronPartition(object):
             sage: r = Polyhedron([(h,0), (1,0), (1,h)])
             sage: P = PolyhedronPartition([p,q,r])
             sage: P.cached_atoms_set()
-            {A 2-dimensional polyhedron in QQ^2 defined as the convex hull of 3 vertices,
-             A 2-dimensional polyhedron in QQ^2 defined as the convex hull of 3 vertices,
-             A 2-dimensional polyhedron in QQ^2 defined as the convex hull of 6 vertices}
+            {A 2-dimensional polyhedron in QQ^2 defined as the convex hull of ... vertices,
+             A 2-dimensional polyhedron in QQ^2 defined as the convex hull of ... vertices,
+             A 2-dimensional polyhedron in QQ^2 defined as the convex hull of ... vertices}
         """
         return set(self.atoms())
 
