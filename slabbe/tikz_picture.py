@@ -35,12 +35,12 @@ Setting ``view=True``, which is the default, opens the pdf in a viewer.
             [x={(0.249656cm, -0.577639cm)},
             y={(0.777700cm, -0.358578cm)},
             z={(-0.576936cm, -0.733318cm)},
-            scale=2.000000,
+            scale=1.000000,
     ...
-    ... 80 lines not printed (4889 characters in total) ...
+    ... 91 lines not printed (5170 characters in total) ...
     ...
-    \node[vertex] at (1.00000, 1.00000, -1.00000)     {};
-    \node[vertex] at (1.00000, 1.00000, 1.00000)     {};
+    \node[vertex] at (0.00000, -1.00000, 0.00000)     {};
+    \node[vertex] at (-0.50000, -0.50000, -0.50000)     {};
     %%
     %%
     \end{tikzpicture}
@@ -208,6 +208,10 @@ class StandaloneTex(SageObject):
             OutputImageSvg container
             sage: dm.preferences.graphics = 'raster'
         """
+        # Use rich output in Jupyter, not in the terminal
+        if display_manager.is_in_terminal():
+            return
+
         types = display_manager.types
         prefer_raster = (
             ('png', types.OutputImagePng),
