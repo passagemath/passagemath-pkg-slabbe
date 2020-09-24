@@ -96,6 +96,7 @@ def build_duration_logs(path_to_file, pattern=None):
     L = []
     for line in result:
         time_string = line[len(pattern):].strip('.')
+        time_string = time_string.replace(',','.')
         seconds = timeparse(time_string)
         if seconds is None:
             raise ValueError('Unable to parse time delta in string '
