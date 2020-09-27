@@ -6,7 +6,8 @@ test:dev: &test
   script:
     - sudo apt update
     - sudo apt install texlive texlive-latex-extra texlive-luatex -qy
-    - sudo apt install graphviz imagemagick -y
+    - sudo apt install graphviz imagemagick pdf2svg -y
+    - sudo sed -i '/PDF/s/none/read|write/' /etc/ImageMagick-6/policy.xml
     - sage -i dot2tex
     - sage -pip install .
     - sage -c 'import sage.env; print(sage.env.SAGE_VERSION)'
@@ -19,7 +20,6 @@ test:dev: &test
     - cd
     - sage -t --force-lib --long ${DIRECTORY}
 
-#- sudo sed -i '/PDF/s/none/read|write/' /etc/ImageMagick-6/policy.xml
 
 #- make testdemos
 #- make doc
