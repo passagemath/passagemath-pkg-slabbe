@@ -1469,14 +1469,7 @@ class DiscreteSubset(SageObject):
 
             sage: from slabbe import DiscretePlane
             sage: p = DiscretePlane([2,3,5], 10)
-            sage: print(p.tikz(points=False, edges=False))
-            \documentclass[tikz]{standalone}
-            \usepackage{amsmath}
-            \begin{document}
-            \begin{tikzpicture}
-            [scale=1]
-            \end{tikzpicture}
-            \end{document}
+            sage: t = p.tikz(points=False, edges=False)
         """
         s = '\\begin{tikzpicture}\n'
         s += '[scale=%s]\n' % scale

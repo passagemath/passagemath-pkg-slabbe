@@ -247,6 +247,7 @@ class StandaloneTex(SageObject):
             sage: s = "\\begin{tikzpicture}\n\\draw (0,0) -- (1,1);\n\\end{tikzpicture}"
             sage: t = TikzPicture(s)
             sage: print(t)
+            \RequirePackage{luatex85}
             \documentclass[tikz]{standalone}
             \usepackage{amsmath}
             \begin{document}
@@ -255,7 +256,12 @@ class StandaloneTex(SageObject):
             \end{tikzpicture}
             \end{document}
         """
-        lines = self._latex_file_header_lines()
+        lines = []
+        # LuaLaTeX, TeXLive 2016, standalone: undefined control sequence
+        # https://tex.stackexchange.com/questions/315025
+        # fixed in 2018, meanwhile, we add the fix here
+        lines.append(r"\RequirePackage{luatex85}")
+        lines.extend(self._latex_file_header_lines())
         lines.append(r"\begin{document}")
         lines.append(self._content)
         lines.append(r"\end{document}")
