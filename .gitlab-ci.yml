@@ -7,10 +7,14 @@ test:dev: &test
     - sudo apt update
     - sudo apt install texlive texlive-latex-extra texlive-luatex -qy
     - sudo apt install graphviz imagemagick -y
-    - sage -c 'import sage.env; print(sage.env.SAGE_VERSION)'
-    - sage -c "print(sage.features.Executable(name='pdflatex',executable='pdflatex').is_present())"
     - sage -i dot2tex
     - sage -pip install .
+    - sage -c 'import sage.env; print(sage.env.SAGE_VERSION)'
+    - dot -V
+    - lualatex --version
+    - pdflatex --version
+    - convert --version
+    - sage -c "print(sage.features.Executable(name='pdflatex',executable='pdflatex').is_present())"
     - export DIRECTORY=`pwd`
     - cd
     - sage -t --force-lib --long ${DIRECTORY}
