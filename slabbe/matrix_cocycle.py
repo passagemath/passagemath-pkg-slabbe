@@ -50,7 +50,7 @@ multiplicatif (2 avril 2014)::
     9
     sage: T.distorsion_max(3, p=oo)
     19/2
-    sage: T.distorsion_max(4, p=oo)  # long time (47s)
+    sage: T.distorsion_max(4, p=oo)  # long time (47s) # not tested
     126/13
 
 .. TODO::
@@ -354,7 +354,7 @@ class MatrixCocycle(object):
             [word: A1, word: A2]
             sage: ARP.n_matrices_non_pisot(2)   # long time (1s)
             [word: A1,A1, word: A1,A2, word: A2,A1, word: A2,A2]
-            sage: ARP.n_matrices_non_pisot(3)   # long time (11s)
+            sage: ARP.n_matrices_non_pisot(3)   # long time (6s)
             [word: A1,A1,A1,
              word: A1,A1,A2,
              word: A1,A2,A1,
@@ -363,7 +363,7 @@ class MatrixCocycle(object):
              word: A2,A1,A2,
              word: A2,A2,A1,
              word: A2,A2,A2]
-            sage: len(ARP.n_matrices_non_pisot(4))  # long time
+            sage: len(ARP.n_matrices_non_pisot(4))  # long time (22s) # not tested
             16
 
         ::
@@ -394,7 +394,7 @@ class MatrixCocycle(object):
             sage: from slabbe.matrix_cocycle import cocycles
             sage: C = cocycles.ARP()
             sage: it = C.n_matrices_semi_norm_iterator(1, p=1)
-            sage: for _ in range(5): print(next(it)) # tolerance 0.0001
+            sage: for _ in range(5): print(next(it)) # long time (1s) # tolerance 0.0001
             (word: 1, 1.0, False)
             (word: 2, 1.0, False)
             (word: 3, 1.0, False)
@@ -722,7 +722,8 @@ class MatrixCocycle(object):
 
             sage: from slabbe.matrix_cocycle import cocycles
             sage: B = cocycles.Sorted_Brun()
-            sage: G = B.plot_pisot_conjugates(5)   # long time (8s)
+            sage: G = B.plot_pisot_conjugates(2)
+            sage: G = B.plot_pisot_conjugates(5)  # long time (8s) # not tested
 
         Image envoyee a Timo (6 mai 2014)::
 
