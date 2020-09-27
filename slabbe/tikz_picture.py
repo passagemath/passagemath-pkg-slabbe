@@ -193,9 +193,12 @@ class StandaloneTex(SageObject):
 
         EXAMPLES::
 
-            sage: from slabbe import TikzPicture
             sage: from sage.repl.rich_output import get_display_manager
             sage: dm = get_display_manager()
+            sage: dm.is_in_terminal()
+            False
+
+            sage: from slabbe import TikzPicture
             sage: g = graphs.PetersenGraph()
             sage: t = TikzPicture.from_graph(g)            # optional dot2tex
             sage: g._rich_repr_(dm)      # random result is Text in doctest
@@ -208,8 +211,12 @@ class StandaloneTex(SageObject):
             OutputImageSvg container
             sage: dm.preferences.graphics = 'raster'
         """
-        # Use rich output in Jupyter, not in the terminal
+        # Do not use rich output in the terminal
         if display_manager.is_in_terminal():
+            return
+        # Do not use rich output if not in IPython notebook (Jupyter)
+        from sage.repl.rich_output.backend_ipython import BackendIPythonNotebook
+        if not isinstance(display_manager._backend, BackendIPythonNotebook):
             return
 
         types = display_manager.types
