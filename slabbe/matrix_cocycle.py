@@ -761,16 +761,9 @@ class MatrixCocycle(object):
             \begin{document}
             \begin{tikzpicture}
             [scale=4]
-            \draw (0.0000, 1.0000) -- (0.4330, 0.2500);
-            \draw (0.0000, 0.2500) -- (0.4330, 0.2500);
-            \draw (0.8660, -0.5000) -- (0.4330, 0.2500);
             ...
             ... 23 lines not printed (1317 characters in total) ...
             ...
-            \node at (-0.1443, 0.1667) {$213$};
-            \node at (-0.2165, 0.0417) {$231$};
-            \node at (0.0722, -0.2083) {$312$};
-            \node at (-0.0722, -0.2083) {$321$};
             \end{tikzpicture}
             \end{document}
 
