@@ -389,17 +389,17 @@ class _MCFAlgorithm_methods(object):
 
             sage: from slabbe.mult_cont_frac import FullySubtractive, ARP, Brun
             sage: A = Brun().discrete_plane_patches((1,e,pi), 10)
-            sage: _ = A.tikz().pdf()     # long time
+            sage: _ = A.tikz().pdf(view=False)     # long time
 
         ::
 
             sage: A = FullySubtractive().discrete_plane_patches((1,e,pi), 10)
-            sage: _ = A.tikz().pdf()     # not tested
+            sage: _ = A.tikz().pdf(view=False)     # not tested
 
         Result is not connected::
 
             sage: A = ARP().discrete_plane_patches((1,e,pi), 10)
-            sage: _ = A.tikz().pdf()     # not tested
+            sage: _ = A.tikz().pdf(view=False)     # not tested
 
         REFERENCES:
 

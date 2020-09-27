@@ -1289,7 +1289,7 @@ class ExtensionType(object):
             set()
             sage: E.weakstrong_sublanguage(L, 123, S, 3)   # known bug
             {(213, 213, 231, 123), (231, 213, 231, 123)}
-            sage: E.weakstrong_sublanguage(L, 123, S, 4)   # long time (8s)
+            sage: E.weakstrong_sublanguage(L, 123, S, 4)   # long time (8s) # known bug
             {(132, 213, 213, 231, 123),
              (213, 213, 213, 231, 123),
              (213, 213, 231, 231, 123),

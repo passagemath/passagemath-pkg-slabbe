@@ -39,7 +39,7 @@ multiplicatif (2 avril 2014)::
     sage: T.distorsion_max(3, p=oo)
     22/3
     sage: T.distorsion_max(4, p=oo)    # long time (4s)
-    62/17
+    53/7
 
 ::
 
@@ -51,7 +51,7 @@ multiplicatif (2 avril 2014)::
     sage: T.distorsion_max(3, p=oo)
     19/2
     sage: T.distorsion_max(4, p=oo)  # long time (47s)
-    161/43
+    126/13
 
 .. TODO::
 
@@ -404,45 +404,47 @@ class MatrixCocycle(object):
         For the 2-norm, AR matrices do not contract::
 
             sage: it = C.n_matrices_semi_norm_iterator(1, p=2)
-            sage: for w,s,b in it: print(w,s,b)  # long time (6s)
-            A1 1.30656296488 False
-            A2 1.30656296486 False
-            A3 1.30656296475 False
-            P12 0.99999999996 False
-            P13 0.999999999967 False
-            P21 0.999999999967 False
-            P23 0.999999999997 False
-            P31 0.999999999769 False
-            P32 0.999999999839 False
+            sage: for w,s,b in it: print(w,s,b)  # long time (6s) # tolerance 0.0001
+            1 1.30656296488 False
+            2 1.30656296486 False
+            3 1.30656296475 False
+            123 0.99999999996 False
+            132 0.999999999967 False
+            213 0.999999999967 False
+            231 0.999999999997 False
+            312 0.999999999769 False
+            321 0.999999999839 False
 
         When, the 1-norm is < 1, the product is pisot::
 
             sage: it = C.n_matrices_semi_norm_iterator(2, p=1)
-            sage: for w,s,b in it: print(w,s,b)  # long time
-            A1,A1 1.0 False
-            A1,A2 1.0 False
-            A1,A3 1.0 False
-            A1,P12 0.999998922557 False
-            A1,P13 0.999997464905 False
-            A1,P21 0.999993244882 False
-            A1,P23 0.999999150973 True
-            A1,P31 0.999994030522 False
-            A1,P32 0.999998046513 True
-            A2,A1 1.0 False
-            A2,A2 1.0 False
-            A2,A3 1.0 False
-            A2,P12 0.99999375291 False
-            A2,P13 0.999995591588 True
+            sage: for w,s,b in it: print(w,s,b)  # long time # not tested
+            11 1.0 False
+            12 1.0 False
+            13 1.0000000000000002 False
+            1,123 0.9999968942506897 True
+            1,132 0.9999987894422356 True
+            1,213 0.9999964086309794 False
+            1,231 0.9999899345706303 False
+            1,312 0.9999985339769911 False
+            1,321 0.9999932100052813 False
+            21 1.0 False
+            22 1.0000000000000002 False
+            23 0.9999999999999998 False
+            2,123 0.9999976016405222 False
+            2,132 0.9999871840192867 False
             ...
-            P31,A3 0.999988326888 False
-            P31,P12 0.749998931902 True
-            P31,P23 0.799999157344 True
-            P31,P32 0.749993104833 True
-            P32,A1 0.999997170005 True
-            P32,A3 0.99999420509 False
-            P32,P13 0.666665046248 True
-            P32,P21 0.666665629351 True
-            P32,P31 0.666664488371 True
+            231,312 0.7499985368044536 True
+            312,1 0.9999929100695556 False
+            312,3 0.9999924874380424 True
+            312,123 0.6666658877702296 True
+            312,213 0.7499990158628145 True
+            312,231 0.5999954614129098 True
+            321,2 0.9999940879276639 False
+            321,3 0.9999930338943775 True
+            321,123 0.7499989002141297 True
+            321,132 0.5999961806665235 True
+
         """
         if n == 0:
             raise NotImplementedError
