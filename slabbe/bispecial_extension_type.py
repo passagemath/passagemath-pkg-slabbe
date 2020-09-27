@@ -253,9 +253,8 @@ class ExtensionType(object):
             sage: from slabbe import ExtensionType1to1
             sage: L = [(1,3), (2,3), (3,1), (3,2), (3,3)]
             sage: E = ExtensionType1to1(L, alphabet=(1,2,3))
-            sage: hash(E)
-            -73163835              # 32-bit
-            -240081390800921986    # 64-bit
+            sage: hash(E) in ZZ
+            True
 
         """
         #return hash((self._pairs, self._factor))
