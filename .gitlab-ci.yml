@@ -5,7 +5,7 @@ test:dev: &test
   image: sagemath/sagemath-dev:develop
   script:
     - sudo apt update
-    - sudo apt install texlive texlive-latex-extra -qy
+    - sudo apt install texlive texlive-latex-extra texlive-luatex -qy
     - sudo apt install graphviz imagemagick -y
     - sage -c 'import sage.env; print(sage.env.SAGE_VERSION)'
     - sage -c "print(sage.features.Executable(name='pdflatex',executable='pdflatex').is_present())"
@@ -14,6 +14,8 @@ test:dev: &test
     - export DIRECTORY=`pwd`
     - cd
     - sage -t --force-lib --long ${DIRECTORY}
+
+#- sudo sed -i '/PDF/s/none/read|write/' /etc/ImageMagick-6/policy.xml
 
 #- make testdemos
 #- make doc
