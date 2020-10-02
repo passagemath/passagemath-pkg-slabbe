@@ -15,12 +15,12 @@ test:dev: &test
     - lualatex --version
     - pdflatex --version
     - convert --version
-    - sage -c "print(sage.features.Executable(name='pdflatex',executable='pdflatex').is_present())"
     - export DIRECTORY=`pwd`
     - cd
     - sage -t --force-lib --long ${DIRECTORY}
 
 
+#- sage -c "print(sage.features.Executable(name='pdflatex',executable='pdflatex').is_present())"
 #- make testdemos
 #- make doc
 #- make doc-pdf
