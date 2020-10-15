@@ -85,7 +85,8 @@ class BetaTransformation(object):
             β-transformation with β = phi ≈ 1.61803398874989
 
         """
-        return f"β-transformation with β = {self._beta} ≈ {self._beta.n()}"
+        return "β-transformation with β = {} ≈ {}".format(self._beta, 
+                          self._beta.n())
 
     def __call__(self, x):
         r"""
