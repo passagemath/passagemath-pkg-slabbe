@@ -15,6 +15,7 @@ test:dev: &test
     - lualatex --version
     - pdflatex --version
     - convert --version
+    - sage -c 'import slabbe'
     - export DIRECTORY=`pwd`
     - cd
     - sage -t --force-lib --long ${DIRECTORY}
