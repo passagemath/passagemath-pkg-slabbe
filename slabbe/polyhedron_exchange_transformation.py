@@ -233,7 +233,8 @@ class PolyhedronExchangeTransformation(object):
         of fundamental domains::
 
             sage: m = matrix(2, (1,1,0,1))
-            sage: T = PET.toral_translation(base, translation, m*F)
+            sage: mF = polytopes.parallelotope(m*base)
+            sage: T = PET.toral_translation(base, translation, mF)
             Traceback (most recent call last):
             ...
             NotImplementedError: Volume of the partition is 41/45 but the
