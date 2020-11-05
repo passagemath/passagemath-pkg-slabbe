@@ -701,6 +701,8 @@ class PolyhedronPartition(object):
 
     def apply_linear_map(self, M):
         r"""
+        Apply a matrix to every polyhedron of the partition.
+
         INPUT:
 
         - ``M`` -- a matrix
@@ -724,7 +726,14 @@ class PolyhedronPartition(object):
             Polyhedron partition of 4 atoms with 4 letters
 
         """
-        L = [(key, M*p) for key,p in self]
+        try:
+            L = [(key, M*p) for key,p in self]
+        except ValueError:
+            # M*p is possible in sage since 9.1.beta2, see #28724
+            L = [(key,
+                  Polyhedron([list(M*v.vector())
+                              for v in p.vertex_generator()]))
+                 for key,p in self]
         return PolyhedronPartition(L)
 
     def translate(self, displacement):
