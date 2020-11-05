@@ -237,7 +237,7 @@ class PolyhedronExchangeTransformation(object):
             sage: T = PET.toral_translation(base, translation, mF)
             Traceback (most recent call last):
             ...
-            NotImplementedError: Volume of the partition is 41/45 but the
+            NotImplementedError: Volume of the partition is 73/75 but the
             fundamental domain as volume 1. The code does not handle this
             case properly yet.
 
