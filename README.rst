@@ -40,9 +40,9 @@ Prerequisites
 
 Installing slabbe requires a working SageMath installation (with Cython and
 gcc). Depending on the usage, it might be necessary to install the optional
-packages dot2tex__, glucose__, cryptominisat__ and latte_int__::
+packages dot2tex__, glucose__ and latte_int__::
 
-    sage -i dot2tex glucose cryptominisat latte_int
+    sage -i dot2tex glucose latte_int
 
 __ https://dot2tex.readthedocs.io/en/latest/
 __ https://www.labri.fr/perso/lsimon/glucose/

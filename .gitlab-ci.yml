@@ -8,7 +8,7 @@ test:dev: &test
     - sudo apt install texlive texlive-latex-extra texlive-luatex -qy
     - sudo apt install graphviz imagemagick pdf2svg -y
     - sudo sed -i '/PDF/s/none/read|write/' /etc/ImageMagick-6/policy.xml
-    - sage -i dot2tex glucose cryptominisat latte_int
+    - sage -i dot2tex glucose
     - sage -pip install .
     - sage -c 'import sage.env; print(sage.env.SAGE_VERSION)'
     - dot -V
@@ -16,13 +16,13 @@ test:dev: &test
     - pdflatex --version
     - convert --version
     - sage -c 'import slabbe'
-    - export DIRECTORY=`pwd`
     - cd
     - make testlong
 
-
-#- sage -c "print(sage.features.Executable(name='pdflatex',executable='pdflatex').is_present())"
+#- export DIRECTORY=`pwd`
+#- sage -t --force-lib --long ${DIRECTORY}
 #- make testdemos
+#- sage -i cryptominisat latte_int   # cryptominisat is heavy on dependencies (cmake etc.)
 #- make doc
 #- make doc-pdf
 
