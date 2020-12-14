@@ -11,7 +11,7 @@ It contains modules on the following topics.
 **Discrete dynamical systems**
   diophantine approximation, Markov transformations, Wang tilings, Lyapunov
   exponents, matrix cocycles, multidimensional continued fraction algorithms,
-  polyhedron exchange transformations, 
+  polyhedron exchange transformations, GIFS.
 
 **Combinatorics**
   2d substitutions, bispecial factors, bond percolation, Dyck word in 3D,
@@ -20,7 +20,7 @@ It contains modules on the following topics.
 
 **Digital geometry**
   Christoffel graph, discrete subset, discrete plane, double square tiles,
-  polyhedron partitions, 
+  polyhedron partitions,
 
 **Vizualization**
   tikzpicture
@@ -35,38 +35,65 @@ Links:
  - gitlab: http://gitlab.com/seblabbe/slabbe
  - www: http://www.slabbe.org/Sage/
 
-Prerequisites
--------------
+Prerequisites - System packages (easy to install)
+-------------------------------------------------
 
-Installing slabbe requires a working SageMath installation (with Cython and
-gcc). Depending on the usage, it might be necessary to install the optional
-packages dot2tex__, glucose__ and latte_int__::
-
-    sage -i dot2tex glucose latte_int
-
-__ https://dot2tex.readthedocs.io/en/latest/
-__ https://www.labri.fr/perso/lsimon/glucose/
-__ https://www.msoos.org/cryptominisat5/
-__ https://www.math.ucdavis.edu/~latte/
-
-as well as the external packages ImageMagick__, Graphviz__ and Gurobi__. See
-this `thematic tutorial`__ to use Gurobi in SageMath.
-
-On Debian or Ubuntu, one may do::
-
-    sudo apt install graphviz imagemagick
-
-On OSX, one may do after installing Homebrew__::
-
-    sudo brew install graphviz imagemagick
-
-Note that graphviz must be installed *before* dot2tex.
+Some functionalities of ``slabbe`` package depend on the installation of
+packages on the system such as pdflatex, lualatex (lualatex compiles large
+tikzpicture exceeding the memory limits of pdflatex), pdf2svg as well as
+softwares including ImageMagick__ (to convert pdf to png so that tikzpicture
+appear directly in the Jupyter notebook), Graphviz__ (to draw graphs). 
 
 __ https://imagemagick.org/
 __ https://graphviz.org/
+
+On Debian or Ubuntu, one may do::
+
+    sudo apt update
+    sudo apt install texlive texlive-latex-extra texlive-luatex -qy
+    sudo apt install graphviz imagemagick pdf2svg -y
+
+The installation of imagemagick done above provides the command ``convert`` but
+it does not *allow* to convert pdf to png unless you edit the Imagemagick's
+``policy.xml`` file which can be done as follows (thanks to `Naveed's comment
+on stackoverflow`__)::
+
+    sudo sed -i '/PDF/s/none/read|write/' /etc/ImageMagick-6/policy.xml
+
+__ https://stackoverflow.com/questions/42928765/
+
+On **OSX**, one should first `install Homebrew`__. Then one can install the
+above packages similarly as above::
+
+    sudo brew install graphviz imagemagick pdf2svg
+
+__ https://brew.sh/
+
+Prerequisites - System packages (more work to install)
+------------------------------------------------------
+
+Some functionalities of ``slabbe`` package depend on the installation of of
+linear program solver such as Gurobi__. See the thematic tutorial to setup the
+`installation of Gurobi in SageMath``__.
+
 __ http://www.gurobi.com/
 __ http://doc.sagemath.org/html/en/thematic_tutorials/linear_programming.html#using-cplex-or-gurobi-through-sage
-__ https://brew.sh/
+
+Prerequisites - SageMath optional packages
+------------------------------------------
+
+Installing slabbe requires a working SageMath installation (with Cython and
+gcc). Depending on the usage, it might be necessary to install the optional
+sagemath packages dot2tex__ (translate dot file to tikz to draw nice graphs),
+glucose__ (SAT solver) and latte_int__::
+
+    sage -i dot2tex glucose latte_int
+
+Note that graphviz must be installed *before* dot2tex.
+
+__ https://dot2tex.readthedocs.io/en/latest/
+__ https://www.labri.fr/perso/lsimon/glucose/
+__ https://www.math.ucdavis.edu/~latte/
 
 Installation
 ------------
@@ -126,6 +153,13 @@ __ https://trac.sagemath.org/
 
 Release history
 ---------------
+
+*Version 0.6.2 (December 14, 2020)*
+  New module on Graph-directed iterated function systems (GIFS).
+  Fixed `TransitiveIdeal` import error.
+  Now using gitlab continuous integration automatic tests:
+  installation + ``import slabbe`` tested to work on versions 8.6, 8.7, 8.8, 9.0, 9.1, 9.2 of SageMath.
+  All tests passed on versions 9.0, 9.1, 9.2 of SageMath.
 
 *Version 0.6.1 (May 8, 2020)*
   New modules to deal with the coding of `Z^d`-action by PETs, `d`-dimensional
