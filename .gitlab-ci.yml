@@ -24,8 +24,17 @@ test:dev: &test
 #- sage -i cryptominisat latte_int   # cryptominisat is heavy on dependencies (cmake etc.)
 #- make doc
 #- make doc-pdf
+#
 
 # les images qui sont sur https://hub.docker.com/r/sagemath/sagemath-dev/
+test:9.3.beta3:
+  << : *test
+  image: sagemath/sagemath-dev:9.3.beta3
+
+test:9.2.beta3:
+  << : *test
+  image: sagemath/sagemath-dev:9.2.beta3
+
 test:9.1.rc5-py3:
   << : *test
   image: sagemath/sagemath-dev:9.1.rc5-py3
