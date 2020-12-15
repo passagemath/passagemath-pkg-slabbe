@@ -154,7 +154,7 @@ __ https://trac.sagemath.org/
 Release history
 ---------------
 
-*Version 0.6.2 (December 14, 2020)*
+*Version 0.6.2 (December 15, 2020)*
   New module on Graph-directed iterated function systems (GIFS).
   Fixed `TransitiveIdeal` import error.
   Now using gitlab continuous integration automatic tests:
