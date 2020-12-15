@@ -128,7 +128,7 @@ as we can see below:
     [[0, 1, 2, 3, 4, 5, 6, 7]]
     sage: U.find_markers(i=2,radius=2,solver="gurobi") # long time (13s) # optional gurobi
     [[0, 1, 2, 3, 4, 5, 6, 7]]
-    sage: U.find_markers(i=2,radius=2,solver="glucose") # long time (2min 10s) # optional glucose
+    sage: U.find_markers(i=2,radius=2,solver="glucose") # long time (2min 10s) # optional glucose # not tested
     [[0, 1, 2, 3, 4, 5, 6, 7]]
 
 Note that for other tasks like finding a valid tiling an `n\times n` square

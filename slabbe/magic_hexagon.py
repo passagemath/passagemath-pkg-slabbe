@@ -46,10 +46,10 @@ def solve_magic_hexagon(solver=None):
     EXAMPLES::
 
         sage: from slabbe.magic_hexagon import solve_magic_hexagon
-        sage: a = solve_magic_hexagon()      # long time (90s if GLPK, <1s if Gurobi)
-        sage: a                              # long time random
+        sage: a = solve_magic_hexagon()      # long time (90s if GLPK, <1s if Gurobi) # optional gurobi
+        sage: a                              # long time random                       # optional gurobi
         [15, 14, 9, 13, 8, 6, 11, 10, 4, 5, 1, 18, 12, 2, 7, 17, 16, 19, 3]
-        sage: sorted(a) == list(range(1,20)) # long time
+        sage: sorted(a) == list(range(1,20)) # long time                              # optional gurobi
         True
 
     """
