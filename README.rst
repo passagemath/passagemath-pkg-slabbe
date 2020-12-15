@@ -63,21 +63,11 @@ on stackoverflow`__)::
 __ https://stackoverflow.com/questions/42928765/
 
 On **OSX**, one should first `install Homebrew`__. Then one can install the
-above packages similarly as above::
+above packages similarly as above using ``brew`` instead of ``apt``::
 
     sudo brew install graphviz imagemagick pdf2svg
 
 __ https://brew.sh/
-
-Prerequisites - System packages (more work to install)
-------------------------------------------------------
-
-Some functionalities of ``slabbe`` package depend on the installation of of
-linear program solver such as Gurobi__. See the thematic tutorial to setup the
-`installation of Gurobi in SageMath``__.
-
-__ http://www.gurobi.com/
-__ http://doc.sagemath.org/html/en/thematic_tutorials/linear_programming.html#using-cplex-or-gurobi-through-sage
 
 Prerequisites - SageMath optional packages
 ------------------------------------------
@@ -115,6 +105,16 @@ To install the most recent development version::
 Usage::
 
     sage: from slabbe import *
+
+Other System packages you may want to install
+---------------------------------------------
+
+Some functionalities of ``slabbe`` package depend on the installation of a
+linear program solver such as Gurobi__. See the thematic tutorial to setup the
+`installation of Gurobi in SageMath``__.
+
+__ http://www.gurobi.com/
+__ http://doc.sagemath.org/html/en/thematic_tutorials/linear_programming.html#using-cplex-or-gurobi-through-sage
 
 It builds on SageMath
 ---------------------
