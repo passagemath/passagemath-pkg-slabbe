@@ -18,7 +18,7 @@ test:dev: &test
     - sage -c 'import slabbe'
     - export DIRECTORY=`pwd`
     - cd
-    - sage -t --force-lib --long ${DIRECTORY}
+    - sage -t --force-lib --long --memlimit=4000 ${DIRECTORY}
     - cd ${DIRECTORY}/docs && sage -sh -c "make html"
 
 #- sage -i cryptominisat latte_int   # cryptominisat is heavy on dependencies (cmake etc.)

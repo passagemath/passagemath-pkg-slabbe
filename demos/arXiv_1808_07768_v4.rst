@@ -284,21 +284,22 @@ We desubstitute $\T_{10}$:
     sage: omega10
     Substitution 2d: {0: [[1]], 1: [[2]], 2: [[3]], 3: [[12]], 4: [[13]], 5: [[14]], 6: [[15]], 7: [[16]], 8: [[17]], 9: [[1, 0]], 10: [[2, 0]], 11: [[3, 0]], 12: [[9, 8]], 13: [[10, 4]], 14: [[11, 4]], 15: [[12, 6]], 16: [[13, 5]], 17: [[13, 8]], 18: [[14, 7]], 19: [[15, 5]], 20: [[17, 7]]}
 
+
 We desubstitute $\T_{11}$:
 
 .. link
 
 ::
 
-    sage: sorted(T11.find_markers(i=1, radius=1, solver='dancing_links'))         # takes 2s
+    sage: sorted(T11.find_markers(i=1, radius=1, solver='dancing_links'))         # takes 2s # optional -- memlimit
     [[0, 1, 2, 9, 10, 11],
      [3, 5, 8, 13, 14, 15, 18, 20],
      [4, 6, 7, 12, 16, 17, 19]]
     sage: M11 = [0, 1, 2, 9, 10, 11]
-    sage: T12,omega11 = T11.find_substitution(M=M11, i=1, radius=1, side='right', solver='dancing_links')
-    sage: T12
+    sage: T12,omega11 = T11.find_substitution(M=M11, i=1, radius=1, side='right', solver='dancing_links') # optional -- memlimit
+    sage: T12                                       # optional -- memlimit
     Wang tile set of cardinality 19
-    sage: omega11
+    sage: omega11                                   # optional -- memlimit
     Substitution 2d: {0: [[5]], 1: [[8]], 2: [[14]], 3: [[15]], 4: [[18]], 5: [[20]], 6: [[3], [1]], 7: [[4], [2]], 8: [[5], [1]], 9: [[6], [0]], 10: [[7], [1]], 11: [[8], [1]], 12: [[12], [11]], 13: [[13], [11]], 14: [[14], [9]], 15: [[15], [10]], 16: [[16], [11]], 17: [[17], [11]], 18: [[19], [9]]}
 
 

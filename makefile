@@ -16,7 +16,7 @@ testlong:
 ptest:
 	sage -tp --force-lib --show-skipped . --log=logs/ptest.log
 ptestlong:
-	sage -tp --force-lib --long --show-skipped . --log=logs/ptestlong.log
+	sage -tp --force-lib --long --memlimit=4000 --show-skipped . --log=logs/ptestlong.log
 
 coverage:
 	sage -coverage slabbe/*
