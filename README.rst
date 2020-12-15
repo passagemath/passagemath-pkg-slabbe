@@ -158,7 +158,7 @@ Release history
   New module on Graph-directed iterated function systems (GIFS).
   Fixed `TransitiveIdeal` import error.
   Now using gitlab continuous integration automatic tests:
-  installation + ``import slabbe`` tested to work on versions 8.6, 8.7, 8.8, 9.0, 9.1, 9.2 of SageMath.
+  installation + ``import slabbe`` tested to work on versions 8.7, 8.8, 9.0, 9.1, 9.2 of SageMath.
   All tests passed on versions 9.0, 9.1, 9.2 of SageMath.
 
 *Version 0.6.1 (May 8, 2020)*
