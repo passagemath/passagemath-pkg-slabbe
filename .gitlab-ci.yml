@@ -11,6 +11,7 @@ test:dev: &test
     - sage -i dot2tex glucose
     - sage -pip install .
     - sage -c 'import sage.env; print(sage.env.SAGE_VERSION)'
+    - sage -python -V
     - dot -V
     - lualatex --version
     - pdflatex --version
