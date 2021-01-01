@@ -325,3 +325,13 @@ We may check that the self-similarity for `\mathcal{P}_8` satisfies
     sage: zeta.inverse()*beta8*beta9*tau*zeta  == betaU
     True
 
+Observe that the `19 \times 19` incidence matrix of `\beta_8\beta_9\tau` is not
+hyperbolic but, as shown by its characteristic polynomial, it is hyperbolic on
+a 8-dimensional subspace:
+
+.. link
+
+::
+
+    sage: (beta8*beta9*tau).incidence_matrix().charpoly().factor()
+    x^3 * (x - 1)^4 * (x + 1)^4 * (x^2 - 3*x + 1) * (x^2 + x - 1)^3
