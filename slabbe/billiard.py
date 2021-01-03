@@ -42,11 +42,16 @@ from slabbe.discrete_subset import DiscreteSubset, Intersection
 ################################################
 class BilliardCube(Intersection):
     r"""
-    This is the set of point `p` such that
+    If `v=(a,b,c)` and the starting point is (0,0,0), 
+    this is the set of point `p` such that:
 
-        `0 \leq  p \cdot v - mu < \omega`  #fix me
-        `0 \leq  p \cdot v - mu < \omega`  #fix me
-        `0 \leq  p \cdot v - mu < \omega`  #fix me
+    .. MATH::
+
+        \begin{array}{l}
+        -(b+c)/2 \leq p \cdot (0,c,-b) < (b+c)/2\\
+        -(a+c)/2 \leq p \cdot (c,0,-a) < (a+c)/2\\
+        -(a+b)/2 \leq p \cdot (b,-a,0) < (a+b)/2
+        \end{array}
 
     INPUT:
 
@@ -101,6 +106,17 @@ class BilliardCube(Intersection):
             sage: b = BilliardCube((1,pi,sqrt(2)))
             sage: b
             Cubic billiard of direction (1, pi, sqrt(2))
+
+        The billiard word is coded as the intersection of 3 discrete
+        planes. Their inequalities can be obtained as follows::
+
+            sage: from slabbe import Intersection
+            sage: print(Intersection._repr_(b))
+            Intersection of the following objects:
+            Set of points x in ZZ^3 satisfying: 0 <= (0, sqrt(2), -pi) . x + 1/2*pi + 1/2*sqrt(2) < pi + sqrt(2)
+            Set of points x in ZZ^3 satisfying: 0 <= (sqrt(2), 0, -1) . x + 1/2*sqrt(2) + 1/2 < sqrt(2) + 1
+            Set of points x in ZZ^3 satisfying: 0 <= (pi, -1, 0) . x + 1/2*pi + 1/2 < pi + 1
+
 
         TESTS::
 

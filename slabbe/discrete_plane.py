@@ -55,7 +55,7 @@ class DiscreteHyperplane(DiscreteSubset):
     r"""
     This is the set of point `p` such that
 
-        `0 \leq  p \cdot v - mu < \omega`
+        `0 \leq  p \cdot v + mu < \omega`
 
     INPUT:
 
