@@ -39,10 +39,11 @@ Prerequisites - System packages (easy to install)
 -------------------------------------------------
 
 Some functionalities of ``slabbe`` package depend on the installation of
-packages on the system such as pdflatex, lualatex (lualatex compiles large
-tikzpicture exceeding the memory limits of pdflatex), pdf2svg as well as
-softwares including ImageMagick__ (to convert pdf to png so that tikzpicture
-appear directly in the Jupyter notebook), Graphviz__ (to draw graphs). 
+packages on the system such as libpari-dev, pdflatex, lualatex (lualatex
+compiles large tikzpicture exceeding the memory limits of pdflatex), pdf2svg as
+well as softwares including ImageMagick__ (to convert pdf to png so that
+tikzpicture appear directly in the Jupyter notebook), Graphviz__ (to draw
+graphs). 
 
 __ https://imagemagick.org/
 __ https://graphviz.org/
@@ -50,6 +51,7 @@ __ https://graphviz.org/
 On Debian or Ubuntu, one may do::
 
     sudo apt update
+    sudo apt install libpari-dev -y
     sudo apt install texlive texlive-latex-extra texlive-luatex -qy
     sudo apt install graphviz imagemagick pdf2svg -y
 
@@ -156,7 +158,7 @@ Release history
 
 *Version 0.6.2 (December 15, 2020)*
   New module on Graph-directed iterated function systems (GIFS).
-  Fixed `TransitiveIdeal` import error.
+  Fixed ``TransitiveIdeal`` import error.
   Now using gitlab continuous integration automatic tests:
   installation + ``import slabbe`` tested to work on versions 8.7, 8.8, 9.0, 9.1, 9.2 of SageMath.
   All tests passed on versions 9.0, 9.1, 9.2 of SageMath.
