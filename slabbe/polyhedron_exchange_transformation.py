@@ -173,7 +173,7 @@ class PolyhedronExchangeTransformation(object):
             sage: t0
             Polyhedron Exchange Transformation of
             Polyhedron partition of 2 atoms with 2 letters
-            with translations {0: (1, 0), 1: (-phi + 1, 0)}
+            with translations {0: ..., 1: ...}
             sage: t0(p).vertices()
             (A vertex at (-phi + 3, phi - 1),
              A vertex at (-phi + 3, 1),
@@ -184,7 +184,7 @@ class PolyhedronExchangeTransformation(object):
             sage: t0.inverse()
             Polyhedron Exchange Transformation of
             Polyhedron partition of 2 atoms with 2 letters
-            with translations {0: (-1, 0), 1: (phi - 1, 0)}
+            with translations {0: ..., 1: ...}
             sage: t0(p) == p
             False
             sage: t0.inverse()(t0(p)) == p
@@ -215,11 +215,11 @@ class PolyhedronExchangeTransformation(object):
             sage: base = diagonal_matrix((phi^-2,1))
             sage: translation = vector((phi^-3, 0))
             sage: t3 = PET.toral_translation(base, translation)
-            sage: t3.domain().vertices()
-            (A vertex at (-phi + 2, 0),
-             A vertex at (-phi + 2, 1),
-             A vertex at (0, 0),
-             A vertex at (0, 1))
+            sage: sorted(t3.domain().vertices())
+            [A vertex at (0, 0),
+             A vertex at (0, 1),
+             A vertex at (-phi + 2, 0),
+             A vertex at (-phi + 2, 1)]
 
         The fundamental domain can be given as input. For example, it can
         be a translated copy of the base parallelotope::
