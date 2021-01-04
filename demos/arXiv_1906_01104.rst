@@ -86,12 +86,11 @@ the substitution `\beta_0` and the `\mathbb{Z}^2`-action `R_1` on `\mathbb{R}^2/
     sage: R1e1
     Polyhedron Exchange Transformation of
     Polyhedron partition of 2 atoms with 2 letters
-    with translations {0: (1, 0), 1: (-phi + 1, 0)}
+    with translations {0: ..., 1: ...}
     sage: R1e2
     Polyhedron Exchange Transformation of
     Polyhedron partition of 4 atoms with 4 letters
-    with translations {0: (phi - 1, -phi + 1), 1: (-1, -phi + 1), 
-                       2: (phi - 1, -phi + 2), 3: (-1, -phi + 2)}
+    with translations {0: ..., 1: ..., 2: ..., 3: ...}
     sage: P1
     Polyhedron partition of 30 atoms with 28 letters
     sage: beta0
