@@ -485,7 +485,7 @@ class _MCFAlgorithm_methods(object):
             sage: from slabbe.mult_cont_frac import Reverse, Brun
             sage: Reverse().invariant_measure_contour_plot(1000000, 80) # known bug
             <Figure size 640x480 with 1 Axes>
-            sage: Brun().invariant_measure_contour_plot(1000000, 40, norm=1)
+            sage: Brun().invariant_measure_contour_plot(1000000, 40, norm=1)  # known bug
             <Figure size 640x480 with 1 Axes>
 
         """
