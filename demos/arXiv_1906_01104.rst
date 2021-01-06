@@ -6,22 +6,22 @@ This file contains the Sage code contained in the preprints:
 
  - `arXiv:1906.01104v1`__, June 2019, 36 p.
  - `arXiv:1906.01104v2`__, May 2020, 40 p.
+ - `arXiv:1906.01104v3`__, January 2021, 40 p.
 
 __ https://arxiv.org/abs/1906.01104v1
 __ https://arxiv.org/abs/1906.01104v2
+__ https://arxiv.org/abs/1906.01104v3
 
 The Jupyter notebook ``arXiv_1906_01104.ipynb`` is created from
 ``arXiv_1906_01104.rst`` with the command ``sage -rst2ipynb
 arXiv_1906_01104.rst arXiv_1906_01104.ipynb`` plus few manual modifications to
-include the figures of partitions. 
-
-The file ``arXiv_1906_01104.rst`` is in the ``slabbe/demos`` directory of the
-optional SageMath package slabbe__.
+include the figures of partitions. The file ``arXiv_1906_01104.rst`` is in the
+``slabbe/demos`` directory of the optional SageMath package slabbe__.
 
 __ https://pypi.org/project/slabbe/
 
 Running all examples below with ``sage -t arXiv_1906_01104.rst`` takes 10
-seconds with sage-9.1 and slabbe-0.6.1.
+seconds with sage-9.1 and slabbe-0.6.1 (or with sage-9.2 and slabbe-0.6.2).
 
 First we construct the golden mean as a element of a quadratic number field
 because it is more efficient for arithmetic operations and comparisons:
