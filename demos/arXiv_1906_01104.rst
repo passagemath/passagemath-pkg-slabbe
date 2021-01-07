@@ -14,14 +14,18 @@ __ https://arxiv.org/abs/1906.01104v3
 
 The Jupyter notebook ``arXiv_1906_01104.ipynb`` is created from
 ``arXiv_1906_01104.rst`` with the command ``sage -rst2ipynb
-arXiv_1906_01104.rst arXiv_1906_01104.ipynb`` plus few manual modifications to
-include the figures of partitions. The file ``arXiv_1906_01104.rst`` is in the
-``slabbe/demos`` directory of the optional SageMath package slabbe__.
+arXiv_1906_01104.rst arXiv_1906_01104.ipynb``. The file
+``arXiv_1906_01104.rst`` is in the ``slabbe/demos`` directory of the optional
+SageMath package slabbe__.
 
 __ https://pypi.org/project/slabbe/
 
 Running all examples below with ``sage -t arXiv_1906_01104.rst`` takes 10
 seconds with sage-9.1 and slabbe-0.6.1 (or with sage-9.2 and slabbe-0.6.2).
+
+::
+
+    sage: %display latex           # not tested
 
 First we construct the golden mean as a element of a quadratic number field
 because it is more efficient for arithmetic operations and comparisons:
@@ -45,6 +49,8 @@ which is predefined in ``slabbe``:
     sage: P0 = jeandel_rao_wang_shift_partition()
     sage: P0
     Polyhedron partition of 24 atoms with 11 letters
+    sage: P0.plot()                    # optional long
+    Graphics object consisting of 145 graphics primitives
 
 We import polyhedron exchange transformations from the package:
 
@@ -87,12 +93,18 @@ the substitution `\beta_0` and the `\mathbb{Z}^2`-action `R_1` on `\mathbb{R}^2/
     Polyhedron Exchange Transformation of
     Polyhedron partition of 2 atoms with 2 letters
     with translations {0: ..., 1: ...}
+    sage: R1e1.plot()              # optional long
+    Graphics object consisting of 16 graphics primitives
     sage: R1e2
     Polyhedron Exchange Transformation of
     Polyhedron partition of 4 atoms with 4 letters
     with translations {0: ..., 1: ..., 2: ..., 3: ...}
+    sage: R1e2.plot()              # optional long
+    Graphics object consisting of 32 graphics primitives
     sage: P1
     Polyhedron partition of 30 atoms with 28 letters
+    sage: P1.plot()                    # optional long
+    Graphics object consisting of 186 graphics primitives
     sage: beta0
     Substitution 2d: {0: [[0, 9, 3, 7]], 1: [[0, 9, 7, 5]], 2: [[0, 9, 10, 4]], 3: [[1, 3, 3, 7]], 4: [[1, 3, 7, 6]], 5: [[1, 3, 8, 7]], 6: [[1, 7, 2, 5]], 7: [[1, 7, 5, 5]], 8: [[1, 7, 5, 6]], 9: [[1, 8, 7, 5]], 10: [[1, 8, 10, 4]], 11: [[1, 10, 4, 5]], 12: [[1, 10, 4, 6]], 13: [[0, 9, 3, 3, 7]], 14: [[0, 9, 3, 7, 6]], 15: [[0, 9, 3, 8, 7]], 16: [[0, 9, 7, 2, 5]], 17: [[0, 9, 7, 2, 6]], 18: [[0, 9, 7, 5, 5]], 19: [[0, 9, 7, 5, 6]], 20: [[0, 9, 8, 7, 5]], 21: [[0, 9, 8, 10, 4]], 22: [[0, 9, 10, 4, 6]], 23: [[1, 3, 3, 7, 6]], 24: [[1, 3, 8, 7, 6]], 25: [[1, 7, 2, 5, 6]], 26: [[1, 8, 10, 4, 6]], 27: [[1, 10, 4, 5, 6]]}
 
@@ -118,6 +130,8 @@ rotation on the torus `\mathbb{R^2}/\Gamma_2`.
     Polyhedron Exchange Transformation of
     Polyhedron partition of 2 atoms with 2 letters
     with translations {0: (0, -phi + 1), 1: (0, -phi + 2)}
+    sage: R2e2.plot()              # optional long
+    Graphics object consisting of 16 graphics primitives
 
 The following allows to compute the induced partition `\mathcal{P}_3` of `\mathbb{R}^2/\Gamma_3`,
 the substitution `\beta_2` and the `\mathbb{Z}^2`-action `R_3` on `\mathbb{R}^2/\Gamma_3`.
@@ -136,6 +150,8 @@ the substitution `\beta_2` and the `\mathbb{Z}^2`-action `R_3` on `\mathbb{R}^2/
     with translations {0: (-phi + 1, 0), 1: (-phi + 2, 0)}
     sage: P3
     Polyhedron partition of 21 atoms with 20 letters
+    sage: P3.plot()                    # optional long
+    Graphics object consisting of 129 graphics primitives
     sage: beta2
     Substitution 2d: {0: [[2]], 1: [[9]], 2: [[10]], 3: [[20]], 4: [[21]], 5: [[22]], 6: [[26]], 7: [[1], [0]], 8: [[6], [5]], 9: [[7], [4]], 10: [[8], [4]], 11: [[11], [3]], 12: [[12], [3]], 13: [[16], [15]], 14: [[17], [15]], 15: [[18], [14]], 16: [[19], [14]], 17: [[22], [13]], 18: [[25], [24]], 19: [[27], [23]]}
 
@@ -157,6 +173,8 @@ The following allows to compute the induced partition `\mathcal{P}_4` of
     with translations {0: (0, -phi + 1), 1: (0, -phi + 2)}
     sage: P4
     Polyhedron partition of 21 atoms with 20 letters
+    sage: P4.plot()                    # optional long
+    Graphics object consisting of 129 graphics primitives
     sage: beta3
     Substitution 2d: {0: [[8]], 1: [[9]], 2: [[10]], 3: [[15]], 4: [[16]], 5: [[18]], 6: [[19]], 7: [[7], [0]], 8: [[7], [2]], 9: [[8], [1]], 10: [[11], [2]], 11: [[12], [2]], 12: [[13], [3]], 13: [[14], [3]], 14: [[15], [5]], 15: [[15], [6]], 16: [[16], [5]], 17: [[16], [6]], 18: [[17], [4]], 19: [[19], [6]]}
 
@@ -175,6 +193,8 @@ The following allows to compute the induced partition `\mathcal{P}_5` of
     sage: R5e2,_ = R4e2.induced_transformation(y_le_phi_inv)
     sage: P5
     Polyhedron partition of 22 atoms with 22 letters
+    sage: P5.plot()                    # optional long
+    Graphics object consisting of 137 graphics primitives
     sage: beta4
     Substitution 2d: {0: [[3]], 1: [[4]], 2: [[5]], 3: [[6]], 4: [[12]], 5: [[13]], 6: [[14]], 7: [[15]], 8: [[18]], 9: [[4, 0]], 10: [[5, 0]], 11: [[5, 1]], 12: [[5, 2]], 13: [[6, 0]], 14: [[13, 8]], 15: [[14, 10]], 16: [[15, 10]], 17: [[16, 11]], 18: [[17, 9]], 19: [[17, 11]], 20: [[18, 7]], 21: [[19, 9]]}
 
@@ -187,6 +207,13 @@ We rescale the partition `\mathcal{P}_5`:
     sage: P5_scaled = (-phi*P5).translate((1,1))
     sage: R5e1_scaled = (-phi*R5e1).translate_domain((1,1))
     sage: R5e2_scaled = (-phi*R5e2).translate_domain((1,1))
+
+.. link
+
+::
+
+    sage: P5_scaled.plot()                  # optional long
+    Graphics object consisting of 137 graphics primitives
 
 The following allows to compute the induced partition `\mathcal{P}_6` of
 `\mathbb{R}^2/\Gamma_6`, the substitution `\beta_5` and the
@@ -202,6 +229,8 @@ The following allows to compute the induced partition `\mathcal{P}_6` of
     sage: R6e2,_ = R5e2_scaled.induced_transformation(x_le_phi_inv)
     sage: P6
     Polyhedron partition of 18 atoms with 18 letters
+    sage: P6.plot()                    # optional long
+    Graphics object consisting of 111 graphics primitives
     sage: beta5
     Substitution 2d: {0: [[8]], 1: [[14]], 2: [[17]], 3: [[20]], 4: [[4], [1]], 5: [[5], [1]], 6: [[6], [3]], 7: [[7], [2]], 8: [[8], [0]], 9: [[14], [9]], 10: [[15], [13]], 11: [[16], [10]], 12: [[16], [11]], 13: [[17], [13]], 14: [[18], [12]], 15: [[19], [10]], 16: [[19], [11]], 17: [[21], [12]]}
 
@@ -218,6 +247,8 @@ The following allows to compute the induced partition `\mathcal{P}_7` of
     sage: R7e2,_ = R6e2.induced_transformation(y_le_phi_inv)
     sage: P7
     Polyhedron partition of 21 atoms with 21 letters
+    sage: P7.plot()                    # optional long
+    Graphics object consisting of 133 graphics primitives
     sage: beta6
     Substitution 2d: {0: [[1]], 1: [[2]], 2: [[3]], 3: [[12]], 4: [[13]], 5: [[14]], 6: [[15]], 7: [[16]], 8: [[17]], 9: [[1, 0]], 10: [[2, 0]], 11: [[3, 0]], 12: [[9, 8]], 13: [[10, 4]], 14: [[11, 4]], 15: [[12, 6]], 16: [[13, 5]], 17: [[13, 8]], 18: [[14, 7]], 19: [[15, 5]], 20: [[17, 7]]}
 
@@ -230,6 +261,13 @@ We rescale the partition `\mathcal{P}_7`:
     sage: P7_scaled = (-phi*P7).translate((1,1))
     sage: R7e1_scaled = (-phi*R7e1).translate_domain((1,1))
     sage: R7e2_scaled = (-phi*R7e2).translate_domain((1,1))
+
+.. link
+
+::
+
+    sage: P7_scaled.plot()                  # optional long
+    Graphics object consisting of 133 graphics primitives
 
 The following allows to compute the induced partition `\mathcal{P}_8` of
 `\mathbb{R}^2/\Gamma_8`, the substitution `\beta_7` and the
@@ -244,6 +282,8 @@ The following allows to compute the induced partition `\mathcal{P}_8` of
     sage: R8e2,_ = R7e2_scaled.induced_transformation(x_le_phi_inv)
     sage: P8
     Polyhedron partition of 19 atoms with 19 letters
+    sage: P8.plot()                    # optional long
+    Graphics object consisting of 119 graphics primitives
     sage: beta7
     Substitution 2d: {0: [[5]], 1: [[8]], 2: [[14]], 3: [[15]], 4: [[18]], 5: [[20]], 6: [[3], [1]], 7: [[4], [2]], 8: [[5], [1]], 9: [[6], [0]], 10: [[7], [1]], 11: [[8], [1]], 12: [[12], [11]], 13: [[13], [11]], 14: [[14], [9]], 15: [[15], [10]], 16: [[16], [11]], 17: [[17], [11]], 18: [[19], [9]]}
 
@@ -261,6 +301,8 @@ The following allows to compute the induced partition `\mathcal{P}_9` of
     sage: R9e2,_ = R8e2.induced_transformation(y_le_phi_inv)
     sage: P9
     Polyhedron partition of 21 atoms with 21 letters
+    sage: P9.plot()                    # optional long
+    Graphics object consisting of 135 graphics primitives
     sage: beta8
     Substitution 2d: {0: [[2]], 1: [[3]], 2: [[4]], 3: [[12]], 4: [[13]], 5: [[14]], 6: [[16]], 7: [[17]], 8: [[2, 0]], 9: [[3, 1]], 10: [[4, 1]], 11: [[5, 1]], 12: [[12, 7]], 13: [[13, 6]], 14: [[14, 6]], 15: [[14, 8]], 16: [[15, 11]], 17: [[16, 9]], 18: [[16, 10]], 19: [[17, 7]], 20: [[18, 10]]}
 
@@ -273,6 +315,13 @@ We rescale the partition `\mathcal{P}_9`:
     sage: P9_scaled = (-phi*P9).translate((1,1))
     sage: R9e1_scaled = (-phi*R9e1).translate_domain((1,1))
     sage: R9e2_scaled = (-phi*R9e2).translate_domain((1,1))
+
+.. link
+
+::
+
+    sage: P9_scaled.plot()                  # optional long
+    Graphics object consisting of 135 graphics primitives
 
 The following allows to compute the induced partition `\mathcal{P}_{10}` of
 `\mathbb{R}^2/\Gamma_{10}`, the substitution `\beta_9` and the
@@ -287,6 +336,8 @@ The following allows to compute the induced partition `\mathcal{P}_{10}` of
     sage: R10e2,_ = R9e2_scaled.induced_transformation(x_le_phi_inv)
     sage: P10
     Polyhedron partition of 19 atoms with 19 letters
+    sage: P10.plot()                    # optional long
+    Graphics object consisting of 119 graphics primitives
     sage: beta9
     Substitution 2d: {0: [[3]], 1: [[7]], 2: [[12]], 3: [[17]], 4: [[18]], 5: [[19]], 6: [[3], [0]], 7: [[4], [0]], 8: [[4], [1]], 9: [[5], [2]], 10: [[6], [0]], 11: [[7], [0]], 12: [[13], [9]], 13: [[14], [10]], 14: [[15], [10]], 15: [[16], [11]], 16: [[17], [8]], 17: [[18], [9]], 18: [[20], [10]]}
 
@@ -327,6 +378,13 @@ We may check that the self-similarity for `\mathcal{P}_8` satisfies
     sage: betaU = Substitution2d({0: [[17]], 1: [[16]], 2: [[15], [11]], 3: [[13], [9]], 4: [[17], [8]], 5: [[16], [8]], 6: [[15], [8]], 7: [[14], [8]], 8: [[14, 6]], 9: [[17, 3]], 10: [[16, 3]], 11: [[14, 2]], 12: [[15, 7], [11, 1]], 13: [[14, 6], [11, 1]], 14: [[13, 7], [9, 1]], 15: [[12, 6], [9, 1]], 16: [[18, 5], [10, 1]], 17: [[13, 4], [9, 1]], 18: [[14, 2], [8, 0]]})
     sage: zeta.inverse()*beta8*beta9*tau*zeta  == betaU
     True
+
+.. link
+
+::
+
+    sage: betaU
+    Substitution 2d: {0: [[17]], 1: [[16]], 2: [[15], [11]], 3: [[13], [9]], 4: [[17], [8]], 5: [[16], [8]], 6: [[15], [8]], 7: [[14], [8]], 8: [[14, 6]], 9: [[17, 3]], 10: [[16, 3]], 11: [[14, 2]], 12: [[15, 7], [11, 1]], 13: [[14, 6], [11, 1]], 14: [[13, 7], [9, 1]], 15: [[12, 6], [9, 1]], 16: [[18, 5], [10, 1]], 17: [[13, 4], [9, 1]], 18: [[14, 2], [8, 0]]}
 
 Observe that the `19 \times 19` incidence matrix of `\beta_8\beta_9\tau` is not
 hyperbolic but, as shown by its characteristic polynomial, it is hyperbolic on
