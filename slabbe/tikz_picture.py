@@ -759,6 +759,29 @@ class TikzPicture(StandaloneTex):
             ....:                               subgraph_clusters=C)
             sage: _ = tikz.pdf()      # not tested
 
+        An example coming from ``graphviz_string`` documentation in SageMath::
+
+            sage: f(x) = -1 / x
+            sage: g(x) = 1 / (x + 1)
+            sage: G = DiGraph()
+            sage: G.add_edges((i, f(i), f) for i in (1, 2, 1/2, 1/4))
+            sage: G.add_edges((i, g(i), g) for i in (1, 2, 1/2, 1/4))
+            sage: t = TikzPicture.from_graph(G)
+            sage: _ = tikz.pdf()      # not tested
+            sage: def edge_options(data):
+            ....:     u, v, label = data
+            ....:     options = {"color": {f: "red", g: "blue"}[label]}
+            ....:     if (u,v) == (1/2, -2): options["label"]       = "coucou"; options["label_style"] = "string"
+            ....:     if (u,v) == (1/2,2/3): options["dot"]         = "x=1,y=2"
+            ....:     if (u,v) == (1,   -1): options["label_style"] = "latex"
+            ....:     if (u,v) == (1,  1/2): options["edge_string"] = "<-"
+            ....:     if (u,v) == (1/2,  1): options["backward"]    = True
+            ....:     return options
+            sage: t = TikzPicture.from_graph(G, edge_options=edge_options)
+            sage: _ = tikz.pdf()      # not tested
+
+        .. TODO:: improve the previous example
+
         """
         from sage.misc.latex import have_pdflatex
         assert have_pdflatex(), "pdflatex does not seem to be installed"
