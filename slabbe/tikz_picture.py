@@ -624,6 +624,56 @@ class TikzPicture(StandaloneTex):
         sage: _ = t.pdf(view=False)   # long time (2s)
     """
     @classmethod
+    def from_dot_string(cls, dotdata, prog='dot'):
+        r"""
+        Convert a graph to a tikzpicture using graphviz and dot2tex.
+
+        .. NOTE::
+
+            Prerequisite: dot2tex optional Sage package and graphviz must be
+            installed.
+
+        INPUT:
+
+        - ``dotdata`` -- dot format string
+        - ``prog`` -- string (default: ``'dot'``) the program used for the
+          layout corresponding to one of the software of the graphviz
+          suite: 'dot', 'neato', 'twopi', 'circo' or 'fdp'.
+
+        EXAMPLES::
+
+            sage: from slabbe import TikzPicture
+            sage: G = graphs.PetersenGraph()
+            sage: dotdata = G.graphviz_string()
+            sage: tikz = TikzPicture.from_dot_string(dotdata) # optional dot2tex # long time (3s)
+            sage: _ = tikz.pdf()      # not tested
+            sage: dotdata = G.graphviz_string(labels='latex')
+            sage: tikz = TikzPicture.from_dot_string(dotdata) # optional dot2tex # long time (3s)
+            sage: _ = tikz.pdf()      # not tested
+
+        ::
+
+            sage: W = CoxeterGroup(["A",2])
+            sage: G = W.cayley_graph()
+            sage: dotdata = G.graphviz_string()
+            sage: tikz = TikzPicture.from_dot_string(dotdata) # optional dot2tex # long time (3s)
+            sage: _ = tikz.pdf()      # not tested
+            sage: dotdata = G.graphviz_string(labels='latex')
+            sage: tikz = TikzPicture.from_dot_string(dotdata) # optional dot2tex # long time (3s)
+            sage: _ = tikz.pdf()      # not tested
+
+        """
+        import dot2tex
+        tikz = dot2tex.dot2tex(dotdata,
+                               format='tikz',
+                               autosize=True,
+                               crop=True,
+                               figonly='True',
+                               prog=prog).strip()
+        return TikzPicture(tikz, standalone_options=["border=4mm"],
+                           usetikzlibrary=['shapes'])
+
+    @classmethod
     def from_graph(cls, graph, merge_multiedges=True,
             merge_label_function=tuple, **kwds):
         r"""
