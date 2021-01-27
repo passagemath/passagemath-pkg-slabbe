@@ -499,6 +499,127 @@ class WangTileSet(object):
             tiles.append(tile)
         return WangTileSet(tiles)
 
+    def rotate(self, i=1):
+        r"""
+        Return the rotated copy of the tiles by a clockwise rotation.
+
+        INPUT:
+
+        - ``i`` -- integer (default:1), number of quarter turns.
+
+        EXAMPLES::
+
+            sage: from slabbe import WangTileSet
+            sage: tiles = [(0,1,2,3)]
+            sage: T = WangTileSet(tiles)
+            sage: T.rotate()
+            Wang tile set of cardinality 1
+
+        ::
+
+            sage: T.rotate().tiles()
+            [(1, 2, 3, 0)]
+            sage: T.rotate(i=2).tiles()
+            [(2, 3, 0, 1)]
+            sage: T.rotate(i=3).tiles()
+            [(3, 0, 1, 2)]
+
+        TESTS::
+
+            sage: T.rotate(i=4).tiles()
+            [(0, 1, 2, 3)]
+            sage: T.rotate(i=7).tiles()
+            [(3, 0, 1, 2)]
+            sage: T.rotate(i=-3).tiles()
+            [(1, 2, 3, 0)]
+
+        """
+        i = i % 4
+        tiles = []
+        for tile in self:
+            tiles.append(tile[i:]+tile[:i])
+        return WangTileSet(tiles)
+
+
+    def union(self, other):
+        r"""
+        Return the union of two wang tile sets.
+
+        INPUT:
+
+        - ``other`` -- WangTileSet
+
+        EXAMPLES::
+
+            sage: from slabbe import WangTileSet
+            sage: tiles_A = ['ABCD', 'EFGH', 'AXCY', 'ABAB']
+            sage: A = WangTileSet(tiles_A)
+            sage: tiles_B = ['ABCD', 'XYZW']
+            sage: B = WangTileSet(tiles_B)
+            sage: A.union(B)
+            Wang tile set of cardinality 5
+            sage: A.union(B).tiles()
+            [('A', 'B', 'A', 'B'),
+             ('A', 'B', 'C', 'D'),
+             ('A', 'X', 'C', 'Y'),
+             ('E', 'F', 'G', 'H'),
+             ('X', 'Y', 'Z', 'W')]
+
+        """
+        if not isinstance(other, WangTileSet):
+            raise TypeError('other(={}) must be a'
+                    ' WangTileSet'.format(other))
+
+        s = set(tuple(tile) for tile in self)
+        t = set(tuple(tile) for tile in other)
+        return WangTileSet(sorted(s|t))
+
+    def closure_under_rotation(self):
+        r"""
+        Return the closure of the set of Wang tiles under rotations.
+
+        EXAMPLES::
+
+            sage: from slabbe import WangTileSet
+            sage: tiles = [(0,1,2,3)]
+            sage: T = WangTileSet(tiles)
+            sage: T.closure_under_rotation()
+            Wang tile set of cardinality 4
+            sage: _.tiles()
+            [(0, 1, 2, 3), (1, 2, 3, 0), (2, 3, 0, 1), (3, 0, 1, 2)]
+
+        """
+        T1 = self.rotate(1)
+        T2 = self.rotate(2)
+        T3 = self.rotate(3)
+        return self.union(T1).union(T2).union(T3)
+
+    def closure_under_symmetries(self):
+        r"""
+        Return the closure of the set of Wang tiles under symmetries.
+
+        EXAMPLES::
+
+            sage: from slabbe import WangTileSet
+            sage: tiles = [(0,1,2,3)]
+            sage: T = WangTileSet(tiles)
+            sage: T.closure_under_symmetries()
+            Wang tile set of cardinality 8
+            sage: _.tiles()
+            [(0, 1, 2, 3),
+             (0, 3, 2, 1),
+             (1, 0, 3, 2),
+             (1, 2, 3, 0),
+             (2, 1, 0, 3),
+             (2, 3, 0, 1),
+             (3, 0, 1, 2),
+             (3, 2, 1, 0)]
+
+        """
+        A = self.closure_under_rotation()
+        B = self.dual().closure_under_rotation()
+        return A.union(B)
+
     def to_transducer(self):
         r"""
         EXAMPLES::
