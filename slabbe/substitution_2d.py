@@ -8,8 +8,32 @@ EXAMPLES::
     sage: A = [[0,1],[2,3]]
     sage: B = [[4,5]]
     sage: d = {0:A, 1:B}
-    sage: Substitution2d(d)
+    sage: s = Substitution2d(d)
+    sage: s
     Substitution 2d: {0: [[0, 1], [2, 3]], 1: [[4, 5]]}
+
+Notice here that we are using **Cartesian-like coordinates** as opposed to
+matrix-like coordinates::
+
+    sage: image = s([[0]])
+    sage: image
+    [[0, 1], [2, 3]]
+    sage: x = 1
+    sage: y = 0
+    sage: image[x][y]
+    2
+
+Computing the image of a 2-dimensional word::
+
+    sage: A = [[0,1],[2,3]]
+    sage: B = [[4,5],[6,7]]
+    sage: C = [[8,9]]
+    sage: d = {0:A, 1:B, 2:C}
+    sage: s = Substitution2d(d)
+    sage: table = [[0,1],[1,1]]
+    sage: s(table)
+    [[0, 1, 4, 5], [2, 3, 6, 7], [4, 5, 4, 5], [6, 7, 6, 7]]
+
 """
 #*****************************************************************************
 #       Copyright (C) 2017 Sebastien Labbe <slabqc@gmail.com>
@@ -42,6 +66,33 @@ class Substitution2d(object):
         sage: s = Substitution2d(d)
         sage: s
         Substitution 2d: {0: [[0, 1], [2, 3]], 1: [[4, 5]]}
+
+    Computing the iterative images of a letter under a 2-dimensional
+    substitution::
+
+        sage: A = [[0,1],[2,0]]
+        sage: B = [[2,1],[2,0]]
+        sage: C = [[1,2],[1,1]]
+        sage: d = {0:A, 1:B, 2:C}
+        sage: s = Substitution2d(d)
+        sage: s([[0]])
+        [[0, 1], [2, 0]]
+        sage: s([[0]], 2)
+        [[0, 1, 2, 1], [2, 0, 2, 0], [1, 2, 0, 1], [1, 1, 2, 0]]
+        sage: s([[0]], 3)
+        [[0, 1, 2, 1, 1, 2, 2, 1],
+        [2, 0, 2, 0, 1, 1, 2, 0],
+        [1, 2, 0, 1, 1, 2, 0, 1],
+        [1, 1, 2, 0, 1, 1, 2, 0],
+        [2, 1, 1, 2, 0, 1, 2, 1],
+        [2, 0, 1, 1, 2, 0, 2, 0],
+        [2, 1, 2, 1, 1, 2, 0, 1],
+        [2, 0, 2, 0, 1, 1, 2, 0]]
+
+    Computing the product of two 2-dimensional substitutions:
+
+        sage: t = s*s
+
     """
     def __init__(self, d):
         r"""
