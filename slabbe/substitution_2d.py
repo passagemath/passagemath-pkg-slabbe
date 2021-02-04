@@ -89,6 +89,26 @@ class Substitution2d(object):
         """
         return isinstance(other, Substitution2d) and self._d == other._d
 
+    def __hash__(self):
+        r"""
+        INPUT:
+
+        - ``other`` -- substitution 2d
+
+        EXAMPLES::
+
+            sage: from slabbe import Substitution2d
+            sage: A = [[0,1],[2,3]]
+            sage: B = [[4,5]]
+            sage: d = {0:A, 1:B}
+            sage: s = Substitution2d(d)
+            sage: hash(s) in ZZ
+            True
+        """
+        sorted_items = tuple(sorted((key,tuple(tuple(column) for column in val))
+                                    for (key,val) in self._d.items()))
+        return hash(sorted_items)
+
     def _latex_(self, ncolumns=8, align='l', variableA=None,
             variableB=None):
         r"""
