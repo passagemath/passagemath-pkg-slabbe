@@ -3804,8 +3804,13 @@ class WangTiling(object):
             L.insert(0, row)
         return L
 
-    def to_image(self):
+    def to_image(self, color_dict=None):
         r"""
+        INPUT:
+
+        - ``color_dict`` -- dict (default:``None``) letters to RGB colors
+          (tuple of 3 int), if ``None``, random colors are chosen
+
         EXAMPLES::
 
             sage: from slabbe import WangTiling
@@ -3815,23 +3820,36 @@ class WangTiling(object):
             sage: img = tiling.to_image()
             sage: img
             <PIL.Image.Image image mode=RGB size=3x4 at ...>
-            sage: img.resize((100,100)).show()     # not tested
+
+        Resize the result when too small::
+
+            sage: import PIL
+            sage: img.resize((100,100), resample=PIL.Image.NEAREST).show()     # not tested
+
+        Specify the colors::
+
+            sage: color_dict = {0:[255,255,255], 1:[0,0,0]}
+            sage: img = tiling.to_image(color_dict)
+            sage: img
+            <PIL.Image.Image image mode=RGB size=3x4 at ...>
 
         """
-        # Chose a random color for each tiles
-        from random import randrange
-        from collections import defaultdict
-        def random_color():
-                return (randrange(255),randrange(255),randrange(255))
-        color_dict = defaultdict(random_color)
-        color_dict[None] = [0,0,0] # black (=0) as the color for None
+        if color_dict is None:
+            # Chose a random color for each tiles
+            from random import randrange
+            from collections import defaultdict
+            def random_color():
+                    return (randrange(255),randrange(255),randrange(255))
+            color_dict = defaultdict(random_color)
+        if not None in color_dict:
+            color_dict[None] = [0,0,0] # black (=0) as the color for None
 
         # Create the image
         import numpy as np
         from PIL import Image
         data = [tuple(color_dict[a] for a in row) for row in self.rows()]
         data = np.array(data, dtype=np.uint8)
-        return Image.fromarray(data)#.resize((100,100))
+        return Image.fromarray(data)#.resize((100,100), resample=PIL.Image.NEAREST)
 
     def transpose(self):
         r"""
