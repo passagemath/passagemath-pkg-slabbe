@@ -329,6 +329,13 @@ class kFace(SageObject):
             Patch: 2[(0, 0, 0), (2, 3)]
             sage: F + F + F
             Patch: 3[(0, 0, 0), (2, 3)]
+
+        TESTS:
+
+        This use to be a bug::
+
+            sage: kFace((0,0,0),(1,2)) + kFace((0,0,1),(3,1)) + kFace((13,23,34),(1,1))
+            Patch: 1[(0, 0, 0), (1, 2)] + -1[(0, 0, 1), (1, 3)]
         """
         if isinstance(other, kFace):
             return kPatch([self, other])
