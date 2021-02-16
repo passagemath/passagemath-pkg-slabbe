@@ -412,6 +412,16 @@ def Minkowski_embedding_without_sqrt2(self, B=None, prec=None):
     This method is a modification of the ``Minkowski_embedding`` method of
     NumberField in sage (without sqrt2).
 
+    INPUT:
+
+    - ``self`` -- number field
+    - ``B`` -- vector (default:``None``), the basis. If ``None``, the
+      default basis is `\{1,\alpha, ..., \alpha^{n-1}\}`.
+    - ``prec`` -- integer (default:``None``), the precision. The
+      computations will use ``RealField(prec)`` or ``RDF`` if ``prec`` is
+      ``None`` or the field of algebraic numbers ``QQbar`` (or it subfield
+      ``AA`` of algebraic reals) if ``prec`` is infinity.
+
     EXAMPLES::
 
         sage: from slabbe.matrices import Minkowski_embedding_without_sqrt2
@@ -432,6 +442,13 @@ def Minkowski_embedding_without_sqrt2(self, B=None, prec=None):
         [0.740078950105127]
         [ 2.62996052494744]
         [ 1.09112363597172]
+
+    The input vector may have arbitrary length::
+
+        sage: Minkowski_embedding_without_sqrt2(F, [1, alpha, alpha^2, 1-alpha])
+        [  1.00000000000000  -1.25992104989487   1.58740105196820  2.25992104989487]
+        [  1.00000000000000  0.629960524947437 -0.793700525984099 0.370039475052563]
+        [ 0.000000000000000   1.09112363597172   1.37472963699860 -1.09112363597172]
 
     Tribo::
 
@@ -478,40 +495,107 @@ def Minkowski_embedding_without_sqrt2(self, B=None, prec=None):
     from sage.matrix.constructor import matrix
     return matrix(rows)
 
-def Minkowski_projection_pair(self, B=None, prec=None):
+def Minkowski_projection_triple(self, B=None, prec=None):
     r"""
-    Return the projections to the expanding and contracting spaces.
+    Return the projections to the expanding, contracting and neutral spaces.
+
+    It describes the images of the vectors in ``B`` as matrix columns.
+
+    INPUT:
+
+    - ``self`` -- number field
+    - ``B`` -- vector (default:``None``), the basis. If ``None``, the
+      default basis is `\{1,\alpha, ..., \alpha^{n-1}\}`.
+    - ``prec`` -- integer (default:``None``), the precision. The
+      computations will use ``RealField(prec)`` or ``RDF`` if ``prec`` is
+      ``None`` or the field of algebraic numbers ``QQbar`` (or it subfield
+      ``AA`` of algebraic reals) if ``prec`` is infinity.
 
     OUTPUT:
-
-    - tuple (A, B) of matrices
+    
+    - tuple (P, Q, R) of matrices giving the projection to the expanding,
+      contracting and neutral eigenspaces respectively.
 
     EXAMPLES::
 
-        sage: from slabbe.matrices import Minkowski_projection_pair
+        sage: from slabbe.matrices import Minkowski_projection_triple
         sage: F.<alpha> = NumberField(x^3+2)
-        sage: Minkowski_projection_pair(F)
+        sage: Minkowski_projection_triple(F)
         (
         [  1.00000000000000  -1.25992104989487   1.58740105196820]
         [  1.00000000000000  0.629960524947437 -0.793700525984099]
-        [ 0.000000000000000   1.09112363597172   1.37472963699860], []
+        [ 0.000000000000000   1.09112363597172   1.37472963699860], [], []
         )
-        sage: Minkowski_projection_pair(F, [1, alpha+2, alpha^2-alpha])
+        sage: Minkowski_projection_triple(F, [1, alpha+2, alpha^2-alpha])
         (
         [ 1.00000000000000 0.740078950105127  2.84732210186307]
         [ 1.00000000000000  2.62996052494744 -1.42366105093154]
-        [0.000000000000000  1.09112363597172 0.283606001026881], []
+        [0.000000000000000  1.09112363597172 0.283606001026881], [], []
+        )
+
+    The input vector may have arbitrary length::
+
+        sage: Minkowski_projection_triple(F, [1, alpha, alpha^2, 1-alpha])
+        (
+        [  1.00000000000000  -1.25992104989487   1.58740105196820   2.25992104989487]
+        [  1.00000000000000  0.629960524947437 -0.793700525984099  0.370039475052563]
+        [ 0.000000000000000   1.09112363597172   1.37472963699860  -1.09112363597172],
+        [],
+        []
         )
 
     Tribo::
 
         sage: F.<beta> = NumberField(x^3-x^2-x-1)
-        sage: Minkowski_projection_pair(F)
+        sage: Minkowski_projection_triple(F)
         (
         [1.000000000000000000000000000000 1.839286755214161132551852564671
         3.382975767906237494122708536521],
         [  1.00000000000000 -0.419643377607080 -0.191487883953119]
-        [ 0.000000000000000  0.606290729207199 -0.508851778832738]
+        [ 0.000000000000000  0.606290729207199 -0.508851778832738], []
+        )
+
+    Tribo, projection in the field of algebraic numbers with ``prec=oo``::
+
+        sage: Minkowski_projection_triple(F, prec=oo)
+        (
+        [                 1 1.839286755214161? 3.382975767906238?],
+        <BLANKLINE>
+        [                   1 -0.4196433776070806? -0.1914878839531188?]
+        [                   0  0.6062907292071993? -0.5088517788327380?],
+        <BLANKLINE>
+        []
+        )
+
+    ::
+
+        sage: F.<alpha> = NumberField(x^3-x-1)
+        sage: Minkowski_projection_triple(F)
+        (
+        [1.000000000000000000000000000000 1.324717957244746025960912521898 1.754877666246692760049518612953],
+        [  1.00000000000000 -0.662358978622373  0.122561166876654]
+        [ 0.000000000000000  0.562279512062301 -0.744861766619744], []
+        )
+
+    With neutral eigenvalues. Notice that if the precision is too low,
+    some roots on the unit circle are wrongly considered strictly inside,
+    thus contracting. One must increase the precision in this case::
+
+        sage: F.<alpha> = NumberField(x^2-x+1)
+        sage: Minkowski_projection_triple(F)     # gives wrong result due to low precision
+        (
+            [ 1.00000000000000 0.500000000000000]
+        [], [0.000000000000000 0.866025403784439], []
+        )
+        sage: Minkowski_projection_triple(F, prec=60)
+        (
+                [ 1.0000000000000000 0.50000000000000000]
+        [], [], [0.00000000000000000 0.86602540378443865]
+        )
+        sage: Minkowski_projection_triple(F, prec=oo)
+        (
+                [                   1 0.50000000000000000?]
+        [], [], [                   0   0.866025403784439?]
         )
 
     """
@@ -524,6 +608,7 @@ def Minkowski_projection_pair(self, B=None, prec=None):
 
     rows_expanding = []
     rows_contracting = []
+    rows_neutral = []
 
     for i in range(r):
         place = places[i]
@@ -534,7 +619,7 @@ def Minkowski_projection_pair(self, B=None, prec=None):
         elif norm > 1:
             rows_expanding.append(row)
         else:
-            raise NotImplementedError
+            rows_neutral.append(row)
 
     for i in range(s):
         place = places[r+i]
@@ -552,11 +637,13 @@ def Minkowski_projection_pair(self, B=None, prec=None):
             rows_expanding.append(row_real)
             rows_expanding.append(row_imag)
         else:
-            raise NotImplementedError
+            rows_neutral.append(row_real)
+            rows_neutral.append(row_imag)
 
     from sage.matrix.constructor import matrix
-    return (matrix(len(rows_expanding), self.degree(), rows_expanding),
-            matrix(len(rows_contracting), self.degree(), rows_contracting))
+    return (matrix(rows_expanding),
+            matrix(rows_contracting),
+            matrix(rows_neutral))
 
 def rauzy_projection(M, beta=None, prec=53):
     r"""
