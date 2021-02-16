@@ -28,6 +28,7 @@ Dynamical systems
    substitution_2d
    coding_of_PETs
    graph_directed_IFS
+   EkEkstar
 
 Combinatorics
 -------------
