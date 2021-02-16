@@ -44,6 +44,8 @@ from .graph_directed_IFS import GraphDirectedIteratedFunctionSystem
 
 from .beta_numeration_system import BetaTransformation
 
+from .EkEkstar import kFace, kPatch, GeoSub
+
 # BUG (sometimes, cython code does not work properly)
 try:
     from .kolakoski_word import KolakoskiWord
