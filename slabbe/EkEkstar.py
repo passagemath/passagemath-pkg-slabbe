@@ -51,7 +51,7 @@ The Tribonacci example::
     ....:             kFace((0,0,0),(3,1),dual=True)])
     sage: Q = geosub(P, 6)
     sage: Q
-    Patch of 47 faces
+    Patch of 32 faces
     sage: _ = Q.plot()
     sage: Q.projection_matrix()
     [  1.00000000000000  -1.41964337760708 -0.771844506346038]
@@ -67,7 +67,7 @@ Hokaido example::
     Patch: 1[(0, 0, 0, 0, 0), (1, 2, 3)]*
     sage: Q = geosub(P, 5)
     sage: Q
-    Patch: -1[(1, 1, 0, 0, 0), (1, 2, 4)]* + 1[(1, 1, 0, 0, 0), (1, 2, 5)]* + 1[(1, 1, 0, 0, 0), (1, 2, 3)]*
+    Patch: 1[(1, 1, 0, 0, 0), (1, 2, 3)]* + -1[(1, 1, 0, 0, 0), (1, 2, 4)]* + 1[(1, 1, 0, 0, 0), (1, 2, 5)]*
     sage: _ = Q.plot()
     sage: Q.projection_matrix()
     [  1.00000000000000  -1.66235897862237  0.784920145499027 0.215079854500973 -0.877438833123346]
@@ -84,7 +84,7 @@ Hokaido example::
 #
 #                  http://www.gnu.org/licenses/
 #*****************************************************************************
-from itertools import product, combinations
+import itertools
 from collections import Counter
 from numpy import argsort
 from sage.misc.cachefunc import cached_method
@@ -175,7 +175,7 @@ class kFace(SageObject):
         if color is not None:
             self._color = Color(color)
         else:
-            sorted_types = list(combinations(range(1,len(v)+1),len(self._type)))
+            sorted_types = list(itertools.combinations(range(1,len(v)+1),len(self._type)))
             Col = rainbow(len(sorted_types))
             D = dict(zip(sorted_types,Col))
             self._color = Color(D.get(self.sorted_type(), 'black'))
@@ -578,7 +578,7 @@ class kPatch(SageObject):
         ....:             kFace((0,1,0),(2,1),dual=True),
         ....:             kFace((0,0,0),(3,1),dual=True)])
         sage: P
-        Patch: 1[(0, 0, 0), (1, 2)]* + 1[(0, 0, 1), (1, 3)]* + -1[(0, 1, 0), (1, 2)]* + -1[(0, 0, 0), (1, 3)]*
+        Patch: 1[(0, 0, 0), (1, 2)]* + -1[(0, 0, 0), (1, 3)]* + 1[(0, 0, 1), (1, 3)]* + -1[(0, 1, 0), (1, 2)]*
     """
     def __init__(self, faces):
         r"""
@@ -712,7 +712,7 @@ class kPatch(SageObject):
             sage: P * 2
             Traceback (most recent call last):
             ...
-            TypeError: unsupported operand parent(s) for *: '<class 'EkEkstar.EkEkstar.kPatch'>' and 'Integer Ring'
+            TypeError: unsupported operand parent(s) for *: '<class '...EkEkstar.kPatch'>' and 'Integer Ring'
 
         """
         D = {f:coeff*m for (f,m) in self._faces.items()}
@@ -740,9 +740,9 @@ class kPatch(SageObject):
             sage: from slabbe import kPatch, kFace
             sage: P = kPatch([kFace((0,1,0),(1,2)), kFace((0,0,0),(1,3))])
             sage: P
-            Patch: 1[(0, 1, 0), (1, 2)] + 1[(0, 0, 0), (1, 3)]
+            Patch: 1[(0, 0, 0), (1, 3)] + 1[(0, 1, 0), (1, 2)]
             sage: P.dual()
-            Patch: 1[(0, 1, 0), (1, 2)]* + 1[(0, 0, 0), (1, 3)]*
+            Patch: 1[(0, 0, 0), (1, 3)]* + 1[(0, 1, 0), (1, 2)]*
 
         """
         D = {f.dual():m for (f,m) in self._faces.items()}
@@ -810,7 +810,7 @@ class kPatch(SageObject):
             ....:             kFace((0,1,0),(2,1),dual=True),
             ....:             kFace((0,0,0),(3,1),dual=True)])
             sage: P
-            Patch: 1[(0, 0, 0), (1, 2)]* + 1[(0, 0, 1), (1, 3)]* + -1[(0, 1, 0), (1, 2)]* + -1[(0, 0, 0), (1, 3)]*
+            Patch: 1[(0, 0, 0), (1, 2)]* + -1[(0, 0, 0), (1, 3)]* + 1[(0, 0, 1), (1, 3)]* + -1[(0, 1, 0), (1, 2)]*
 
         With multiplicity::
 
@@ -934,29 +934,23 @@ def ps_automaton(sub, presuf):
     EXAMPLES::
 
         sage: from slabbe.EkEkstar import ps_automaton
-        sage: m = {2:[2,1,1], 1:[2,1]}
+        sage: m = {1:[2,1], 2:[2,1,1]}
         sage: ps_automaton(m, "prefix")
         {1: [(2, []), (1, [2])], 2: [(2, []), (1, [2]), (1, [2, 1])]}
         sage: ps_automaton(m, 'suffix')
         {1: [(2, [1]), (1, [])], 2: [(2, [1, 1]), (1, [1]), (1, [])]}
 
-    .. TODO::
-
-        Improve how it is coded.
-
     """
     d = {}
-    v = list(sub.values())
-    for i in range(len(v)):
+    for key,value in sub.items():
         L = []
-        for j in range(len(v[i])):
+        for j,letter in enumerate(value):
             if presuf == "prefix":
-                L.append((v[i][j],sub[i+1][0:j]))
+                L.append((letter, value[:j]))
             elif presuf == "suffix":
-                L.append((v[i][j],sub[i+1][j+1:len(v[i])])) 
-        d[i+1] = L  
+                L.append((letter, value[j+1:])) 
+        d[key] = L  
     return d             
-                  
 
 def ps_automaton_inverted(sub, presuf):
     r"""
@@ -980,19 +974,20 @@ def ps_automaton_inverted(sub, presuf):
         sage: ps_automaton_inverted(m, "prefix")
         {1: [(1, [2]), (2, [2]), (2, [2, 1])], 2: [(1, []), (2, [])]}
         sage: ps_automaton_inverted(m, 'suffix')
-        {1: [(1, []), (2, [1]), (2, [])], 2: [(1, [1]), (2, [1, 1])]}
+        {1: [(1, []), (2, []), (2, [1])], 2: [(1, [1]), (2, [1, 1])]}
 
     """
-    d = {}
-    k = sub.keys()
     Gr = ps_automaton(sub, presuf)
-    for a in k:
+    d = {}
+    for a in sub:
         L = []
-        for i in k:
-            L += [(i,Gr[i][j][1]) for j in range(len(sub[i])) if sub[i][j] == a]
+        for i,Gr_i in Gr.items():
+            sub_i = sub[i]
+            L.extend((i,Gr_i[j][1]) for j,sub_i_j in enumerate(sub_i) 
+                                    if sub_i_j == a)
+        L.sort()
         d[a] = L    
     return d
-      
 
 def abelian(L, alphabet):
     r"""
@@ -1204,6 +1199,22 @@ class GeoSub(SageObject):
             return Q
         else:
             return -P
+    def prefix_suffix_automaton(self):
+        r"""
+        EXAMPLES::
+
+            sage: from slabbe import GeoSub
+            sage: sub = {1:[1,2], 2:[1,3], 3:[1]}
+            sage: E = GeoSub(sub,2)
+            sage: E.prefix_suffix_automaton()
+            {1: [(1, []), (2, [1])], 2: [(1, []), (3, [1])], 3: [(1, [])]}
+
+        """
+        if self.is_dual():
+            return ps_automaton_inverted(self._sigma_dict, self._presuf)
+        else:
+            return ps_automaton(self._sigma_dict, self._presuf)
+
     @cached_method
     def base_iter(self):
         r"""
@@ -1228,23 +1239,20 @@ class GeoSub(SageObject):
             [(0, 0, 0), (1, 1)],
             [(1, 0, 0), (3, 1)]]}
         """
+        automaton = self.prefix_suffix_automaton()
         X = {}
         S = self._sigma_dict.keys()
-        for x in combinations(S,self._k):
+        for x in itertools.combinations(S, self._k):
             X[x] = []
             bigL = []
             for y in x:
-                if self.is_dual():
-                    bigL.append(ps_automaton_inverted(self._sigma_dict,self._presuf)[y])
-                else:
-                    bigL.append(ps_automaton(self._sigma_dict,self._presuf)[y])
-                Lpro = list(product(*bigL))
-                for el in Lpro:
+                bigL.append(automaton[y])
+                for el in itertools.product(*bigL):
                     z = []
                     w = []
-                    for i in range(len(el)):
-                        z += el[i][1]
-                        w.append(el[i][0])
+                    for el_i in el:
+                        z.extend(el_i[1])
+                        w.append(el_i[0])
                     if self.is_dual():
                         M = self._sigma.incidence_matrix()
                         X[x].append([-M.inverse()*abelian(z, S),tuple(w)])
@@ -1265,7 +1273,7 @@ class GeoSub(SageObject):
             ....:             kFace((0,0,0),(3,1),dual=True)])
             sage: Q = geosub(P, 6)
             sage: Q
-            Patch of 47 faces
+            Patch of 32 faces
         """
         if iterations == 0:
             return kPatch(patch)
@@ -1319,19 +1327,19 @@ class GeoSub(SageObject):
 
         The available face type are::
 
-            sage: E.base_iter().keys()
+            sage: sorted(E.base_iter().keys())
             [(1, 2), (1, 3), (2, 3)]
 
         For each we get::
 
             sage: d = E._call_on_face(kFace((10,11,12), (1,2)))
             sage: sorted(d.items())
-            [([(34, 10, 11), (1, 3)], 1),
-             ([(33, 10, 11), (1, 1)], 1),
+            [([(33, 10, 11), (1, 1)], 1),
+             ([(34, 10, 11), (1, 3)], 1),
              ([(34, 10, 11), (2, 1)], 1),
              ([(35, 10, 11), (2, 3)], 1)]
             sage: sorted(E._call_on_face(kFace((10,11,12), (1,3))).items())
-            [([(34, 10, 11), (2, 1)], 1), ([(33, 10, 11), (1, 1)], 1)]
+            [([(33, 10, 11), (1, 1)], 1), ([(34, 10, 11), (2, 1)], 1)]
             sage: E._call_on_face(kFace((10,11,12), (2,3)))
             {[(33, 10, 11), (1, 1)]: 1, [(34, 10, 11), (3, 1)]: 1}
 
