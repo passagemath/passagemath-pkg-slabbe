@@ -277,6 +277,24 @@ class kFace(SageObject):
         d = '*' if self.is_dual() else ''
         return "[{}, {}]{}".format(self.vector(), self.type(), d)
 
+    def __lt__(self, other):
+        if not isinstance(other, kFace):
+            return NotImplemented
+        elif self.vector() < other.vector():
+            return True
+        elif self.vector() == other.vector():
+            if self.type() < other.type():
+                return True
+            elif self.type() == other.type(): 
+                if self.is_dual() < other.is_dual():
+                    return True
+                else:
+                    return False
+            else:
+                return False
+        else:
+            return False
+
     def __eq__(self, other):
         return (isinstance(other, kFace) and
                 self.vector() == other.vector() and
@@ -593,7 +611,7 @@ class kPatch(SageObject):
                 self._faces[canonical] += m*f.sign()
 
         # Remove faces with multiplicty zero from the formal sum
-        for f,m in self._faces.items():
+        for f,m in list(self._faces.items()):
             if m == 0:
                 del self._faces[f]
 
@@ -922,9 +940,13 @@ def ps_automaton(sub, presuf):
         sage: ps_automaton(m, 'suffix')
         {1: [(2, [1]), (1, [])], 2: [(2, [1, 1]), (1, [1]), (1, [])]}
 
+    .. TODO::
+
+        Improve how it is coded.
+
     """
     d = {}
-    v = sub.values()
+    v = list(sub.values())
     for i in range(len(v)):
         L = []
         for j in range(len(v[i])):
