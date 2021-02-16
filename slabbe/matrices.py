@@ -422,6 +422,16 @@ def Minkowski_embedding_without_sqrt2(self, B=None, prec=None):
       ``None`` or the field of algebraic numbers ``QQbar`` (or it subfield
       ``AA`` of algebraic reals) if ``prec`` is infinity.
 
+    OUTPUT:
+
+        a matrix
+
+    .. SEEALSO:: 
+
+        function :func:`Minkowski_projection_triple` which
+        returns the rows of the same matrix split into three according
+        to the expanding, contracting and neutral eigenspaces.
+
     EXAMPLES::
 
         sage: from slabbe.matrices import Minkowski_embedding_without_sqrt2
@@ -764,6 +774,7 @@ def rauzy_projection(M, beta=None, prec=53):
     K = NumberField(beta.minpoly(), 'b')
     vb = (M-K.gen()).kernel().basis()[0]
 
-    return Minkowski_embedding_without_sqrt2(K, vb)
     #return K.Minkowski_embedding(vb)
-
+    return Minkowski_embedding_without_sqrt2(K, vb)
+    #P,Q,R = Minkowski_projection_triple(K, vb)
+    #return P,Q,R
