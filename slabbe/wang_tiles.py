@@ -4663,10 +4663,12 @@ class WangTiling(object):
                 right_edges = edges and (j == W - 1 or self._table[j+1][k] is None)
                 top_edges = edges and (k == H - 1 or self._table[j][k+1] is None)
                 if color_by_tile_id:
-                    color = color_by_tile_id[i]
+                    this_color = color_by_tile_id[i]
                 elif color is not None:
-                    color = tuple(color[a] for a in tile)
-                more_lines = tile_to_tikz(tile, position, color=color,
+                    this_color = tuple(color[a] for a in tile)
+                else:
+                    this_color = None
+                more_lines = tile_to_tikz(tile, position, color=this_color,
                         id=this_id, id_color=id_color, id_format=id_format,
                         sizex=size, sizey=size, rotate=rotate, label=label,
                         label_shift=label_shift, label_color=label_color,

@@ -538,7 +538,7 @@ def random_jeandel_rao_rectangular_pattern(width, height, start=None):
                   for a in range(width)]
     tiles = [(2,4,2,1), (2,2,2,0), (1,1,3,1), (1,2,3,2), (3,1,3,3), (0,1,3,1), 
              (0,0,0,1), (3,1,0,2), (0,2,1,2), (1,2,1,4), (3,3,1,2)]
-    tiles = [map(str,t) for t in tiles]
+    tiles = [tuple(str(a) for a in t) for t in tiles]
     from collections import defaultdict
     color = defaultdict(lambda : 'white')
     color.update({0:'white', 1:'red', 2:'cyan', 3:'green', 4:'lightgray'})
