@@ -39,7 +39,7 @@ from .partial_injection import (number_of_partial_injection,
 
 from .write_to_file import write_str_to_file
 
-from .jeandel_rao import random_jeandel_rao_tiling_rectangle
+from .arXiv_1903_06137 import random_jeandel_rao_rectangular_pattern
 from .graph_directed_IFS import GraphDirectedIteratedFunctionSystem
 
 from .beta_numeration_system import BetaTransformation
