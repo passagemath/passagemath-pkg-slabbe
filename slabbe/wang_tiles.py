@@ -3932,12 +3932,19 @@ class WangTiling(object):
 
     def diff(self, other):
         r"""
-        Return a Wang tiling where positions where the tile in self differs
-        from the tile in other are replaced by ``None``.
+        Return a tuple of three Wang tilings A,B,C such that self is the
+        union of A and B, other is the union of A and C, and A is the
+        maximum common part of both self and other.
 
         INPUT:
 
         - ``other`` -- a Wang tiling
+
+        OUTPUT:
+
+        - A tiling of the common part of self and other.
+        - A tiling of the different part of self and other (the self part)
+        - A tiling of the different part of self and other (the other part)
 
         EXAMPLES::
 
@@ -3947,18 +3954,31 @@ class WangTiling(object):
             sage: tilingA = WangTiling(tableA, tiles)
             sage: tableB = [[0, 1, 0, 0], [1, 0, 0, 0], [0, 1, 0, 1]]
             sage: tilingB = WangTiling(tableB, tiles)
-            sage: d = tilingA.diff(tilingB)
+            sage: d,ds,do = tilingA.diff(tilingB)
             sage: d
             A wang tiling of a 3 x 4 rectangle
             sage: d.table()
             [[0, 1, None, None], [1, 0, None, 0], [0, 1, 0, 1]]
+            sage: ds.table()
+            [[None, None, 1, 1], [None, None, 1, None], [None, None, None, None]]
+            sage: do.table()
+            [[None, None, 0, 0], [None, None, 0, None], [None, None, None, None]]
 
         """
-        table = []
+        table_same = []
+        table_self = []
+        table_other = []
         for colA,colB in zip(self.table(), other.table()):
-            col = [(a if a==b else None) for a,b in zip(colA, colB)]
-            table.append(col)
-        return WangTiling(table, self._tiles, color=self._color)
+            col_same = [(a if a==b else None) for a,b in zip(colA, colB)]
+            col_self = [(a if a!=b else None) for a,b in zip(colA, colB)]
+            col_other = [(b if a!=b else None) for a,b in zip(colA, colB)]
+            table_same.append(col_same)
+            table_self.append(col_self)
+            table_other.append(col_other)
+        tiling_same = WangTiling(table_same, self._tiles, color=self._color)
+        tiling_self = WangTiling(table_self, self._tiles, color=self._color)
+        tiling_other = WangTiling(table_other, self._tiles, color=self._color)
+        return tiling_same, tiling_self, tiling_other
 
 
     def apply_matrix_transformation(self, M):
