@@ -290,6 +290,14 @@ class dSturmianConfiguration(object):
             sage: tikz = c.rectangular_subword_discrete_plane_tikz(((0,3),(0,4)))
             sage: tikz.pdf()    # not tested
 
+        A workaround using a convention based on the ordering of the normal
+        vector was found to fix the overlaps of rhombus. I should
+        understand and clean this hack some day::
+
+            sage: c = dSturmianConfiguration((.72, .34), 0)
+            sage: tikz = c.rectangular_subword_discrete_plane_tikz(((0,3),(0,4)))
+            sage: tikz.pdf()    # not tested
+
         """
         # shift the coordinates of fill_color
         if fill_color:
@@ -306,10 +314,16 @@ class dSturmianConfiguration(object):
             shifted_fill_color = None
         # get the table
         table = self.rectangular_subword(window)
+
+        # get the good convention for drawing the rhombus
+        a1, a2 = self._normal_vector
+        convention = 'increasing' if a1 < a2 else 'decreasing'
+
         return table_to_discrete_plane_tikz(table, 
                 fill_color=shifted_fill_color,
                 extra_code_before=extra_code_before,
-                extra_code_after=extra_code_after)
+                extra_code_after=extra_code_after,
+                convention=convention)
 
     def pattern_number_occurrences(self, shape, window, avoid_border=0):
         r"""
@@ -529,7 +543,8 @@ def matrix_to_tikz(M, node_format=None, boundary_dash_line=False, extra_code_aft
     macros = [r'\newcommand{\symb}[1]{\mathtt{#1}}  % Symbol']
     return TikzPicture('\n'.join(lines), usetikzlibrary=usetikzlibrary, macros=macros)
 
-def table_to_discrete_plane_tikz(table, fill_color=None, extra_code_before='', extra_code_after=''):
+def table_to_discrete_plane_tikz(table, fill_color=None,
+        extra_code_before='', extra_code_after='', convention='increasing'):
     r"""
     Return a discrete plane representation of the table over alphabet `0`,
     `1` and `2`.
@@ -545,10 +560,18 @@ def table_to_discrete_plane_tikz(table, fill_color=None, extra_code_before='', e
       Rhombus of type ``a`` have color ``fill_color[a]``.
       If tuple ``(i,j)`` is in ``fill_color``, then ``fill_color[(i,j)]``
       gives the color of the rhombus at position (i,j).
+    - ``convention`` -- string, ``'decreasing'`` or ``'increasing'``, the
+      convention for drawing the rhombus according to increasing or
+      decreasing normal vectors
 
     OUTPUT:
 
     TikzPicture
+
+    .. TODO::
+
+        Understand, improve and replace the ``convention`` argument by
+        something better.
 
     EXAMPLES::
 
@@ -580,16 +603,27 @@ def table_to_discrete_plane_tikz(table, fill_color=None, extra_code_before='', e
     import itertools
     from slabbe import M3to2
 
+
     # faces of a unit cube
     zero = vector((0,0,0))
     e0 = vector((1,0,0))
     e1 = vector((0,1,0))
     e2 = vector((0,0,1))
-    cube_faces = {0:[zero, -e0, -e0-e1, -e1, zero],
-                  1:[zero, e2, e2-e0, -e0, zero],
-                  2:[zero, e1, e1+e2, e2, zero]}
-    label_angle = {0:90, 1:80, 2:30}
-    cone_angle = {0:(30,150), 1:(30,90), 2:(-30,90)}
+    if convention == "increasing":
+        cube_faces = {0:[zero, -e0, -e0-e1, -e1, zero],
+                      1:[zero, e2, e2-e0, -e0, zero],
+                      2:[zero, e1, e1+e2, e2, zero]}
+        label_angle = {0:90, 1:80, 2:30}
+        cone_angle = {0:(30,150), 1:(30,90), 2:(-30,90)}
+    elif convention == "decreasing":
+        cube_faces = {0:[zero, e1, e1+e2, e2, zero],
+                      1:[zero, e2, e2-e0, -e0, zero],
+                      2:[zero, -e0, -e0-e1, -e1, zero]}
+        label_angle = {0:30, 1:80, 2:90}
+        cone_angle = {0:(-30,90), 1:(30,90), 2:(30,150)}
+    else:
+        raise ValueError('convention(={}) is not a valid option'.format(convention))
+
     if fill_color is None:
         fill_color = {0:'black!10',
                       1:'black!30',
