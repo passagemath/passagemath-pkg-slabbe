@@ -153,7 +153,7 @@ def good_simultaneous_convergents_upto(v, double Q, int start=1, int step=1):
     # http://stackoverflow.com/questions/21382180/cython-pure-c-loop-optimization
     L = []
     for q from start <= q < stop by step:
-        sig_check() # Check for Keyboard interupt
+        sig_check()  # Check for Keyboard interrupt
         for i in range(d):
             a = q*vdouble[i]
             a = a - floor(a) 

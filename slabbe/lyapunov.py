@@ -99,6 +99,7 @@ def lyapunov_sample(algo, n_orbits, n_iterations=1000, ncpus=2,
         print(L_error_msg)
     return list(zip(*L_filtered))
 
+
 def lyapunov_table(algo, n_orbits, n_iterations=1000, ncpus=2):
     r"""
     Return a table of values of Lyapunov exponents for this algorithm.
@@ -112,7 +113,7 @@ def lyapunov_table(algo, n_orbits, n_iterations=1000, ncpus=2):
 
     OUTPUT:
 
-        table of liapounov exponents
+    table of Lyapunov exponents
 
     EXAMPLES::
 

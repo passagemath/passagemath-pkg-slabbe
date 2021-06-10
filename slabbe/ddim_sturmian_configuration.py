@@ -170,7 +170,7 @@ class dSturmianConfiguration(object):
     def rectangular_subword(self, window):
         r"""
         Return the rectangular subword appearing in the
-        given retangular window.
+        given rectangular window.
 
         INPUT:
 
@@ -196,7 +196,7 @@ class dSturmianConfiguration(object):
     def rectangular_subword_matrix(self, window):
         r"""
         Return the rectangular subword appearing in the
-        given retangular window (as a matrix).
+        given rectangular window (as a matrix).
 
         INPUT:
 
@@ -224,7 +224,7 @@ class dSturmianConfiguration(object):
     def rectangular_subword_tikz(self, window, node_format=None, extra_code_after=''):
         r"""
         Return the rectangular subword appearing in the
-        given retangular window (as a TikzPicture).
+        given rectangular window (as a TikzPicture).
 
         INPUT:
 
@@ -232,7 +232,7 @@ class dSturmianConfiguration(object):
         - ``node_format`` -- function or ``None``, a function giving the
           format for the matrix node at coordinate (i,j) like ``lambda
           i,j:r"{{\color{{black!60}}\symb{{{}}}}}"``.  If None, it gets
-          replaced by a function which put red at postions `(0,...,0)` and
+          replaced by a function which put red at positions `(0,...,0)` and
           `-e_i` and black elsewhere.
         - ``extra_code_after`` -- string (default: ``''``)
 
@@ -266,7 +266,7 @@ class dSturmianConfiguration(object):
             fill_color=None, extra_code_before='', extra_code_after=''):
         r"""
         Return the rectangular subword appearing in the
-        given retangular window (as a TikzPicture).
+        given rectangular window (as a TikzPicture).
 
         INPUT:
 

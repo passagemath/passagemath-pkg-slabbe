@@ -67,7 +67,7 @@ cdef class WordDatatype_Kolakoski(object):
 
         - ``n`` - integer such that `n < 365583569409` or slice
 
-        OUPUT:
+        OUTPUT:
 
         n-th letter of the Kolakoski Word or a substring
 

@@ -27,6 +27,7 @@ from __future__ import absolute_import, print_function
 from sage.combinat.words.words import InfiniteWords
 from sage.rings.semirings.non_negative_integer_semiring import NN
 
+
 def derived_sequence(self, u, coding=False):
     r"""
     Return the derived sequence of according to the return words to a factor of
@@ -36,7 +37,7 @@ def derived_sequence(self, u, coding=False):
 
     - ``u`` -- finite word, the length of the nonempty prefix
     - ``coding`` -- boolean (default: ``False``), whether to
-      include the return word coding dictionnary
+      include the return word coding dictionary
 
     EXAMPLES::
 
@@ -73,7 +74,7 @@ def derived_sequence(self, u, coding=False):
 
         Note that method ``return_words_derivate`` of finite words in Sage does
         the same for finite words but without returning the translation
-        dictionnary::
+        dictionary::
 
             sage: w = words.ThueMorseWord()
             sage: prefix = w[:1000]

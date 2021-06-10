@@ -2556,7 +2556,7 @@ def triple_square_example(i):
 
     Triple square tile do not exist. Hence the example provided by Xavier
     Provençal can not be the boundary word of a tile. One can see it by
-    ploting it or by the fact that the turning number is zero::
+    plotting it or by the fact that the turning number is zero::
 
         sage: from slabbe import DoubleSquare
         sage: D = DoubleSquare(triple_square_example(1))
