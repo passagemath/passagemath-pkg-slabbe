@@ -384,6 +384,93 @@ class dSturmianConfiguration(object):
                 C[pattern] += 1
         return C
 
+    def pattern_complexity(self, shape, window, avoid_border=0, verbose=False):
+        r"""
+        Return the number of patterns having a given shape inside of a
+        rectangular window box.
+
+        INPUT:
+
+        - ``shape`` -- list, list of coordinates
+        - ``window`` -- tuple of 2-tuples
+        - ``avoid_border`` -- integer (default: 0), the size of the border
+            to avoid during the computation
+        - ``verbose`` -- bool (default: ``False``), print the theoretical
+          upper-bound
+
+        OUTPUT
+
+        integer
+
+        EXAMPLES::
+
+            sage: z = polygen(QQ, 'z')
+            sage: K = NumberField(z**2-z-1, 'phi', embedding=RR(1.6))
+            sage: phi = K.gen()
+
+        ::
+
+            sage: from slabbe import dSturmianConfiguration
+            sage: c = dSturmianConfiguration((phi^-1, phi^-2), 0)
+            sage: shape = [(0,0), (1,0), (0,1), (1,1)]
+            sage: window = ((0,10),(0,10))
+            sage: c.pattern_complexity(shape, window)
+            5
+
+        Totally irrational normal vector::
+
+            sage: c = dSturmianConfiguration((phi^-1, sqrt(2)), 0)
+            sage: shape = [(0,0), (1,0), (0,1), (1,1)]
+            sage: window = ((0,10),(0,10))
+            sage: c.pattern_complexity(shape, window)
+            8
+
+        """
+        if verbose:
+            print("upper bound is:", self.pattern_complexity_upper_bound(shape))
+        C = self.pattern_number_occurrences(shape, window, avoid_border=avoid_border)
+        return len(C)
+
+    def pattern_complexity_upper_bound(self, shape):
+        r"""
+        Return the known upper bound for the number of patterns of given
+        shape it may have.
+
+        INPUT:
+
+        - ``shape`` -- list, list of coordinates
+
+        OUTPUT
+
+        integer
+
+        EXAMPLES::
+
+            sage: z = polygen(QQ, 'z')
+            sage: K = NumberField(z**2-z-1, 'phi', embedding=RR(1.6))
+            sage: phi = K.gen()
+
+        ::
+
+            sage: from slabbe import dSturmianConfiguration
+            sage: c = dSturmianConfiguration((phi^-1, phi^-2), 0)
+            sage: shape = [(0,0), (1,0), (0,1), (1,1)]
+            sage: c.pattern_complexity_upper_bound(shape)
+            8
+
+        Totally irrational normal vector::
+
+            sage: c = dSturmianConfiguration((phi^-1, sqrt(2)), 0)
+            sage: shape = [(0,0), (1,0), (0,1), (1,1)]
+            sage: c.pattern_complexity_upper_bound(shape)
+            8
+
+        """
+        F = [vector(t) for t in ((0,0), (0,-1), (-1,0))]
+        S = [vector(t) for t in shape]
+        F_minus_S = set(tuple(f - s) for f in F for s in S)
+        return len(F_minus_S)
+
     def rectangular_subwords(self, sizes, window):
         r"""
         Return the list of rectangular subword appearing in the
