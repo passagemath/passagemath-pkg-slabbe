@@ -273,6 +273,35 @@ class Substitution2d(object):
         return Substitution2d(d)
 
     @classmethod
+    def from_1d_row_column_substitutions(self, s_row, s_column):
+        r"""
+        INPUT:
+
+        - ``s_row`` -- dict
+        - ``s_column`` -- dict
+
+        EXAMPLES::
+
+            sage: from slabbe import Substitution2d
+            sage: fibo = {0:[0,1], 1:[0]}
+            sage: s = Substitution2d.from_1d_row_column_substitutions(fibo, fibo)
+            sage: s
+            Substitution 2d: {0: [[0, 1], [2, 3]], 1: [[0], [2]], 2: [[0, 1]], 3: [[0]]}
+
+        """
+        alphabetX = [key for key in s_row]
+        alphabetY = [key for key in s_column]
+        alphabetXY = list(itertools.product(alphabetX, alphabetY))
+        alphabetXY_to_index = dict((ab,i) for (i,ab) in enumerate(alphabetXY))
+        alphabet = list(range(len(alphabetXY)))
+        d = {}
+        for i,(a,b) in enumerate(alphabetXY):
+            v_word = s_column[b]
+            h_word = s_row[a]
+            d[i] = [[alphabetXY_to_index[(c,d)] for d in v_word] for c in h_word]
+        return Substitution2d(d)
+
+    @classmethod
     def from_permutation(self, d):
         r"""
         INPUT:
