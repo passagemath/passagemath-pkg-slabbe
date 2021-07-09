@@ -1252,6 +1252,7 @@ class Substitution2d(object):
         from sage.sets.disjoint_set import DisjointSet
         from sage.combinat.words.morphism import WordMorphism
         from slabbe.matrices import perron_left_eigenvector_in_number_field
+        from sage.combinat.words.words import Words
 
         dominoesH = self.list_dominoes(direction='horizontal')
         partitionH = DisjointSet(alphabet)
@@ -1263,7 +1264,7 @@ class Substitution2d(object):
         qH = Substitution2d.from_permutation({r:r for r in repH})
         sH = pH * self * qH
         sH = {k:v[0] for k,v in sH._d.items()}
-        sH = WordMorphism(sH).incidence_matrix()
+        sH = WordMorphism(sH, codomain=Words(sorted(sH))).incidence_matrix()
         rootY, heights = perron_left_eigenvector_in_number_field(sH, 'rootY')
         heigths_dict = dict(zip(repH, heights))
         heigths_dict = {k:heigths_dict[v] for k,v in pHd.items()}
@@ -1278,7 +1279,7 @@ class Substitution2d(object):
         qV = Substitution2d.from_permutation({r:r for r in repV})
         sV = pV * self * qV
         sV = {k:[col[0] for col in v] for k,v in sV._d.items()}
-        sV = WordMorphism(sV).incidence_matrix()
+        sV = WordMorphism(sV, codomain=Words(sorted(sV))).incidence_matrix()
         rootX, widths = perron_left_eigenvector_in_number_field(sV, 'rootX')
         widths_dict = dict(zip(repV, widths))
         widths_dict = {k:widths_dict[v] for k,v in pVd.items()}
@@ -1568,6 +1569,70 @@ class Substitution2d(object):
 
         from slabbe import TikzPicture
         return TikzPicture('\n'.join(lines))
+
+    def split_letters_randomly(self, n_copies):
+        r"""
+        Return a substitution 2d obtained by spliting letters.
+
+        INPUT:
+
+        - ``n_copies`` -- dict, letters to integers indicating the number
+          of copies of each letter
+
+        OUTPUT
+
+            Substitution 2d
+
+        EXAMPLES::
+
+            sage: from slabbe import Substitution2d
+            sage: A = [[1,1],[1,1]]
+            sage: B = [[0,0]]
+            sage: d = {0:A, 1:B}
+            sage: s = Substitution2d(d)
+
+        ::
+
+            sage: n_copies = {0:2, 1:1}
+            sage: s.split_letters_randomly(n_copies)  # random
+            Substitution 2d: {0: [[2, 2], [2, 2]], 1: [[2, 2], [2, 2]], 2: [[1, 0]]}
+
+        ::
+
+            sage: n_copies = {0:2,1:3}
+            sage: s.split_letters_randomly(n_copies)  # random
+            Substitution 2d: {0: [[3, 3], [4, 3]], 1: [[4, 2], [2, 2]], 
+            2: [[0, 0]], 3: [[0, 1]], 4: [[1, 0]]}
+
+        ::
+
+            sage: from slabbe import Substitution2d
+            sage: from slabbe import GraphDirectedIteratedFunctionSystem as GIFS
+            sage: fibo = {0:[0,1], 1:[0]}
+            sage: s = Substitution2d.from_1d_row_column_substitutions(fibo, fibo)
+            sage: n_copies = {0:2,1:1,2:1,3:1}
+            sage: t = s.split_letters_randomly(n_copies)
+            sage: ifs = GIFS.from_two_dimensional_substitution(t)
+            sage: _ = ifs.galois_conjugate().plot(n_iterations=9)
+
+        ::
+
+            sage: n_copies = {0:2,1:2,2:2,3:2}
+            sage: t = s.split_letters_randomly(n_copies)
+            sage: ifs = GIFS.from_two_dimensional_substitution(t)
+            sage: _ = ifs.galois_conjugate().plot(n_iterations=9)
+
+        """
+        from random import randrange
+        L = [(a,i) for a,n in n_copies.items() for i in range(n)]
+        translate = {pair:i for i,pair in enumerate(L)}
+        new_subs = {}
+        for (a,i) in L:
+            letter = translate[(a,i)]
+            image = self([[a]])
+            new_image = [[translate[(b,randrange(n_copies[b]))] for b in col] for col in image]
+            new_subs[letter] = new_image
+        return Substitution2d(new_subs)
 
 def set_of_factors(table, shape, avoid_border=0):
     r"""
