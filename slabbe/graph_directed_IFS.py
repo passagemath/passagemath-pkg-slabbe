@@ -629,7 +629,7 @@ class GraphDirectedIteratedFunctionSystem(object):
 
         return GraphDirectedIteratedFunctionSystem(self._module, edges)
 
-    def plot(self, S=None, n_iterations=1, projection=None):
+    def plot(self, S=None, n_iterations=1, projection=None, vertices=None):
         r"""
         Return a graphic image of the IFS after few iterations
 
@@ -641,6 +641,8 @@ class GraphDirectedIteratedFunctionSystem(object):
         - ``n_iterations`` -- integer (default: ``1``)
         - ``projection`` -- matrix (default: ``None``), projection matrix
           to 2-dimensional space
+        - ``vertices`` -- list (default: ``None``), list of vertices to
+          plot
 
         OUTPUT:
 
@@ -680,6 +682,10 @@ class GraphDirectedIteratedFunctionSystem(object):
             sage: ifs = GIFS.from_two_dimensional_substitution(s)
             sage: G = ifs.plot(n_iterations=7)
 
+        Draw only few vertices::
+
+            sage: G = ifs.plot(n_iterations=7, vertices=[0,3])
+
         This inflation rule is related to a contracting IFS whose unique
         solution is given in formula (4.5) of [BFG19]_::
 
@@ -704,7 +710,10 @@ class GraphDirectedIteratedFunctionSystem(object):
         shuffle(bow)
         vertex_to_color = dict(zip(self.vertices(), bow))
         ifs = self(S=S, n_iterations=n_iterations)
-        for v,P in ifs.items():
+        if vertices is None:
+            vertices = ifs.keys()
+        for v in vertices:
+            P = ifs[v]
             if not self._module.dimension() == 2:
                 P = [projection*p for p in P]
             G += points(P, color=vertex_to_color[v], legend_label=str(v))
