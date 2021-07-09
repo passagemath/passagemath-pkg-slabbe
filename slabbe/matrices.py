@@ -122,12 +122,12 @@ def perron_right_eigenvector_in_number_field(M, name='root'):
 
         sage: m = matrix(2,[11,14,26,29])
         sage: perron_right_eigenvector_in_number_field(m)
-        (root, (1, 1/14*root - 11/14))
+        (-2*root + 21, (1, -1/7*root + 5/7))
 
     Using a different name for the root::
 
         sage: perron_right_eigenvector_in_number_field(m, 'rho')
-        (rho, (1, 1/14*rho - 11/14))
+        (-2*rho + 21, (1, -1/7*rho + 5/7))
 
     Works if the characteristic polynomial is reducible::
 
@@ -144,19 +144,20 @@ def perron_right_eigenvector_in_number_field(M, name='root'):
         (15, (1, 13/7))
 
     """
-    from sage.rings.number_field.number_field import NumberField
-    perron = max(M.eigenvalues())
-    polynomials = [f for (f,_) in M.charpoly().factor() if f(perron) == 0]
-    assert len(polynomials) == 1, "there should be only one such polynomial"
-    polynomial = polynomials[0]
-
-    K = NumberField(polynomial, name, embedding=perron.n())
-    root = K.gen()
-    [(V,mul)] = [(V,mul) for (e,V,mul) in M.change_ring(K).eigenvectors_right() if e == root]
-    assert mul == 1, "Multiplicity should be 1 when primitive"
-    assert len(V) == 1, "Multiplicity should be 1 when primitive"
-    perron_right = V[0]
-    return (root, perron_right)
+    from sage.rings.all import QQ, AA, NumberField
+    eigs = M.charpoly().roots(AA)
+    eigs.sort()
+    if not eigs or eigs[-1][1] != 1:
+        raise ValueError('not primitive')
+    R, e, phi = eigs[-1][0].as_number_field_element(embedded=True)
+    if R is not QQ:
+        # NOTE: the method NumberFieldElement.change_names forgets about the embedding
+        R = NumberField(R.defining_polynomial(), name, check=False, embedding=R.gen_embedding())
+        e = R(e)
+    K = (M - e).right_kernel_matrix()
+    if K.nrows() != 1:
+        raise ValueError('not primitive')
+    return (e, K[0])
 
 def perron_left_eigenvector_in_number_field(M, name='root'):
     r"""
@@ -185,12 +186,12 @@ def perron_left_eigenvector_in_number_field(M, name='root'):
 
         sage: m = matrix(2,[11,14,26,29])
         sage: perron_left_eigenvector_in_number_field(m)
-        (root, (1, 1/26*root - 11/26))
+        (-2*root + 21, (1, -1/13*root + 5/13))
 
-    Using a different name for the root::
+    Using a different name for the generator::
 
         sage: perron_left_eigenvector_in_number_field(m, 'rho')
-        (rho, (1, 1/26*rho - 11/26))
+        (-2*rho + 21, (1, -1/13*rho + 5/13))
 
     """
     return perron_right_eigenvector_in_number_field(M.T, name)

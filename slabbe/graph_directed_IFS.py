@@ -32,13 +32,15 @@ Fibonacci substitution::
     sage: fibo_ifs = GIFS.from_one_dimensional_substitution(m)
     sage: fibo_ifs
     GIFS defined by 3 maps on Vector space of dimension 1 over
-    Number Field in root with defining polynomial x^2 - x - 1 with
+    Number Field in root with defining polynomial y^2 - y - 1 with
     root = 1.618033988749895?
 
 Its element-wise Galois conjugate is a contracting IFS::
 
     sage: fibo_ifs.galois_conjugate().pp()
-    GIFS defined by 3 maps on Vector space of dimension 1 over Number Field in root with defining polynomial x^2 - x - 1 with root = 1.618033988749895?
+    GIFS defined by 3 maps on Vector space of dimension 1 over
+    Number Field in root with defining polynomial y^2 - y - 1 with
+    root = 1.618033988749895?
     edge (0,0):
     x |-> [-root + 1] x + [0]
     edge (1,0):
@@ -55,7 +57,7 @@ Direct Product of 2 Fibonacci::
     sage: fibo2_ifs = GIFS.from_two_dimensional_substitution(s)
     sage: fibo2_ifs
     GIFS defined by 9 maps on Vector space of dimension 2 over 
-    Number Field in rootX with defining polynomial x^2 - x - 1 with 
+    Number Field in rootX with defining polynomial y^2 - y - 1 with 
     rootX = 1.618033988749895?
 
 REFERENCES:
@@ -190,7 +192,7 @@ class GraphDirectedIteratedFunctionSystem(object):
             sage: g
             GIFS defined by 3 maps on
             Vector space of dimension 1 over
-            Number Field in root with defining polynomial x^2 - x - 1 with
+            Number Field in root with defining polynomial y^2 - y - 1 with
             root = 1.618033988749895?
 
         """
@@ -233,7 +235,7 @@ class GraphDirectedIteratedFunctionSystem(object):
             sage: ifs = GIFS.from_two_dimensional_substitution(s)
             sage: ifs.pp()
             GIFS defined by 9 maps on Vector space of dimension 2 over 
-            Number Field in rootX with defining polynomial x^2 - x - 1 with 
+            Number Field in rootX with defining polynomial y^2 - y - 1 with 
             rootX = 1.618033988749895?
             edge (0,3):
                   [rootX     0]     [0]
@@ -374,6 +376,18 @@ class GraphDirectedIteratedFunctionSystem(object):
         return DiGraph(edges, format='list_of_edges', loops=True,
                 multiedges=True)
 
+    def to_line_digraph(self):
+        from sage.graphs.digraph import DiGraph
+        n = len(self._edges)
+        G = self.to_digraph()
+        L = DiGraph(n, loops=True, multiedges=False)
+        indices = {(u,v): i for i,(u,v,_) in enumerate(self._edges)}
+        for v in G.vertices():
+            for e0 in G.incoming_edges(v, labels=False):
+                for e1 in G.outgoing_edges(v, labels=False):
+                    L.add_edge(indices[e0], indices[e1])
+        return L
+
     def vertices(self):
         r"""
         EXAMPLES::
@@ -424,7 +438,7 @@ class GraphDirectedIteratedFunctionSystem(object):
             sage: s = GIFS.from_one_dimensional_substitution(m)
             sage: s.galois_conjugate()
             GIFS defined by 3 maps on Vector space of dimension 1 over
-            Number Field in root with defining polynomial x^2 - x - 1 with
+            Number Field in root with defining polynomial y^2 - y - 1 with
             root = 1.618033988749895?
 
         Direct Product of 2 Fibonacci::
@@ -435,7 +449,7 @@ class GraphDirectedIteratedFunctionSystem(object):
             sage: ifs = GIFS.from_two_dimensional_substitution(s)
             sage: ifs.galois_conjugate()
             GIFS defined by 9 maps on Vector space of dimension 2 over 
-            Number Field in rootX with defining polynomial x^2 - x - 1 with 
+            Number Field in rootX with defining polynomial y^2 - y - 1 with 
             rootX = 1.618033988749895?
 
         """
@@ -628,6 +642,99 @@ class GraphDirectedIteratedFunctionSystem(object):
             edges = [(u,v,F(-f.A(), -f.b())) for (u,v,f) in self._edges]
 
         return GraphDirectedIteratedFunctionSystem(self._module, edges)
+
+    def path_to_map(self, path):
+        r"""
+        Return the map obtained by the composition of the applications along
+        the ``path``.
+
+        INPUT:
+
+        - ``path`` - a path represented as a list of integers
+        """
+        f = self._edges[path[0]][2]
+        for i in range(1, len(path)):
+            if self._edges[path[i-1]][1] != self._edges[path[i]][0]:
+                raise ValueError('not a path')
+            f = self._edges[path[i]][2] * f
+        return f
+
+    def periodic_point(self, cycle):
+        r"""
+        Return the periodic point associated to ``cycle``.
+
+        The periodic point associated to a given cycle in the graph is the
+        attractor of that cycle.
+
+        INPUT:
+
+        - ``cycle`` - a cycle in the graph represented as a list of integers
+
+        EXAMPLES:
+
+        We can realize the interval `[0,1]` as an IFS for which the cycle
+        corresponds to the ternary expansion::
+
+            sage: from slabbe import GraphDirectedIteratedFunctionSystem as GIFS
+            sage: F = AffineGroup(1, QQ)
+            sage: f0 = F(1/3, vector([0/3]))
+            sage: f1 = F(1/3, vector([1/3]))
+            sage: f2 = F(1/3, vector([2/3]))
+            sage: cantor_IFS = GIFS(QQ^1, [(0,0,f0), (0,0,f1), (0,0,f2)])
+            sage: cantor_IFS.periodic_point([0])
+            (0)
+            sage: cantor_IFS.periodic_point([1])
+            (1/2)
+            sage: cantor_IFS.periodic_point([2])
+            (1)
+            sage: cantor_IFS.periodic_point([0,1,0,2])
+            (57/80)
+            sage: (57./80).str(base=3)
+            '0.20102010201020102010201020102010202'
+            sage: cantor_IFS.periodic_point([2,1,2,2])
+            (77/80)
+            sage: (77./80).str(base=3)
+            '0.22122212221222122212221222122220000'
+        """
+        f = self.path_to_map(cycle)
+        if self._edges[cycle[-1]][1] != self._edges[cycle[0]][0]:
+            raise ValueError('not a cycle')
+        if not f.A().is_scalar():
+            raise NotImplementedError('not an homothety')
+        s = f.A()[0,0]
+        v = f.b()
+        return v / (1 - s)
+
+    def periodic_points(self, start, max_length):
+        r"""
+        EXAMPLES::
+
+            sage: from slabbe import GraphDirectedIteratedFunctionSystem as GIFS
+            sage: m = WordMorphism('a->ab,b->ac,c->a')
+            sage: tribo = GIFS.from_one_dimensional_substitution(m)
+            sage: for c, v in tribo.periodic_points('a', 5):
+            ....:     print(c, v)
+
+            sage: from slabbe import GraphDirectedIteratedFunctionSystem as GIFS
+            sage: from slabbe import Substitution2d
+            sage: d = {0:[[3]],
+            ....:      1:[[4],[2]],
+            ....:      2:[[3,1]],
+            ....:      3:[[4,1],[2,0]],
+            ....:      4:[[3,1],[2,0]]}
+            sage: s = Substitution2d(d)
+            sage: ifs = GIFS.from_two_dimensional_substitution(s)
+            sage: P3 = point2d([p for _,p in ifs.periodic_points(3, 5)], color='blue')
+            sage: P4 = point2d([p for _,p in ifs.periodic_points(4, 5)], color='red')
+            sage: P3 + P4
+            Graphics object consisting of 2 graphics primitives
+        """
+        L = self.to_line_digraph()
+        for i,e in enumerate(self._edges):
+            if e[0] == start:
+                for cycle in L.all_cycles_iterator([i], max_length=max_length):
+                    cycle = cycle[:-1]
+                    yield (cycle, self.periodic_point(cycle))
 
     def plot(self, S=None, n_iterations=1, projection=None, vertices=None):
         r"""
