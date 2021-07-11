@@ -5,7 +5,7 @@ test:dev: &test
   image: sagemath/sagemath-dev:develop
   script:
     - sudo apt update
-    - sudo apt install texlive texlive-latex-extra texlive-luatex -qy
+    - sudo apt install texlive texlive-latex-extra texlive-luatex texlive-fonts-extra -qy
     - sudo apt install graphviz imagemagick pdf2svg -y
     - sudo sed -i '/PDF/s/none/read|write/' /etc/ImageMagick-6/policy.xml
     - sage -i dot2tex glucose
