@@ -77,10 +77,14 @@ AUTHORS:
 #                  http://www.gnu.org/licenses/
 #*****************************************************************************
 from __future__ import absolute_import, print_function
+
+from subprocess import run, PIPE, CalledProcessError
+import os
+
 from sage.misc.latex import have_pdflatex, have_convert, have_program
 from sage.misc.temporary_file import tmp_filename
 from sage.structure.sage_object import SageObject
-import os
+
 
 class StandaloneTex(SageObject):
     def __init__(self, content, standalone_options=None, usepackage=['amsmath'],
@@ -348,30 +352,16 @@ class StandaloneTex(SageObject):
         base, _filename_tex = os.path.split(_filename_tex)
         _filename, ext = os.path.splitext(_filename_tex)
 
-        # subprocess stuff
-        from subprocess import check_call, CalledProcessError, PIPE
-
         # running pdflatex or lualatex
         cmd = [program, '-interaction=nonstopmode', _filename_tex]
         cmd = ' '.join(cmd)
-        try:
-            check_call(cmd, shell=True, stdout=PIPE, stderr=PIPE, cwd=base)
-        except (CalledProcessError, OSError):
-            _filename_log = os.path.join(base, _filename+'.log')
-            if os.path.exists(_filename_log):
-                with open(_filename_log) as f:
-                    print(f.read())
-            else:
-                print("Error: log file was not found")
-            raise OSError("Error when running {} (see log printed above).".format(program))
-        else:
-            _filename_pdf = os.path.join(base, _filename+'.pdf')
+        run(cmd, shell=True, stdout=PIPE, stderr=PIPE, cwd=base, check=True)
+        _filename_pdf = os.path.join(base, _filename+'.pdf')
 
         # move the pdf into the good location
         if filename:
             filename = os.path.abspath(filename)
-            cmd = ['mv', _filename_pdf, filename]
-            check_call(cmd, stdout=PIPE, stderr=PIPE)
+            os.rename(_filename_pdf, filename)
             return filename
 
         # open the tmp pdf
@@ -379,7 +369,7 @@ class StandaloneTex(SageObject):
             from sage.misc.viewer import pdf_viewer
             cmd = [pdf_viewer(), _filename_pdf]
             cmd = ' '.join(cmd)
-            check_call(cmd, shell=True, cwd=base, stdout=PIPE, stderr=PIPE)
+            run(cmd, shell=True, cwd=base, stdout=PIPE, stderr=PIPE, check=True)
 
         return _filename_pdf
 
@@ -427,10 +417,6 @@ class StandaloneTex(SageObject):
                   "appear to be installed. Converting PDFLaTeX output to png "
                   "requires this program, so please install and try again. "
                   "Go to http://www.imagemagick.org to download it.")
-
-        # subprocess stuff
-        from subprocess import check_call, PIPE
-
         _filename_pdf = self.pdf(filename=None, view=False)
         _filename, ext = os.path.splitext(_filename_pdf)
         _filename_png = _filename+'.png'
@@ -440,13 +426,12 @@ class StandaloneTex(SageObject):
                '{0}x{0}'.format(density), '-trim', _filename_pdf,
                _filename_png]
         cmd = ' '.join(cmd)
-        check_call(cmd, shell=True, stdout=PIPE, stderr=PIPE)
+        run(cmd, shell=True, stdout=PIPE, stderr=PIPE, check=True)
 
         # move the png into the good location
         if filename:
             filename = os.path.abspath(filename)
-            cmd = ['mv', _filename_png, filename]
-            check_call(cmd, stdout=PIPE, stderr=PIPE)
+            os.rename(_filename_png, filename)
             return filename
 
         # open the tmp png
@@ -454,7 +439,7 @@ class StandaloneTex(SageObject):
             from sage.misc.viewer import png_viewer
             cmd = [png_viewer(), _filename_png]
             cmd = ' '.join(cmd)
-            check_call(cmd, shell=True, stdout=PIPE, stderr=PIPE)
+            run(cmd, shell=True, stdout=PIPE, stderr=PIPE, check=True)
 
         return _filename_png
 
@@ -499,9 +484,6 @@ class StandaloneTex(SageObject):
                     "Install it for example with ``brew install pdf2svg``"
                     " or ``apt-get install pdf2svg``.")
 
-        # subprocess stuff
-        from subprocess import check_call, PIPE
-
         _filename_pdf = self.pdf(filename=None, view=False)
         _filename, ext = os.path.splitext(_filename_pdf)
         _filename_svg = _filename+'.svg'
@@ -509,13 +491,12 @@ class StandaloneTex(SageObject):
         # convert to svg
         cmd = ['pdf2svg', _filename_pdf, _filename_svg]
         cmd = ' '.join(cmd)
-        check_call(cmd, shell=True, stdout=PIPE, stderr=PIPE)
+        run(cmd, shell=True, stdout=PIPE, stderr=PIPE, check=True)
 
         # move the svg into the good location
         if filename:
             filename = os.path.abspath(filename)
-            cmd = ['mv', _filename_svg, filename]
-            check_call(cmd, stdout=PIPE, stderr=PIPE)
+            os.rename(_filename_svg, filename)
             return filename
 
         # open the tmp svg
@@ -523,7 +504,7 @@ class StandaloneTex(SageObject):
             from sage.misc.viewer import browser
             cmd = [browser(), _filename_svg]
             cmd = ' '.join(cmd)
-            check_call(cmd, shell=True, stdout=PIPE, stderr=PIPE)
+            run(cmd, shell=True, stdout=PIPE, stderr=PIPE, check=True)
 
         return _filename_svg
 

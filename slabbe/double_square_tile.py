@@ -1547,8 +1547,8 @@ class DoubleSquare(SageObject):
         #for i in range(4):
         #    s += '$w_{%s} = %s$\\\\\n'%(i, remove_coma(self.w(i).string_rep()))
         s += '$(w_0,w_1,w_2,w_3) = (%s,%s,%s,%s)$ \\\\\n'%tuple(len(self.w(i)) for i in range(4))
-        s += '$u_0 = %s$\quad $u_1 = %s$\\\\$u_2 = %s$\\quad $u_3 = %s$\\\\\n'%tuple(u[i] for i in range(4))
-        s += '$v_0 = %s$\quad $v_1 = %s$\\\\$v_2 = %s$\\quad $v_3 = %s$\\\\\n'%tuple(v[i] for i in range(4))
+        s += '$u_0 = %s$\\quad $u_1 = %s$\\\\$u_2 = %s$\\quad $u_3 = %s$\\\\\n'%tuple(u[i] for i in range(4))
+        s += '$v_0 = %s$\\quad $v_1 = %s$\\\\$v_2 = %s$\\quad $v_3 = %s$\\\\\n'%tuple(v[i] for i in range(4))
         s += '$(n_0,n_1,n_2,n_3) = (%s,%s,%s,%s)$ \\\\\n'%tuple(self.n(i) for i in range(4))
         s += 'Turning number = %s\\\\\n'%self.turning_number()
         s += 'Self-avoiding = %s\\\\\n'%self.boundary_word().is_simple()
