@@ -844,7 +844,7 @@ class _MCFAlgorithm_methods(object):
         elif draw.startswith('image'):
             L.sort(key=lambda a:branch_order.index(a[4]))
         else:
-            raise ValueError("Unkown value for draw(={})".format(draw))
+            raise ValueError("Unknown value for draw(={})".format(draw))
 
         if draw == 'domain_left':
             for x,y,u,v,prev_br,next_br in L:
@@ -859,7 +859,7 @@ class _MCFAlgorithm_methods(object):
             for x,y,u,v,prev_br,next_br in L:
                 data[v,u] = color_dict[prev_br]
         else:
-            raise ValueError("Unkown value for draw(={})".format(draw))
+            raise ValueError("Unknown value for draw(={})".format(draw))
 
         from PIL import Image
         img = Image.fromarray(data)
@@ -926,11 +926,11 @@ class _MCFAlgorithm_methods(object):
             ndivs=ndivs)
 
         if draw.endswith('left'):
-            S = set((p[0],p[1]) for p in L)
+            S = set((p[0], p[1]) for p in L)
         elif draw.endswith('right'):
-            S = set((p[2],p[3]) for p in L)
+            S = set((p[2], p[3]) for p in L)
         else:
-            raise ValueError("Unkown value for draw(={})".format(draw))
+            raise ValueError("Unknown value for draw(={})".format(draw))
 
         if verbose:
             print("nombre diterations dans la fenetre : ", len(L))

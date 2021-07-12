@@ -7,7 +7,7 @@ AUTHORS:
  - Milton Minervino, 2017, initial version
  - Sébastien Labbé, July 6th 2017: added doctests, package, improve object
    oriented structure of the classes, multiplicity stored in the patch not
-   in the faces. Fixed the creation of patchs (linear time instead of
+   in the faces. Fixed the creation of patches (linear time instead of
    quadratic time). Added a dozen of doctests.
  - Sébastien Labbé, March 28th, 2018: projection and plot of k-faces
    from a projection matrix. Computation of the projection on the
@@ -29,7 +29,7 @@ AUTHORS:
     - Add a function that creates the tiling
 
     - Add a method taking a substitution as input, computing the Markov
-      partition (3d-cylinder of Rauzy fractals) from E_k and E_k^*, 
+      partition (3d-cylinder of Rauzy fractals) from E_k and E_k^*,
 
     - Deal with reducible with neutral eigenvalues
 
@@ -617,8 +617,8 @@ class kPatch(SageObject):
                 canonical = kFace(f.vector(), f.sorted_type(), dual=f.is_dual(), color=f.color())
                 self._faces[canonical] += m*f.sign()
 
-        # Remove faces with multiplicty zero from the formal sum
-        for f,m in list(self._faces.items()):
+        # Remove faces with multiplicity zero from the formal sum
+        for f, m in list(self._faces.items()):
             if m == 0:
                 del self._faces[f]
 

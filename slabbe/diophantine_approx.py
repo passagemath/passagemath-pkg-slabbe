@@ -114,7 +114,7 @@ linear combination of the previous three::
       16   (307498741, 355384705, 113122465)   [1, 1]            (0, 0, 0)
       17   (779567097, 900967015, 286786708)   [2, 1]            (0, 0, 0)
 
-Remark: matrices of independant lines is 1 (with Thomas Garrity, 27oct 2016).
+Remark: matrices of independent lines is 1 (with Thomas Garrity, 27oct 2016).
 He kind of have a proof of that...
 
 This used to give a Value Error::
@@ -360,7 +360,8 @@ def best_simultaneous_convergents_upto(v, Q, start=1, verbose=False):
             best_error_inv = error_inv
     return bests
 
-def best_simultaneous_convergents(v):  
+
+def best_simultaneous_convergents(v):
     r"""
     Return an iterator of best convergents to a vector of real number according
     to Dirichlet theorem on simultaneous approximations.
@@ -386,7 +387,7 @@ def best_simultaneous_convergents(v):
 
     TESTS:
 
-    Correspondance with continued fraction when d=1::
+    Correspondence with continued fraction when d=1::
 
         sage: it = best_simultaneous_convergents([e])
         sage: [next(it) for _ in range(10)]
@@ -409,9 +410,10 @@ def best_simultaneous_convergents(v):
     while True:
         bests = best_simultaneous_convergents_upto(v, Q, start)
         start = Q**d
-        for u,Q in bests:
+        for u, Q in bests:
             yield u
         Q += 0.001 # make sure we do not get the same again
+
 
 def dirichlet_convergents_dependance(v, n, verbose=False):
     r"""

@@ -253,9 +253,10 @@ def random_cyclically_reduced_stallings_graph(n, r=2, verbose=False, merge=False
 
         return G, not_connected_count, has_degree_1_count
 
+
 def reject_statistics(n, r=2, sample_size=50, verbose=False):
     r"""
-    Return return reject statistics when randomly chosing Stallings graph
+    Return return reject statistics when randomly choosing Stallings graph
     of n vertices over r letters.
 
     INPUT:

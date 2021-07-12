@@ -121,7 +121,7 @@ class BetaTransformation(object):
         INPUT:
 
         - ``x`` -- real number in [0,1]
-        - ``n`` -- postive integer
+        - ``n`` -- positive integer
 
         OUTPUT:
 

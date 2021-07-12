@@ -89,7 +89,7 @@ class PolyhedronExchangeTransformation(object):
         sage: P = PolyhedronPartition({0:p, 1:q})
         sage: T = {0:(1-h,0), 1:(-h,0)}
         sage: PolyhedronExchangeTransformation(P, T)
-        Polyhedron Exchange Transformation of 
+        Polyhedron Exchange Transformation of
         Polyhedron partition of 2 atoms with 2 letters
         with translations {0: (2/3, 0), 1: (-1/3, 0)}
 
@@ -99,7 +99,7 @@ class PolyhedronExchangeTransformation(object):
 
         - Do we want to merge atoms mapped by the same translation?
 
-        - Add a ploting function with seperated domain/codomain
+        - Add a plotting function with separated domain/codomain
 
     REFERENCES:
 

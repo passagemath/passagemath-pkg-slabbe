@@ -171,7 +171,7 @@ class DiscreteSubset(SageObject):
     - ``iterator`` -- function (default: ``None``) returning an iterator of
       points, it must be consistent with the predicate
     - ``roots`` -- list (default: ``None``) of some elements in self. If
-      ``iterator`` is not provided, it is used to iterate the elements throught
+      ``iterator`` is not provided, it is used to iterate the elements through
       connectedness.
 
     EXAMPLES::
@@ -868,7 +868,7 @@ class DiscreteSubset(SageObject):
             elif dim == (3,1):
                 return v.right_kernel().basis_matrix()
             else:
-                raise ValueError("uncorrect dimension (=%s) " % (dim,))
+                raise ValueError("incorrect dimension (=%s) " % (dim,))
 
     def plot_points(self, color='blue', m=None):
         r"""

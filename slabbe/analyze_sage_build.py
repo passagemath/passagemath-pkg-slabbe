@@ -96,7 +96,7 @@ def build_duration_logs(path_to_file, pattern=None):
     L = []
     for line in result:
         time_string = line[len(pattern):].strip('.')
-        time_string = time_string.replace(',','.')
+        time_string = time_string.replace(',', '.')
         seconds = timeparse(time_string)
         if seconds is None:
             raise ValueError('Unable to parse time delta in string '
@@ -105,9 +105,10 @@ def build_duration_logs(path_to_file, pattern=None):
 
     return L
 
+
 def sage_logs_datetime_list(consider='last', verbose=False):
     r"""
-    Return a dictionnary of duration and last modified information from the
+    Return a dictionary of duration and last modified information from the
     sage log files.
 
     INPUT:

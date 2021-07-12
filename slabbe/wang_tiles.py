@@ -1967,7 +1967,7 @@ class WangTileSet(object):
         if MM:
             print("Warning: it is expected as hypothesis that M odot^i M is "
                   "forbidden but the following dominoes admit a radius "
-                  "{} neighborhood: {}. The algorihm works if M are "
+                  "{} neighborhood: {}. The algorithm works if M are "
                   " a set of markers anyway.".format(radius, MM))
 
         # Compute K and dominoes ending in M
