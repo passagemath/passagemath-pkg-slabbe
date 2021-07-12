@@ -5,7 +5,11 @@ test:dev: &test
   image: sagemath/sagemath-dev:develop
   script:
     - sudo apt update
-    - DEBIAN_FRONTEND="noninteractive" TZ="Europe/Paris" sudo apt install -qy texlive texlive-latex-extra texlive-luatex texlive-fonts-extra graphviz imagemagick pdf2svg
+    # https://github.com/moby/moby/issues/27988
+    - echo 'debconf debconf/frontend select Noninteractive' | sudo debconf-set-selections
+    - sudo apt-get install -qy
+    #- DEBIAN_FRONTEND="noninteractive" TZ="Europe/Paris" 
+    - sudo apt install -qy texlive texlive-latex-extra texlive-luatex texlive-fonts-extra graphviz imagemagick pdf2svg
     - sudo sed -i '/PDF/s/none/read|write/' /etc/ImageMagick-6/policy.xml
     - sage -i dot2tex glucose
     - sage -pip install .
@@ -27,6 +31,10 @@ test:dev: &test
 #
 
 # les images qui sont sur https://hub.docker.com/r/sagemath/sagemath-dev/
+test:9.3.beta8:
+  << : *test
+  image: sagemath/sagemath-dev:9.3.beta8
+
 test:9.3.beta3:
   << : *test
   image: sagemath/sagemath-dev:9.3.beta3
