@@ -153,6 +153,12 @@ def iter_pisot_irreductible(d=3, arg=None):
 
 def is_left_marked(m):
     r"""
+    Return whether the morphism is left-marked.
+
+    A morphism is *left-marked* if its left-most conjugate is such that the
+    restriction of the images to its first letter is an injective map, see
+    [LP16]_.
+
     EXAMPLES::
 
         sage: from slabbe.word_morphisms import is_left_marked
@@ -174,6 +180,12 @@ def is_left_marked(m):
         sage: m = WordMorphism('0->000001,1->010001,2->0101')
         sage: is_left_marked(m)
         False
+
+    REFERENCES:
+
+    .. [LP16] S. Labbé, E. Pelantová, Palindromic sequences generated from marked
+    morphisms, European Journal of Combinatorics 51 (2016) 200-214,
+    http://dx.doi.org/10.1016/j.ejc.2015.05.006
     """
     images = m.images()
     N = len(images)
@@ -189,6 +201,11 @@ def is_left_marked(m):
 
 def is_marked(m):
     r"""
+    Return whether the morphism is marked.
+
+    A morphism is *marked* if is both left-marked and right-marked,
+    see [LP16]_.
+
     EXAMPLES::
 
         sage: from slabbe.word_morphisms import is_marked
