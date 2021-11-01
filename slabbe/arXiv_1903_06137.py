@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
 r"""
-The code to construct the partitions in [Lab2019]_.
+The code to construct the partitions in [Lab2021b]_.
 
 REFERENCES:
 
-.. [Lab2019] S. Labbé.  Markov partitions for toral
-    `\mathbb{Z}^2`-rotations featuring Jeandel-Rao Wang shift and model
-    sets, https://arxiv.org/abs/1903.06137, April 2020 (v3).
-    https://doi.org/10.5802/ahl.73
+.. [Lab2021b] S. Labbé.  Markov partitions for toral
+   `\mathbb{Z}^2`-rotations featuring Jeandel-Rao Wang shift and model
+   sets, *Annales Henri Lebesgue* 4 (2021) 283-324. 
+   https://doi.org/10.5802/ahl.73
+   https://arxiv.org/abs/1903.06137
 
 .. [Lab2018] S. Labbé. A self-similar aperiodic set of 19 Wang
-    tiles. Geom. Dedicata, 2018.
-    https://doi.org/10.1007/s10711-018-0384-8.
+   tiles. Geom. Dedicata, 201 (2019) 81-109 
+   https://doi.org/10.1007/s10711-018-0384-8.
+   http://arxiv.org/abs/1802.03265
 
 EXAMPLES:
 
@@ -97,7 +99,7 @@ from slabbe import PolyhedronPartition
 def jeandel_rao_wang_shift_partition(backend=None):
     r"""
     This construct the polygon partition associated to Jeandel-Rao
-    tilings introduced in [Lab2019]_.
+    tilings introduced in [Lab2021b]_.
 
     INPUT:
 
@@ -171,7 +173,7 @@ def jeandel_rao_wang_shift_partition(backend=None):
 
 def self_similar_19_atoms_partition(backend=None):
     r"""
-    This construct the polygon partition introduced in [Lab2019]_
+    This construct the polygon partition introduced in [Lab2021b]_
     associated to the self-similar 19 Wang tiles [Lab2018]_.
 
     INPUT:
@@ -392,7 +394,7 @@ def plane_to_torus(m,n):
 def torus_to_code(x,y):
     r"""
     Return in which atom of the partition associated to Jeandel-Rao tilings
-    the point (x,y) falls in according to [Lab2019]_.
+    the point (x,y) falls in according to [Lab2021b]_.
 
     EXAMPLES::
 

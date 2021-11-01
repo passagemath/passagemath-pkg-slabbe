@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 r"""
-The values computed in [Lab2019]_.
+The values computed in [Lab2021a]_.
 
 Computing them from scratch takes 70 seconds. This file contains those
 values.
 
 REFERENCES:
 
-.. [Lab2019] S. Labbé. Substitutive structure of Jeandel-Rao aperiodic tilings,
-   *Discrete & Computational Geometry*, 2019,
+.. [Lab2021a] S. Labbé. Substitutive structure of Jeandel-Rao aperiodic tilings,
+   *Discrete & Computational Geometry* 65 (2021) 800-855.
    https://doi.org/10.1007/s00454-019-00153-3
    http://arxiv.org/abs/1808.07768
 

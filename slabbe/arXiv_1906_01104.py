@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 r"""
-The code contained in `arXiv:1906.01104`__
+The code contained in [Lab2021c]_
 
-S. Labbé, Rauzy induction of polygon partitions and toral $\Z^2$-rotations
-arXiv:1906.01104, June 2019, 36 p. (v2: revised in May 2020).
+REFERENCES:
 
-__ https://arxiv.org/abs/1906.01104
+.. [Lab2021c] S. Labbé. Rauzy induction of polygon partitions and toral
+   $\Z^2$-rotations, 2021, https://arxiv.org/abs/1906.01104
 
 EXAMPLES::
 
