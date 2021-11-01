@@ -1,0 +1,13 @@
+.. nodoctest
+
+Code for `arXiv:1808.07768`__
+=============================
+
+.. automodule:: slabbe.arXiv_1808_07768
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+__ https://arxiv.org/abs/1808.07768
+
+

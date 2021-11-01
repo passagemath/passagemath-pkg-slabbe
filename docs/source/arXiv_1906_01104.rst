@@ -1,0 +1,12 @@
+.. nodoctest
+
+Code for `arXiv:1906.01104`__
+=============================
+
+.. automodule:: slabbe.arXiv_1906_01104
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+__ https://arxiv.org/abs/1906.01104
+
