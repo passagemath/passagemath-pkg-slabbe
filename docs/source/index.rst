@@ -44,7 +44,6 @@ Combinatorics
    partial_injection
    magic_hexagon
    wang_tiles
-   ostrowski
 
 Combinatorics on words
 ----------------------
@@ -89,9 +88,9 @@ Code in research papers
 .. toctree::
    :maxdepth: 1
 
-    arXiv_1808_07768
-    arXiv_1903_06137
-    arXiv_1906_01104
+   arXiv_1808_07768
+   arXiv_1903_06137
+   arXiv_1906_01104
 
 Miscellaneous
 -------------
