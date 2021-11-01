@@ -760,7 +760,7 @@ class TikzPicture(StandaloneTex):
             ....:     if (u,v) == (1/2, -2): options["label"]       = "coucou"; options["label_style"] = "string"
             ....:     if (u,v) == (1/2,2/3): options["dot"]         = "x=1,y=2"
             ....:     if (u,v) == (1,   -1): options["label_style"] = "latex"
-            ....:     if (u,v) == (1,  1/2): options["edge_string"] = "<-"
+            ....:     if (u,v) == (1,  1/2): options["edge_string"] = "->"
             ....:     if (u,v) == (1/2,  1): options["backward"]    = True
             ....:     return options
             sage: t = TikzPicture.from_graph(G, edge_options=edge_options)
