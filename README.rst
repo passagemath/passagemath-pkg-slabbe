@@ -168,6 +168,17 @@ __ https://trac.sagemath.org/
 Release history
 ---------------
 
+*Version 0.6.3 (November 1, 2021)*
+  New module on Ostrowski numeration system (basic stuff).
+  New module on EkEkStar (written with Milton Minvervino).
+  New modules containing the updated code published in `arXiv:1808.07768`__,
+  `arXiv:1903.06137`__ and `arXiv:1906.01104`__.
+  All tests passed on versions 9.0, 9.1, 9.2, 9.3 and 9.4 of SageMath.
+
+__ https://arxiv.org/abs/1808.07768
+__ https://arxiv.org/abs/1903.06137
+__ https://arxiv.org/abs/1906.01104
+
 *Version 0.6.2 (December 15, 2020)*
   New module on Graph-directed iterated function systems (GIFS).
   Fixed ``TransitiveIdeal`` import error.
