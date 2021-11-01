@@ -147,8 +147,10 @@ cpus:
 
     sage: S.has_solution(solver='Gurobi')         # not tested (takes 45s)
     False
-    sage: S.milp()
-    (Boolean Program (maximization, 19170 variables, 1838 constraints),
-     MIPVariable of dimension 1)
+    sage: p,x = S.milp()
+    sage: p
+    Boolean Program (maximization, 19170 variables, 1838 constraints)
+    sage: x
+    MIPVariable ...
 
 

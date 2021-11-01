@@ -2717,7 +2717,7 @@ class WangTileSolver(object):
             sage: p
             Boolean Program (maximization, 36 variables, 29 constraints)
             sage: x
-            MIPVariable of dimension 1
+            MIPVariable ...
 
         Then you can solve it and get the solutions::
 
