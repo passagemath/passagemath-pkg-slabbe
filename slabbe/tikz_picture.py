@@ -81,7 +81,12 @@ from __future__ import absolute_import, print_function
 from subprocess import run, PIPE, CalledProcessError
 import os
 
-from sage.misc.latex import have_pdflatex, have_convert, have_program
+from sage.misc.latex import have_pdflatex, have_convert
+try:
+    from sage.misc.latex import have_program
+except ImportError:
+    from sage.misc.sage_ostools import have_program
+
 from sage.misc.temporary_file import tmp_filename
 from sage.structure.sage_object import SageObject
 
