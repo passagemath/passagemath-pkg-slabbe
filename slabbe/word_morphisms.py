@@ -184,8 +184,8 @@ def is_left_marked(m):
     REFERENCES:
 
     .. [LP16] S. Labbé, E. Pelantová, Palindromic sequences generated from marked
-    morphisms, European Journal of Combinatorics 51 (2016) 200-214,
-    http://dx.doi.org/10.1016/j.ejc.2015.05.006
+       morphisms, European Journal of Combinatorics 51 (2016) 200-214,
+       http://dx.doi.org/10.1016/j.ejc.2015.05.006
     """
     images = m.images()
     N = len(images)
