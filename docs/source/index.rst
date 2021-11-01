@@ -29,6 +29,7 @@ Dynamical systems
    coding_of_PETs
    graph_directed_IFS
    EkEkstar
+   ostrowski
 
 Combinatorics
 -------------
@@ -44,7 +45,6 @@ Combinatorics
    partial_injection
    magic_hexagon
    wang_tiles
-   jeandel_rao
 
 Combinatorics on words
 ----------------------
@@ -83,6 +83,16 @@ Vizualization
 
    tikz_picture
 
+Code in research papers
+-----------------------
+
+.. toctree::
+   :maxdepth: 1
+
+    arXiv_1808_07768
+    arXiv_1903_06137
+    arXiv_1906_01104
+
 Miscellaneous
 -------------
 
@@ -93,6 +103,7 @@ Miscellaneous
    ranking_scale
    fruit
    write_to_file
+
 
 Indices and Tables
 ==================
