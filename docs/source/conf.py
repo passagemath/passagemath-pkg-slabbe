@@ -21,7 +21,12 @@ from sage.env import SAGE_DOC_SRC, SAGE_DOC, SAGE_SRC
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.append(os.path.abspath('../../slabbe'))
-sys.path.append(os.path.join(SAGE_SRC, "sage_setup", "docbuild", "ext"))
+sys.path.append(os.path.join(SAGE_SRC, "sage_setup", "docbuild", "ext")) # before 9.3
+sys.path.append(os.path.join(SAGE_SRC, "sage_docbuild", "ext"))          # after 9.3
+
+# NOTE: The path to sage_autodoc.py file changed
+# from src/sage_setup/docbuild/ext/ to src/sage_docbuild/ext/
+# in https://trac.sagemath.org/ticket/30010 merged in Sagemath-9.3
 
 # -- General configuration ------------------------------------------------
 
