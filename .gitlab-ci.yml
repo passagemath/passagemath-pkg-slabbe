@@ -12,6 +12,7 @@ test:dev: &test
     - sudo apt install -qy texlive texlive-latex-extra texlive-luatex texlive-fonts-extra graphviz imagemagick pdf2svg
     - sudo sed -i '/PDF/s/none/read|write/' /etc/ImageMagick-6/policy.xml
     - sage -i dot2tex glucose
+    - sage -pip install pytimeparse roman
     - sage -pip install .
     - sage -c 'import sage.env; print(sage.env.SAGE_VERSION)'
     - sage -python -V

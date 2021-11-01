@@ -52,7 +52,7 @@ On Debian or Ubuntu, one may do::
 
     sudo apt update
     sudo apt install libpari-dev -y
-    sudo apt install texlive texlive-latex-extra texlive-luatex -qy
+    sudo apt install texlive texlive-latex-extra texlive-luatex texlive-fonts-extra -qy
     sudo apt install graphviz imagemagick pdf2svg -y
 
 The installation of imagemagick done above provides the command ``convert`` but
@@ -107,6 +107,18 @@ To install the most recent development version::
 Usage::
 
     sage: from slabbe import *
+
+Other Python packages you may want to install
+---------------------------------------------
+
+Some functionalities of ``slabbe`` package depend on the installation of few
+Python libraries such as pytimeparse__ (time expression parser) and roman__
+(integer to Roman numerals converter)::
+
+    sage -pip install pytimeparse roman
+
+__ https://pypi.org/project/pytimeparse/
+__ https://pypi.org/project/roman/
 
 Other System packages you may want to install
 ---------------------------------------------
