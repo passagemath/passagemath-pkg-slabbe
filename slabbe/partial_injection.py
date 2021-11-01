@@ -21,9 +21,9 @@ EXAMPLES::
 Random partial injections on ``[0, 1, ..., 6]``::
 
     sage: from slabbe import random_partial_injection
-    sage: random_partial_injection(7)
+    sage: random_partial_injection(7)   # random
     [None, None, 1, 3, None, 0, None]
-    sage: random_partial_injection(7)
+    sage: random_partial_injection(7)   # random
     [5, 1, 0, 3, None, 4, None]
 
 Random Stallings graph on ``[0, 1, ..., 19]`` over 2 letters::
@@ -140,11 +140,11 @@ def random_partial_injection(n):
     EXAMPLES::
 
         sage: from slabbe import random_partial_injection
-        sage: random_partial_injection(10)
+        sage: random_partial_injection(10)       # random
         [3, 5, 2, None, 1, None, 0, 8, 7, 6]
-        sage: random_partial_injection(10)
+        sage: random_partial_injection(10)       # random
         [1, 7, 4, 8, 3, 5, 9, None, 6, None]
-        sage: random_partial_injection(10)
+        sage: random_partial_injection(10)       # random
         [5, 6, 8, None, 7, 4, 0, 9, None, None]
 
     TODO::
