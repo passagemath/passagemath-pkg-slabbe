@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 r"""
-Ostrowski numeration
+Ostrowski numeration system
 
 See [Ber2001]_.
 

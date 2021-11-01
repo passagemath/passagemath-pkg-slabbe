@@ -29,7 +29,6 @@ Dynamical systems
    coding_of_PETs
    graph_directed_IFS
    EkEkstar
-   ostrowski
 
 Combinatorics
 -------------
@@ -45,6 +44,7 @@ Combinatorics
    partial_injection
    magic_hexagon
    wang_tiles
+   ostrowski
 
 Combinatorics on words
 ----------------------
