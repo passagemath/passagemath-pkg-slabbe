@@ -32,6 +32,14 @@ test:dev: &test
 #
 
 # les images qui sont sur https://hub.docker.com/r/sagemath/sagemath-dev/
+test:9.4:
+  << : *test
+  image: sagemath/sagemath-dev:9.4
+
+test:9.3:
+  << : *test
+  image: sagemath/sagemath-dev:9.3
+
 test:9.3.beta8:
   << : *test
   image: sagemath/sagemath-dev:9.3.beta8
