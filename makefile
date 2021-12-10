@@ -10,13 +10,13 @@ develop:
 	sage -pip install --upgrade -e .
 
 test:
-	sage -t --force-lib --show-skipped . --log=logs/test.log
+	sage -t --force-lib --show-skipped --log=logs/test.log .
 testlong:
-	sage -t --force-lib --long --show-skipped . --log=logs/testlong.log
+	sage -t --force-lib --long --show-skipped --log=logs/testlong.log .
 ptest:
-	sage -tp --force-lib --show-skipped . --log=logs/ptest.log
+	sage -tp --force-lib --show-skipped --log=logs/ptest.log .
 ptestlong:
-	sage -tp --force-lib --long --memlimit=4000 --show-skipped . --log=logs/ptestlong.log
+	sage -tp --force-lib --long --show-skipped --log=logs/ptestlong.log .
 
 coverage:
 	sage -coverage slabbe/*
