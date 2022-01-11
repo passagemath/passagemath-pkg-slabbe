@@ -358,7 +358,8 @@ class SturmianLanguage(Language):
         """
         from slabbe import PolyhedronPartition
         from sage.geometry.polyhedron.library import polytopes
-        square = polytopes.hypercube(2, intervals='zero_one')
+        # square = polytopes.hypercube(2, intervals='zero_one') # broken in sage 9.0
+        square = polytopes.hypercube(2, intervals=[[0,1]]*2)
         P = PolyhedronPartition([square])
         for i in range(1, length+1):
             for j in range(1, i+1):
