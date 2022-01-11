@@ -23,6 +23,8 @@ from .bond_percolation import (BondPercolationSamples,
                              BondPercolationSample, 
                              PercolationProbability)
 from .tikz_picture import TikzPicture, StandaloneTex
+
+from .sturmian_subshift import SturmianSubshift
 from .ddim_sturmian_configuration import dSturmianConfiguration
 
 from .matrices import M3to2, M2to3, M4to2, M4to3

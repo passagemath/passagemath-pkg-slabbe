@@ -51,6 +51,7 @@ Combinatorics on words
 .. toctree::
    :maxdepth: 1
 
+   sturmian_subshift
    kolakoski_word
    bispecial_extension_type
    finite_word
