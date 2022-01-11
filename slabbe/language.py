@@ -87,6 +87,33 @@ class Language(object):
         s = "Language of finite words over alphabet {}"
         return s.format(self._alphabet)
 
+    def __call__(self, length):
+        r"""
+        Return the language of words of length n.
+
+        INPUT:
+
+        - ``length`` -- integer
+
+        OUTPUT:
+
+        set
+
+        EXAMPLES::
+
+            sage: from slabbe.language import Language
+            sage: L = Language(alphabet=['a'])
+            sage: sorted(L(2))
+            [word: aa]
+
+        .. TODO::
+
+            Should this return a list or a set, since most of the time
+            we know the list contains one copy of each?
+
+        """
+        return set(self.words_of_length_iterator(length))
+
     def words_of_length_iterator(self, length):
         r"""
         Return an iterator over words of given length.
@@ -287,26 +314,47 @@ class RegularLanguage(Language):
         return [a for a in it if self._automaton(a)]
 
 class SturmianLanguage(Language):
+    r"""
+    Language of all Sturmian sequences
+
+    INPUT:
+
+    - ``alphabet`` -- list of size 2
+
+    EXAMPLES::
+
+        sage: from slabbe.language import SturmianLanguage
+        sage: S = SturmianLanguage(['a', 'b'])
+        sage: sorted(S(0))
+        [word: ]
+        sage: sorted(S(1))
+        [word: a, word: b]
+        sage: sorted(S(2))
+        [word: aa, word: ab, word: ba, word: bb]
+        sage: sorted(S(4))
+        [word: aaaa, word: aaab, word: aaba,
+         word: abaa, word: abab, word: abba, word: abbb,
+         word: baaa, word: baab, word: baba, word: babb,
+         word: bbab, word: bbba, word: bbbb]
+        sage: [len(S(n)) for n in range(5)]
+        [1, 2, 4, 8, 14]
+
+    The number of factors of length n is well-known (http://oeis.org/A005598)::
+
+        sage: [len(S(n)) for n in range(15)] # not tested
+        [1, 2, 4, 8, 14, 24, 36, 54, 76, 104, 136, 178, 224, 282, 346]
+        sage: oeis.find_by_subsequence(_)                                  # not tested
+        0: A005598: a(n) = 1 + Sum_{i=1..n} (n-i+1)*phi(i).
+
+    """
     def __init__(self, alphabet):
         r"""
-        INPUT:
-
-        - ``alphabet`` -- list of size 2
+        Constructor. See module for documentation.
 
         EXAMPLES::
 
             sage: from slabbe.language import SturmianLanguage
             sage: S = SturmianLanguage(['a', 'b'])
-            sage: [S.complexity(n) for n in range(5)]
-            [1, 2, 4, 8, 14]
-
-        The number of factors of length n is well-known (http://oeis.org/A005598)::
-
-            sage: [len(set(S.words_of_length_iterator(i))) for i in range(15)] # not tested
-            [1, 2, 4, 8, 14, 24, 36, 54, 76, 104, 136, 178, 224, 282, 346]
-            sage: oeis.find_by_subsequence(_)                                  # not tested
-            0: A005598: a(n) = 1 + Sum_{i=1..n} (n-i+1)*phi(i).
-
         """
         self._alphabet = list(alphabet)
         self._parent = Words(self._alphabet)
@@ -318,7 +366,8 @@ class SturmianLanguage(Language):
         EXAMPLES::
 
             sage: from slabbe.language import SturmianLanguage
-            sage: SturmianLanguage(alphabet=['a', 'b'])
+            sage: S = SturmianLanguage(alphabet=['a', 'b'])
+            sage: S
             Language of all Sturmian factors over alphabet ['a', 'b']
         """
         s = "Language of all Sturmian factors over alphabet {}"
