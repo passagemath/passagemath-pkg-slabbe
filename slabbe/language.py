@@ -286,6 +286,152 @@ class RegularLanguage(Language):
         it = super(RegularLanguage, self).words_of_length_iterator(length)
         return [a for a in it if self._automaton(a)]
 
+class SturmianLanguage(Language):
+    def __init__(self, alphabet):
+        r"""
+        INPUT:
+
+        - ``alphabet`` -- list of size 2
+
+        EXAMPLES::
+
+            sage: from slabbe.language import SturmianLanguage
+            sage: S = SturmianLanguage(['a', 'b'])
+            sage: [S.complexity(n) for n in range(5)]
+            [1, 2, 4, 8, 14]
+
+        The number of factors of length n is well-known (http://oeis.org/A005598)::
+
+            sage: [len(set(S.words_of_length_iterator(i))) for i in range(15)] # not tested
+            [1, 2, 4, 8, 14, 24, 36, 54, 76, 104, 136, 178, 224, 282, 346]
+            sage: oeis.find_by_subsequence(_)                                  # not tested
+            0: A005598: a(n) = 1 + Sum_{i=1..n} (n-i+1)*phi(i).
+
+        """
+        self._alphabet = list(alphabet)
+        self._parent = Words(self._alphabet)
+        if not len(self._alphabet) == 2:
+            raise ValueError('alphabet(={}) must be of size 2'.format(self._alphabet))
+
+    def __repr__(self):
+        r"""
+        EXAMPLES::
+
+            sage: from slabbe.language import SturmianLanguage
+            sage: SturmianLanguage(alphabet=['a', 'b'])
+            Language of all Sturmian factors over alphabet ['a', 'b']
+        """
+        s = "Language of all Sturmian factors over alphabet {}"
+        return s.format(self._alphabet)
+
+    def unit_square_parameter_partition(self, length):
+        r"""
+        Return the partition of the unit square where each polygonal atom
+        represents the set of parameter associated to a factor of length n.
+
+        EXAMPLES::
+
+            sage: from slabbe.language import SturmianLanguage
+            sage: S = SturmianLanguage('ab')
+            sage: S.unit_square_parameter_partition(5)
+            Polyhedron partition of 24 atoms with 24 letters
+
+        We check that the sizes are ok::
+
+            sage: [len(S.unit_square_parameter_partition(i)) for i in range(10)] # long time (2s)
+            [1, 2, 4, 8, 14, 24, 36, 54, 76, 104]
+            sage: oeis.find_by_subsequence(_)                   # not tested
+            0: A005598: a(n) = 1 + Sum_{i=1..n} (n-i+1)*phi(i).
+
+        TESTS::
+
+            sage: [len(S.unit_square_parameter_partition(i)) for i in range(15)] # not tested
+            [1, 2, 4, 8, 14, 24, 36, 54, 76, 104, 136, 178, 224, 282, 346]
+
+        """
+        from slabbe import PolyhedronPartition
+        from sage.geometry.polyhedron.library import polytopes
+        square = polytopes.hypercube(2, intervals='zero_one')
+        P = PolyhedronPartition([square])
+        for i in range(1, length+1):
+            for j in range(1, i+1):
+                P = P.refine_by_hyperplane([j,-i,-1])
+        return P
+
+    def factor(self, slope, intercept, length):
+        r"""
+
+        EXAMPLES::
+
+            sage: from slabbe.language import SturmianLanguage
+            sage: S = SturmianLanguage('ab')
+            sage: S.factor(1/3, 0, 5)
+            word: aabaa
+            sage: S.factor(1/3, 4/5, 5)
+            word: baaba
+
+        """
+        from sage.functions.other import floor
+        L = [floor((n+1)*slope + intercept) - floor(n*slope + intercept)
+                for n in range(length)]
+        L = [self._alphabet[a] for a in L]
+        return self._parent(L)
+
+    def words_of_length_iterator(self, length):
+        r"""
+        Return an iterator over words of given length.
+
+        INPUT:
+
+        - ``length`` -- integer
+
+        EXAMPLES::
+
+            sage: from slabbe.language import SturmianLanguage
+            sage: S = SturmianLanguage('ab')
+            sage: sorted(S.words_of_length_iterator(0))
+            [word: ]
+            sage: sorted(S.words_of_length_iterator(1))
+            [word: a, word: b]
+            sage: sorted(S.words_of_length_iterator(2))
+            [word: aa, word: ab, word: ba, word: bb]
+            sage: sorted(S.words_of_length_iterator(3))
+            [word: aaa,
+             word: aab,
+             word: aba,
+             word: abb,
+             word: baa,
+             word: bab,
+             word: bba,
+             word: bbb]
+            sage: sorted(S.words_of_length_iterator(4))
+            [word: aaaa,
+             word: aaab,
+             word: aaba,
+             word: abaa,
+             word: abab,
+             word: abba,
+             word: abbb,
+             word: baaa,
+             word: baab,
+             word: baba,
+             word: babb,
+             word: bbab,
+             word: bbba,
+             word: bbbb]
+
+        ::
+
+            sage: [len(set(S.words_of_length_iterator(i))) for i in range(10)] # long time
+            [1, 2, 4, 8, 14, 24, 36, 54, 76, 104]
+
+        """
+        P = self.unit_square_parameter_partition(length)
+        for atom in P.atoms():
+            slope,intercept = atom.center()
+            w = self.factor(slope, intercept, length)
+            yield w
+
 #####################
 # Language generators
 #####################
