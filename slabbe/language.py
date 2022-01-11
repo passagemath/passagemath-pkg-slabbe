@@ -329,6 +329,13 @@ class SturmianLanguage(Language):
         Return the partition of the unit square where each polygonal atom
         represents the set of parameter associated to a factor of length n.
 
+        See Chapter 2 from this book:
+
+        Filiot, Emmanuel, Anna Frid, Franck Hétroy-Wheeler, Kolja Knauer,
+        Arnaud Labourel, Jean-Luc Mari, Pierre-Alain Reynier, et Gérard
+        Subsol. Informatique Mathématique Une photographie en 2019.
+        https://www.gdr-im.fr/im-photographie/
+
         EXAMPLES::
 
             sage: from slabbe.language import SturmianLanguage
