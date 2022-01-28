@@ -78,10 +78,9 @@ AUTHORS:
 #*****************************************************************************
 from __future__ import absolute_import, print_function
 
-from subprocess import run, PIPE, CalledProcessError
+from subprocess import run, PIPE
 import os
 
-from sage.misc.latex import have_pdflatex, have_convert
 try:
     from sage.misc.latex import have_program
 except ImportError:
@@ -342,7 +341,7 @@ class StandaloneTex(SageObject):
                program = 'pdflatex'
 
         # Check availability of programs
-        if program == 'pdflatex' and not have_pdflatex():
+        if program == 'pdflatex' and not have_program(program):
             raise RuntimeError("PDFLaTeX does not seem to be installed. " 
                     "Download it from ctan.org and try again.")
         elif program == 'lualatex' and not have_program(program):
@@ -417,11 +416,20 @@ class StandaloneTex(SageObject):
 
             The code was adapted and taken from the module :mod:`sage.misc.latex.py`.
         """
-        if not have_convert():
-            raise RuntimeError("convert (from the ImageMagick suite) does not "
-                  "appear to be installed. Converting PDFLaTeX output to png "
-                  "requires this program, so please install and try again. "
-                  "Go to http://www.imagemagick.org to download it.")
+        try:
+            from sage.features.imagemagick import ImageMagick
+        except ImportError:
+            # This is deprecated in sagemath >=9.5
+            from sage.misc.latex import have_convert
+            if not have_convert():
+                raise RuntimeError("convert (from the ImageMagick suite) does not "
+                    "appear to be installed. Converting PDFLaTeX output to png "
+                    "requires this program, so please install and try again. "
+                    "Go to http://www.imagemagick.org to download it.")
+        else:
+            # This is how to do it in sagemath >=9.5
+            ImageMagick().require()
+
         _filename_pdf = self.pdf(filename=None, view=False)
         _filename, ext = os.path.splitext(_filename_pdf)
         _filename_png = _filename+'.png'
@@ -769,10 +777,19 @@ class TikzPicture(StandaloneTex):
         .. TODO:: improve the previous example
 
         """
-        from sage.misc.latex import have_pdflatex
-        assert have_pdflatex(), "pdflatex does not seem to be installed"
+        try:
+            from sage.features.latex import pdflatex
+        except ImportError:
+            # This is deprecated in sagemath >=9.5
+            from sage.misc.latex import have_pdflatex
+            assert have_pdflatex(), "pdflatex does not seem to be installed"
+        else:
+            # This is how to do it in sagemath >=9.5
+            pdflatex().require()
+
         from sage.features.graphviz import Graphviz
-        assert Graphviz().is_present(), "graphviz does not seem to be installed"
+        Graphviz().require()
+
         # TODO: test the presence of dot2tex
 
         if merge_multiedges and graph.has_multiple_edges():
