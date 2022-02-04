@@ -114,6 +114,69 @@ class Language(object):
         """
         return set(self.words_of_length_iterator(length))
 
+    def factors_extensions(self, n):
+        r"""
+        Return a dict of factors to list of extensions
+
+        INPUT:
+
+        - ``length`` -- integer
+
+        OUTPUT:
+
+        dict
+
+        EXAMPLES::
+
+            sage: from slabbe.language import FactorialLanguage
+            sage: alphabet = ['a', 'b', 'c', 'd']
+            sage: L = FactorialLanguage(alphabet, ['abc', 'acd'])
+            sage: d = L.factors_extensions(0)
+            sage: for key in sorted(d): key, sorted(d[key])
+            (word: , [('a', 'b'), ('a', 'c'), ('b', 'c'), ('c', 'd')])
+            sage: d = L.factors_extensions(1)
+            sage: for key in sorted(d): key, sorted(d[key])
+            (word: b, [('a', 'c')])
+            (word: c, [('a', 'd')])
+
+        """
+        from collections import defaultdict
+        d = defaultdict(list)
+        for awb in self(n+2):
+            w = awb[1:-1]
+            a,b = awb[0],awb[-1]
+            d[w].append((a,b))
+        return dict(d)
+
+    def bispecial_factors(self, n):
+        r"""
+        Return the bispecial factors of length n
+
+        INPUT:
+
+        - ``length`` -- integer
+
+        OUTPUT:
+
+        list of pairs of (factor, list of extensions)
+
+        EXAMPLES::
+
+            sage: from slabbe.language import FactorialLanguage
+            sage: alphabet = ['a', 'b', 'c', 'd']
+            sage: L = FactorialLanguage(alphabet, ['abc', 'acd'])
+            sage: result = L.bispecial_factors(0)
+            sage: [(key, sorted(val)) for (key,val) in result]
+            [(word: , [('a', 'b'), ('a', 'c'), ('b', 'c'), ('c', 'd')])]
+            sage: L.bispecial_factors(1)
+            []
+
+        """
+        d = self.factors_extensions(n)
+        bispecials = [(w,L) for (w,L) in d.items() if len(set(a for (a,b) in L)) >= 2
+                                              and len(set(b for (a,b) in L)) >= 2]
+        return bispecials
+
     def words_of_length_iterator(self, length):
         r"""
         Return an iterator over words of given length.
@@ -243,6 +306,65 @@ class FiniteLanguage(Language):
             5
         """
         return len(self.minimal_automaton().states())
+
+class FactorialLanguage(Language):
+    r"""
+    Finite language
+
+    INPUT:
+
+    - ``alphabet`` -- iterable of letters
+    - ``words`` -- finite iterable of words
+
+    """
+    def __init__(self, alphabet, L):
+        self._alphabet = alphabet
+        self._L = L
+
+    def __repr__(self):
+        r"""
+        EXAMPLES::
+
+            sage: from slabbe.language import FactorialLanguage
+            sage: alphabet = ['a', 'b', 'c', 'd']
+            sage: L = FactorialLanguage(alphabet, ['abc', 'acd'])
+            sage: L
+            Language of the factors of the finite words ['abc', 'acd'] over
+            alphabet ['a', 'b', 'c', 'd']
+        """
+        s = "Language of the factors of the finite words {} over alphabet {}"
+        return s.format(self._L, self._alphabet)
+
+    def __call__(self, length):
+        r"""
+        Return the words of given length.
+
+        INPUT:
+
+        - ``length`` -- integer
+
+        EXAMPLES::
+
+            sage: from slabbe.language import FactorialLanguage
+            sage: alphabet = ['a', 'b', 'c', 'd']
+            sage: L = FactorialLanguage(alphabet, ['abc', 'acd'])
+            sage: L(0)
+            {word: }
+            sage: L(1)
+            {word: a, word: b, word: c, word: d}
+            sage: L(2)
+            {word: ab, word: ac, word: bc, word: cd}
+            sage: L(3)
+            {word: abc, word: acd}
+            sage: L(4)
+            set()
+
+        """
+        W = Words(self._alphabet)
+        S = set()
+        S.update(f for w in self._L for f in W(w).factor_set(length))
+        return S
+
 
 class RegularLanguage(Language):
     r"""
