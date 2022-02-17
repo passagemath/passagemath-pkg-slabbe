@@ -231,10 +231,11 @@ def random_cyclically_reduced_stallings_graph(n, r=2, verbose=False, merge=False
         injections = [random_partial_injection(n) for _ in range(r)]
 
         edges = []
-        for i,injection in enumerate(injections):
+        for i, injection in enumerate(injections):
             label = LatexExpr('a_{}'.format(i))
-            edges.extend([(j,image_j,label) for (j,image_j) in enumerate(injection)
-                                        if not image_j is None])
+            edges.extend([(j, image_j, label)
+                          for (j, image_j) in enumerate(injection)
+                          if image_j is not None])
 
         G = DiGraph([range(n), edges], format='vertices_and_edges',
                 loops=True, multiedges=True)

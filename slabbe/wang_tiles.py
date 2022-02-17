@@ -1786,7 +1786,7 @@ class WangTileSet(object):
             elif i == 2:
                 slope = 0
 
-        if not i in [1, 2]:
+        if i not in [1, 2]:
             raise ValueError("i(={}) should be 1 or 2".format(i))
         if i == 1 and slope not in [1, -1, Infinity]:
             raise ValueError("slope(={}) should be -1, 1 or +Infinity when i=1".format(slope))
@@ -1878,7 +1878,7 @@ class WangTileSet(object):
         """
         from sage.sets.disjoint_set import DisjointSet
 
-        if not i in [1, 2]:
+        if i not in [1, 2]:
             raise ValueError("i(={}) should be 1 or 2".format(i))
 
         dominoes_i = self.dominoes_with_surrounding(i=i, radius=radius,
@@ -1887,8 +1887,8 @@ class WangTileSet(object):
                                         solver=solver, ncpus=ncpus)
 
         union_find = DisjointSet(len(self))
-        for A,B in dominoes_j:
-            union_find.union(A,B)
+        for A, B in dominoes_j:
+            union_find.union(A, B)
 
         ans = []
         for subset in union_find:
@@ -3841,8 +3841,8 @@ class WangTiling(object):
             def random_color():
                     return (randrange(255),randrange(255),randrange(255))
             color_dict = defaultdict(random_color)
-        if not None in color_dict:
-            color_dict[None] = [0,0,0] # black (=0) as the color for None
+        if None not in color_dict:
+            color_dict[None] = [0, 0, 0]  # black (=0) as the color for None
 
         # Create the image
         import numpy as np

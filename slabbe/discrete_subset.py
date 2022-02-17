@@ -297,13 +297,13 @@ class DiscreteSubset(SageObject):
         if self._roots is None:
             element = self._space(0)
             element.set_immutable()
-            if not element in self: 
+            if element not in self:
                 raise ValueError("default element (={}) is not in self, please provide "
                         "one at initialisation".format(element))
             self._roots = [element]
         else:
             for p in self._roots:
-                if not p in self: 
+                if p not in self:
                     raise ValueError("root element (={}) provided at"
                             " initialisation is not in self".format(p))
         return self._roots
@@ -849,26 +849,21 @@ class DiscreteSubset(SageObject):
             [0.333333333333            1.0            0.0]
             [0.666666666667            0.0            1.0]
         """
+        sqrt3 = 1.7320508075688772
         if m == 'isometric':
-            return matrix(2, [-1.7320508075688772*0.5, 1.7320508075688772*0.5, 0, 
-                                           -0.5, -0.5, 1])
+            return matrix(2, [-sqrt3 * 0.5, sqrt3 * 0.5, 0,
+                              -0.5, -0.5, 1])
         elif m == 'belle':
-            return matrix(2, [1/3.0, 1, 0, 2/3.0, 0, 1])
+            return matrix(2, [1 / 3.0, 1, 0, 2 / 3.0, 0, 1])
         elif m == 'plusbelle':
             return matrix(2, [1, 0, -0.4, 0, 1, -0.4])
-        else:
-            try:
-                v = matrix(RR, m)
-            except:
-                raise
-                #TypeError, "unknown input for m(=%s)" % m
-            dim = v.ncols(), v.nrows()
-            if dim == (3,2):
-                return v
-            elif dim == (3,1):
-                return v.right_kernel().basis_matrix()
-            else:
-                raise ValueError("incorrect dimension (=%s) " % (dim,))
+        v = matrix(RR, m)
+        dim = v.ncols(), v.nrows()
+        if dim == (3, 2):
+            return v
+        if dim == (3, 1):
+            return v.right_kernel().basis_matrix()
+        raise ValueError("incorrect dimension (=%s) " % (dim,))
 
     def plot_points(self, color='blue', m=None):
         r"""

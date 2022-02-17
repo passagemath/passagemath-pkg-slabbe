@@ -301,15 +301,16 @@ class dSturmianConfiguration(object):
         """
         # shift the coordinates of fill_color
         if fill_color:
-            (xmin,xmax), (ymin,ymax) = window
+            (xmin, xmax), (ymin, ymax) = window
             shifted_fill_color = {}
-            for key,color in fill_color.items():
+            for key, color in fill_color.items():
                 try:
-                    x,y = key
-                except: # we allow keys to be the type of rhombus (integer)
+                    x, y = key
+                except TypeError:
+                    # we allow keys to be the type of rhombus (integer)
                     shifted_fill_color[key] = color
                 else:
-                    shifted_fill_color[(x-xmin,y-ymin)] = color
+                    shifted_fill_color[(x - xmin, y - ymin)] = color
         else:
             shifted_fill_color = None
         # get the table

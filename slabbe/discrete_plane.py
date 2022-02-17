@@ -159,7 +159,7 @@ class DiscreteHyperplane(DiscreteSubset):
         p = self.an_element()
         p = self._space(p)
         p.set_immutable()
-        if not p in self: 
+        if p not in self:
             raise ValueError("root element (={}) provided at"
                     " initialisation is not in self".format(p))
         self._roots = [p]
@@ -175,7 +175,7 @@ class DiscreteHyperplane(DiscreteSubset):
             Set of points x in ZZ^3 satisfying: 0 <= (1, pi, 7) . x + 10 < pi + 8
         """
         s = "Set of points x in ZZ^{} satisfying: ".format(self.dimension())
-        s +=  "0 <= {} . x + {} < {}".format(self._v,self._mu, self._omega)
+        s += "0 <= {} . x + {} < {}".format(self._v, self._mu, self._omega)
         return s
 
     def an_element(self, x=0, y=0):

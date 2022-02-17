@@ -10,7 +10,7 @@ EXAMPLES::
 
 AUTHOR:
 
-    - Sébastien Labbé, December 9-11, 2016
+- Sébastien Labbé, December 9-11, 2016
 """
 #*****************************************************************************
 #       Copyright (C) 2016 Sébastien Labbé <slabqc@gmail.com>
@@ -22,9 +22,12 @@ AUTHOR:
 #                  http://www.gnu.org/licenses/
 #*****************************************************************************
 from __future__ import absolute_import, print_function
-import os, datetime, re
+import os
+import datetime
+import re
 from slabbe.tikz_picture import TikzPicture
 from pytimeparse.timeparse import timeparse
+
 
 def last_modified_datetime(path_to_file):
     r"""
@@ -39,6 +42,7 @@ def last_modified_datetime(path_to_file):
     """
     t_stamp = os.path.getmtime(path_to_file)
     return datetime.datetime.fromtimestamp(t_stamp)
+
 
 def build_duration_logs(path_to_file, pattern=None):
     r"""
@@ -174,6 +178,7 @@ def sage_logs_datetime_list(consider='last', verbose=False):
 
     return L
 
+
 def draw_sage_build(start=None, stop=None, consider='last', verbose=False):
     r"""
     Return a time evolution picture of packages built by Sage
@@ -295,4 +300,3 @@ def draw_sage_build(start=None, stop=None, consider='last', verbose=False):
 
     lines.append('\\end{tikzpicture}')
     return TikzPicture('\n'.join(lines))
-
