@@ -2214,14 +2214,14 @@ class ExtensionTypeLong(ExtensionType):
         if self._factors_length_k is None:
             # We suppose here the factor is the empty word...
             assert self.is_empty(), "can't compute factor of length k for nonempty word"
-            assert not k is None, "you must provide a value for k to compute them"
+            assert k is not None, "you must provide a value for k to compute them"
             self._factors_length_k = set(w for a,b in self._pairs for w in (a*b).factor_iterator(k))
-        if not k is None and (not self._factors_length_k or
+        if k is not None and (not self._factors_length_k or
                 next(iter(self._factors_length_k)).length() != k):
             raise NotImplementedError("can't compute factors of length k for this word")
         return self._factors_length_k
 
-    def is_valid(self):
+    def is_valid(self) -> bool:
         r"""
         Return whether self is valid, i.e, each left and right extension is
         non empty.
@@ -2234,11 +2234,8 @@ class ExtensionTypeLong(ExtensionType):
             sage: E = ExtensionTypeLong(L, (1,2,3))
             sage: E.is_valid()
             True
-
         """
-        if any(len(a)==0 or len(b)==0 for a,b in self._pairs):
-            return False
-        return True
+        return not any(len(a) == 0 or len(b) == 0 for a, b in self._pairs)
 
     def left_word_extensions(self):
         r"""

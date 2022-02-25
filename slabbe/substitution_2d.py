@@ -417,14 +417,13 @@ class Substitution2d(object):
             ...
             ValueError: the image of 2 in the column (=[0, 2]) has width 1
             but the image of another has width 2
-
         """
         if not column:
             return []
 
         # compute the width of the image
         for a in column:
-            if not a is None:
+            if a is not None:
                 width = len(self._d[a])
                 break
         else:
@@ -432,7 +431,7 @@ class Substitution2d(object):
 
         # compute the image
         rep = [[] for _ in range(width)]
-        for i,a in enumerate(column):
+        for i, a in enumerate(column):
             if a is None:
                 if heights is None:
                     raise ValueError("the {}-th element of given column is None,"
@@ -892,7 +891,7 @@ class Substitution2d(object):
                         " {}".format(self.domain_alphabet(),
                         domain_tiles))
 
-        if not direction in ['right', 'down']:
+        if direction not in ['right', 'down']:
             raise ValueError("direction(={}) must be 'right' or"
                     " 'down'".format(direction))
 

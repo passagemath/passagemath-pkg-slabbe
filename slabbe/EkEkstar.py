@@ -1027,13 +1027,13 @@ class GeoSub(SageObject):
         self._sigma_dict = sigma
         self._sigma = WordMorphism(sigma)
         self._k = k
-        if not presuf in ['prefix', 'suffix']:
+        if presuf not in ['prefix', 'suffix']:
             raise ValueError('Input presuf(={}) should be "prefix" or'
                     ' "suffix"'.format(presuf))
         self._presuf = presuf
         self._dual = dual
 
-    def is_dual(self):
+    def is_dual(self) -> bool:
         return self._dual
 
     @cached_method
