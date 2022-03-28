@@ -456,6 +456,37 @@ class GraphDirectedIteratedFunctionSystem(object):
         edges = [(u,v,galois_conjugate(f)) for (u,v,f) in self._edges]
         return GraphDirectedIteratedFunctionSystem(self._module, edges)
 
+    def inverse(self):
+        r"""
+        Return the inverse of this GIFS
+
+        EXAMPLES:
+
+        Fibonacci substitution::
+
+            sage: from slabbe import GraphDirectedIteratedFunctionSystem as GIFS
+            sage: m = WordMorphism('a->ab,b->a')
+            sage: g = GIFS.from_one_dimensional_substitution(m)
+            sage: g.inverse()
+            GIFS defined by 3 maps on Vector space of dimension 1 over
+            Number Field in root with defining polynomial y^2 - y - 1 with
+            root = 1.618033988749895?
+
+        Direct Product of 2 Fibonacci::
+
+            sage: from slabbe import Substitution2d
+            sage: d = {0:[[3]], 1:[[3],[2]], 2:[[3,1]], 3:[[3,1],[2,0]]}
+            sage: s = Substitution2d(d)
+            sage: ifs = GIFS.from_two_dimensional_substitution(s)
+            sage: ifs.inverse()
+            GIFS defined by 9 maps on Vector space of dimension 2 over
+            Number Field in rootX with defining polynomial y^2 - y - 1 with
+            rootX = 1.618033988749895?
+
+        """
+        edges = [(v,u,f.inverse()) for (u,v,f) in self._edges]
+        return GraphDirectedIteratedFunctionSystem(self._module, edges)
+
     def __call__(self, S=None, n_iterations=1):
         r"""
         Return the image of the list of list of points.
