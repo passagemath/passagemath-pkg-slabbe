@@ -32,9 +32,11 @@ test:dev: &test
 #
 
 # les images qui sont sur https://hub.docker.com/r/sagemath/sagemath-dev/
-test:9.5:
-  << : *test
-  image: sagemath/sagemath-dev:9.5
+
+# this image is broken as it takes more than one hour to unpack and test
+#test:9.5:
+#  << : *test
+#  image: sagemath/sagemath-dev:9.5
 
 test:9.4:
   << : *test
