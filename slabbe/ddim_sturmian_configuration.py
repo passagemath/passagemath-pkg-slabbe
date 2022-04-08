@@ -472,6 +472,127 @@ class dSturmianConfiguration(object):
         F_minus_S = set(tuple(f - s) for f in F for s in S)
         return len(F_minus_S)
 
+    def bispecial_patterns_of_shape(self, shape, a, b, window):
+        r"""
+        Return the patterns of a given shape bispecial at positions a and b
+        appearing in a given window.
+
+        INPUT:
+
+        - ``shape`` -- list, list of coordinates
+        - ``a`` -- position
+        - ``b`` -- position
+        - ``window`` -- tuple of 2-tuples
+
+        EXAMPLES::
+
+            sage: z = polygen(QQ, 'z')
+            sage: K = NumberField(z**2-z-1, 'phi', embedding=RR(1.6))
+            sage: phi = K.gen()
+
+        ::
+
+            sage: from slabbe import dSturmianConfiguration
+            sage: c = dSturmianConfiguration((phi^-1, phi^-2), 0)
+            sage: shape = [(0,0), (1,0), (0,1), (1,1)]
+            sage: window = ((0,10),(0,10))
+            sage: c.bispecial_patterns_of_shape(shape, (-1,0), (2,1), window)
+            []
+
+        With totally irrational normal vector::
+
+            sage: c = dSturmianConfiguration((phi^-1, sqrt(2)), 0)
+            sage: shape = [(0,0), (1,0), (0,1), (1,1)]
+            sage: window = ((0,10),(0,10))
+            sage: c.bispecial_patterns_of_shape(shape, (-1,0), (2,1), window)
+            [(3, 1, 1, 3)]
+
+        """
+        a_shape_b = []
+        a_shape_b.append(a)
+        a_shape_b.extend(shape)
+        a_shape_b.append(b)
+        from collections import defaultdict
+        E_left = defaultdict(set)
+        E_right = defaultdict(set)
+        language_Sab = self.pattern_number_occurrences(a_shape_b, window, avoid_border=0)
+        for pattern in language_Sab:
+            E_left[tuple(pattern[1:-1])].add(pattern[0])
+            E_right[tuple(pattern[1:-1])].add(pattern[-1])
+        left_special = [pattern for (pattern,left_extensions) in
+                                     E_left.items() if len(left_extensions) > 1]
+        right_special = [pattern for (pattern,right_extensions) in
+                                     E_right.items() if len(right_extensions) > 1]
+        return sorted(set(left_special) & set(right_special))
+
+    def bispecial_patterns(self, n, window):
+        r"""
+        Return the vectors of L-shaped bispecial patterns of size up to n.
+
+        INPUT:
+
+        - ``n`` -- integer, maximum size
+        - ``window`` -- tuple of 2-tuples
+
+        EXAMPLES::
+
+            sage: z = polygen(QQ, 'z')
+            sage: K = NumberField(z**2-z-1, 'phi', embedding=RR(1.6))
+            sage: phi = K.gen()
+
+        ::
+
+            sage: from slabbe import dSturmianConfiguration
+            sage: c = dSturmianConfiguration((phi^-1, phi^-2), 0)
+            sage: window = ((0,10),(0,10))
+            sage: c.bispecial_patterns(5, window)
+            {(0, 0): [()],
+             (1, 0): [()],
+             (1, 1): [(0,)],
+             (2, 2): [(0, 2, 0)],
+             (3, 0): [(0, 2)],
+             (3, 3): [(0, 2, 1, 2, 0)],
+             (4, 4): [(0, 2, 1, 0, 1, 2, 0)]}
+
+        With totally irrational normal vector::
+
+            sage: c = dSturmianConfiguration((phi^-1, sqrt(2)), 0)
+            sage: window = ((0,10),(0,10))
+            sage: c.bispecial_patterns(5, window)
+            {(0, 0): [()],
+             (1, 0): [()],
+             (1, 1): [(1,), (3,)],
+             (1, 2): [(3, 1)],
+             (1, 3): [(1, 3, 1)],
+             (1, 4): [(3, 1, 2, 3)],
+             (2, 0): [(3,)],
+             (2, 1): [(1, 3)],
+             (2, 2): [(1, 3, 1)],
+             (2, 3): [(3, 1, 3, 1)],
+             (2, 4): [(1, 3, 1, 3, 1)],
+             (3, 0): [(1, 3)],
+             (3, 1): [(3, 1, 3)],
+             (3, 2): [(1, 3, 2, 3)],
+             (4, 0): [(3, 1, 3)],
+             (4, 1): [(1, 3, 2, 1)],
+             (4, 2): [(3, 1, 3, 2, 3)],
+             (4, 3): [(1, 3, 2, 1, 2, 3)]}
+
+        .. TODO::
+
+            Add negative entries as well
+
+        """
+        d = {}
+        import itertools
+        for i,j in itertools.product(range(n), range(n)):
+            shape = [(a,0) for a in range(1,i)]
+            shape.extend((i,b) for b in range(j))
+            bispecials = self.bispecial_patterns_of_shape(shape, (0,0), (i,j), window)
+            if bispecials:
+                d[(i,j)] = bispecials
+        return d
+
     def rectangular_subwords(self, sizes, window):
         r"""
         Return the list of rectangular subword appearing in the
