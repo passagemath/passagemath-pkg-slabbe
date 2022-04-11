@@ -73,11 +73,6 @@ EXAMPLES::
     sage: len(_)
     8
 
-.. TODO::
-
-    Add a method to plot the configuration as a discrete plane with
-    rhombus.
-
 """
 #*****************************************************************************
 #       Copyright (C) 2020 Sébastien Labbé <slabqc@gmail.com>
@@ -576,11 +571,15 @@ class dSturmianConfiguration(object):
              (4, 0): [(3, 1, 3)],
              (4, 1): [(1, 3, 2, 1)],
              (4, 2): [(3, 1, 3, 2, 3)],
-             (4, 3): [(1, 3, 2, 1, 2, 3)]}
-
-        .. TODO::
-
-            Add negative entries as well
+             (4, 3): [(1, 3, 2, 1, 2, 3)],
+             (1, -1): [(3,)],
+             (1, -2): [(1, 3)],
+             (1, -3): [(3, 1, 3)],
+             (2, -1): [(1, 3)],
+             (2, -2): [(1, 3, 2)],
+             (2, -3): [(3, 1, 3, 2)],
+             (3, -1): [(1, 3, 2)],
+             (4, -4): [(1, 3, 2, 1, 3, 1, 3)]}
 
         """
         d = {}
@@ -591,6 +590,12 @@ class dSturmianConfiguration(object):
             bispecials = self.bispecial_patterns_of_shape(shape, (0,0), (i,j), window)
             if bispecials:
                 d[(i,j)] = bispecials
+        for i,j in itertools.product(range(1,n), range(1,n)):
+            shape = [(a,0) for a in range(1,i)]
+            shape.extend((i,-b) for b in range(j))
+            bispecials = self.bispecial_patterns_of_shape(shape, (0,0), (i,-j), window)
+            if bispecials:
+                d[(i,-j)] = bispecials
         return d
 
     def rectangular_subwords(self, sizes, window):
