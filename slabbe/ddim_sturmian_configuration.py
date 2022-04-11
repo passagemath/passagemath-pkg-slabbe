@@ -556,6 +556,42 @@ class dSturmianConfiguration(object):
                                      E_right.items() if len(right_extensions) > 1]
         return sorted(set(left_special) & set(right_special))
 
+    def bispecial_patterns_of_Lshape(self, v):
+        r"""
+        Return the patterns of a given L-shape bispecial of vector v
+
+        INPUT:
+
+        - ``v`` -- vector
+
+        EXAMPLES::
+
+            sage: z = polygen(QQ, 'z')
+            sage: K = NumberField(z**2-z-1, 'phi', embedding=RR(1.6))
+            sage: phi = K.gen()
+
+        ::
+
+            sage: from slabbe import dSturmianConfiguration
+            sage: c = dSturmianConfiguration((phi^-1, sqrt(2)), 0)
+            sage: c.bispecial_patterns_of_Lshape((3,1))
+            [(3, 1, 3)]
+
+        """
+        i,j = v
+        assert i >= 0
+        if j >= 0:
+            shape = [(a,0) for a in range(1,i)]
+            shape.extend((i,b) for b in range(j))
+            bispecials = self.bispecial_patterns_of_shape(shape, (0,0), (i,j))
+        else:
+            j = -j
+            assert i > 0
+            shape = [(a,0) for a in range(1,i)]
+            shape.extend((i,-b) for b in range(j))
+            bispecials = self.bispecial_patterns_of_shape(shape, (0,0), (i,-j))
+        return bispecials
+
     def bispecial_patterns(self, n):
         r"""
         Return the vectors of L-shaped bispecial patterns of size up to n.
@@ -625,18 +661,12 @@ class dSturmianConfiguration(object):
         """
         d = {}
         import itertools
-        for i,j in itertools.product(range(n), range(n)):
-            shape = [(a,0) for a in range(1,i)]
-            shape.extend((i,b) for b in range(j))
-            bispecials = self.bispecial_patterns_of_shape(shape, (0,0), (i,j))
+        for i,j in itertools.product(range(n), range(-n+1,n)):
+            if i == 0 and j < 0:
+                continue
+            bispecials = self.bispecial_patterns_of_Lshape((i,j))
             if bispecials:
                 d[(i,j)] = bispecials
-        for i,j in itertools.product(range(1,n), range(1,n)):
-            shape = [(a,0) for a in range(1,i)]
-            shape.extend((i,-b) for b in range(j))
-            bispecials = self.bispecial_patterns_of_shape(shape, (0,0), (i,-j))
-            if bispecials:
-                d[(i,-j)] = bispecials
         return d
 
     def rectangular_subwords(self, sizes, window):
