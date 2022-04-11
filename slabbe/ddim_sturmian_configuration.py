@@ -576,13 +576,20 @@ class dSturmianConfiguration(object):
             sage: c = dSturmianConfiguration((phi^-1, sqrt(2)), 0)
             sage: c.bispecial_patterns_of_Lshape((3,1))
             [(3, 1, 3)]
+            sage: c.bispecial_patterns_of_Lshape((0,7))
+            [(3, 1, 3, 1, 2, 3)]
+            sage: c.bispecial_patterns_of_Lshape((7,0))
+            [(3, 1, 3, 2, 1, 3)]
 
         """
         i,j = v
         assert i >= 0
-        if j >= 0:
+        if j > 0:
+            shape = [(a,0) for a in range(1,i+1)]
+            shape.extend((i,b) for b in range(1,j))
+            bispecials = self.bispecial_patterns_of_shape(shape, (0,0), (i,j))
+        elif j == 0:
             shape = [(a,0) for a in range(1,i)]
-            shape.extend((i,b) for b in range(j))
             bispecials = self.bispecial_patterns_of_shape(shape, (0,0), (i,j))
         else:
             j = -j
@@ -612,6 +619,8 @@ class dSturmianConfiguration(object):
             sage: c = dSturmianConfiguration((phi^-1, phi^-2), 0)
             sage: c.bispecial_patterns(5)
             {(0, 0): [()],
+             (0, 1): [()],
+             (0, 3): [(2, 0)],
              (1, -2): [(0, 2)],
              (1, 0): [()],
              (1, 1): [(0,)],
@@ -629,6 +638,9 @@ class dSturmianConfiguration(object):
             sage: c = dSturmianConfiguration((phi^-1, sqrt(2)), 0)
             sage: c.bispecial_patterns(5)
             {(0, 0): [()],
+             (0, 1): [()],
+             (0, 2): [(3,)],
+             (0, 3): [(2, 3), (3, 1)],
              (1, -4): [(1, 3, 1, 3)],
              (1, -3): [(3, 1, 3)],
              (1, -2): [(1, 3)],
