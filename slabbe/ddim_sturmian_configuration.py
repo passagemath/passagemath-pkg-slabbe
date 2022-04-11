@@ -467,17 +467,55 @@ class dSturmianConfiguration(object):
         F_minus_S = set(tuple(f - s) for f in F for s in S)
         return len(F_minus_S)
 
-    def bispecial_patterns_of_shape(self, shape, a, b, window):
+    def language(self, shape):
+        r"""
+        Return the language of a given shape.
+
+        INPUT:
+
+        - ``shape`` -- list, list of coordinates
+
+        OUTPUT:
+
+        list of tuples
+
+        EXAMPLES::
+
+            sage: sqrt2 = AA(sqrt(2))
+            sage: sqrt3 = AA(sqrt(3))
+            sage: from slabbe import dSturmianConfiguration
+            sage: c = dSturmianConfiguration((sqrt2/2, sqrt3/4), 0)
+            sage: shape = [(0,0), (1,0), (0,1), (1,1)]
+            sage: sorted(c.language(shape))
+            [(0, 2, 1, 0),
+             (0, 2, 2, 0),
+             (0, 2, 2, 1),
+             (1, 0, 2, 1),
+             (1, 0, 2, 2),
+             (2, 0, 0, 2),
+             (2, 1, 0, 2),
+             (2, 2, 1, 0)]
+            sage: len(set(c.language(shape)))
+            8
+            sage: c.pattern_complexity_upper_bound(shape)
+            8
+
+        """
+        F = [vector(t) for t in ((0,0), (0,-1), (-1,0))]
+        S = [vector(t) for t in shape]
+        F_minus_S = set(tuple(f - s) for f in F for s in S)
+        return [tuple(self(n+vector(f_s)) for n in S) for f_s in F_minus_S]
+
+
+    def bispecial_patterns_of_shape(self, shape, a, b):
         r"""
         Return the patterns of a given shape bispecial at positions a and b
-        appearing in a given window.
 
         INPUT:
 
         - ``shape`` -- list, list of coordinates
         - ``a`` -- position
         - ``b`` -- position
-        - ``window`` -- tuple of 2-tuples
 
         EXAMPLES::
 
@@ -490,16 +528,14 @@ class dSturmianConfiguration(object):
             sage: from slabbe import dSturmianConfiguration
             sage: c = dSturmianConfiguration((phi^-1, phi^-2), 0)
             sage: shape = [(0,0), (1,0), (0,1), (1,1)]
-            sage: window = ((0,10),(0,10))
-            sage: c.bispecial_patterns_of_shape(shape, (-1,0), (2,1), window)
+            sage: c.bispecial_patterns_of_shape(shape, (-1,0), (2,1))
             []
 
         With totally irrational normal vector::
 
             sage: c = dSturmianConfiguration((phi^-1, sqrt(2)), 0)
             sage: shape = [(0,0), (1,0), (0,1), (1,1)]
-            sage: window = ((0,10),(0,10))
-            sage: c.bispecial_patterns_of_shape(shape, (-1,0), (2,1), window)
+            sage: c.bispecial_patterns_of_shape(shape, (-1,0), (2,1))
             [(3, 1, 1, 3)]
 
         """
@@ -510,7 +546,7 @@ class dSturmianConfiguration(object):
         from collections import defaultdict
         E_left = defaultdict(set)
         E_right = defaultdict(set)
-        language_Sab = self.pattern_number_occurrences(a_shape_b, window, avoid_border=0)
+        language_Sab = self.language(a_shape_b)
         for pattern in language_Sab:
             E_left[tuple(pattern[1:-1])].add(pattern[0])
             E_right[tuple(pattern[1:-1])].add(pattern[-1])
@@ -520,14 +556,13 @@ class dSturmianConfiguration(object):
                                      E_right.items() if len(right_extensions) > 1]
         return sorted(set(left_special) & set(right_special))
 
-    def bispecial_patterns(self, n, window):
+    def bispecial_patterns(self, n):
         r"""
         Return the vectors of L-shaped bispecial patterns of size up to n.
 
         INPUT:
 
         - ``n`` -- integer, maximum size
-        - ``window`` -- tuple of 2-tuples
 
         EXAMPLES::
 
@@ -539,47 +574,53 @@ class dSturmianConfiguration(object):
 
             sage: from slabbe import dSturmianConfiguration
             sage: c = dSturmianConfiguration((phi^-1, phi^-2), 0)
-            sage: window = ((0,10),(0,10))
-            sage: c.bispecial_patterns(5, window)
+            sage: c.bispecial_patterns(5)
             {(0, 0): [()],
+             (1, -2): [(0, 2)],
              (1, 0): [()],
              (1, 1): [(0,)],
+             (2, -4): [(0, 2, 1, 0, 2)],
+             (2, -1): [(0, 2)],
              (2, 2): [(0, 2, 0)],
+             (3, -3): [(0, 2, 1, 0, 2)],
              (3, 0): [(0, 2)],
              (3, 3): [(0, 2, 1, 2, 0)],
+             (4, -2): [(0, 2, 1, 0, 2)],
              (4, 4): [(0, 2, 1, 0, 1, 2, 0)]}
 
         With totally irrational normal vector::
 
             sage: c = dSturmianConfiguration((phi^-1, sqrt(2)), 0)
-            sage: window = ((0,10),(0,10))
-            sage: c.bispecial_patterns(5, window)
+            sage: c.bispecial_patterns(5)
             {(0, 0): [()],
+             (1, -4): [(1, 3, 1, 3)],
+             (1, -3): [(3, 1, 3)],
+             (1, -2): [(1, 3)],
+             (1, -1): [(3,)],
              (1, 0): [()],
              (1, 1): [(1,), (3,)],
              (1, 2): [(3, 1)],
              (1, 3): [(1, 3, 1)],
              (1, 4): [(3, 1, 2, 3)],
+             (2, -3): [(3, 1, 3, 2)],
+             (2, -2): [(1, 3, 2), (3, 1, 3)],
+             (2, -1): [(1, 3)],
              (2, 0): [(3,)],
              (2, 1): [(1, 3)],
              (2, 2): [(1, 3, 1)],
              (2, 3): [(3, 1, 3, 1)],
              (2, 4): [(1, 3, 1, 3, 1)],
+             (3, -2): [(3, 1, 3, 2)],
+             (3, -1): [(1, 3, 2)],
              (3, 0): [(1, 3)],
              (3, 1): [(3, 1, 3)],
              (3, 2): [(1, 3, 2, 3)],
+             (3, 4): [(3, 1, 3, 1, 3, 1)],
+             (4, -4): [(1, 3, 2, 1, 3, 1, 3)],
              (4, 0): [(3, 1, 3)],
              (4, 1): [(1, 3, 2, 1)],
              (4, 2): [(3, 1, 3, 2, 3)],
-             (4, 3): [(1, 3, 2, 1, 2, 3)],
-             (1, -1): [(3,)],
-             (1, -2): [(1, 3)],
-             (1, -3): [(3, 1, 3)],
-             (2, -1): [(1, 3)],
-             (2, -2): [(1, 3, 2)],
-             (2, -3): [(3, 1, 3, 2)],
-             (3, -1): [(1, 3, 2)],
-             (4, -4): [(1, 3, 2, 1, 3, 1, 3)]}
+             (4, 3): [(1, 3, 2, 1, 2, 3)]}
 
         """
         d = {}
@@ -587,13 +628,13 @@ class dSturmianConfiguration(object):
         for i,j in itertools.product(range(n), range(n)):
             shape = [(a,0) for a in range(1,i)]
             shape.extend((i,b) for b in range(j))
-            bispecials = self.bispecial_patterns_of_shape(shape, (0,0), (i,j), window)
+            bispecials = self.bispecial_patterns_of_shape(shape, (0,0), (i,j))
             if bispecials:
                 d[(i,j)] = bispecials
         for i,j in itertools.product(range(1,n), range(1,n)):
             shape = [(a,0) for a in range(1,i)]
             shape.extend((i,-b) for b in range(j))
-            bispecials = self.bispecial_patterns_of_shape(shape, (0,0), (i,-j), window)
+            bispecials = self.bispecial_patterns_of_shape(shape, (0,0), (i,-j))
             if bispecials:
                 d[(i,-j)] = bispecials
         return d
