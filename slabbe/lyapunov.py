@@ -245,7 +245,7 @@ def lyapunov_comparison_table(L, n_orbits=100, n_iterations=10000, ncpus=2):
     Works for higher dimensional algorithms::
 
         sage: algos = [mcf.Brun(a) for a in range(3,6)]
-        sage: lyapunov_comparison_table(algos)    # abs tol 0.01
+        sage: lyapunov_comparison_table(algos)    # abs tol 0.05
           Algorithm    \#Orbits   $\theta_1$ (std)   $\theta_2$ (std)   $1-\theta_2/\theta_1$ (std)
         +------------+----------+------------------+------------------+-----------------------------+
           Brun (d=3)   100        0.304 (0.0083)     -0.112 (0.0035)    1.369 (0.0068)

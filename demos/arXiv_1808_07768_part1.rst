@@ -129,7 +129,7 @@ seconds:
 
 ::
 
-    sage: S.sat_solver('cryptominisat')            # optional cryptominisat  # takes 3s
+    sage: S.sat_solver('cryptominisat')            # optional cryptominisat pycryptosat # takes 3s
     CryptoMiniSat solver: 19170 variables, 1078659 clauses.
     sage: S.has_solution(solver='glucose')         # optional glucose # takes 4 s
     False

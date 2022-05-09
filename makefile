@@ -10,11 +10,11 @@ develop:
 	sage -pip install --upgrade -e .
 
 test:
-	sage -t --force-lib --show-skipped --log=logs/test.log .
+	sage -t --force-lib --show-skipped --log=logs/test.log slabbe demos
 testlong:
 	sage -t --force-lib --long --show-skipped --log=logs/testlong.log .
 ptest:
-	sage -tp --force-lib --show-skipped --log=logs/ptest.log .
+	sage -tp --force-lib --show-skipped --log=logs/ptest.log slabbe demos
 ptestlong:
 	sage -tp --force-lib --long --show-skipped --log=logs/ptestlong.log .
 
