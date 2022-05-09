@@ -708,10 +708,9 @@ def matrix_to_tikz(M, node_format=None, boundary_dash_line=False, extra_code_aft
         sage: M = identity_matrix(4)
         sage: matrix_to_tikz(M)
         \documentclass[tikz]{standalone}
-        \usepackage{amsmath}
+        \newcommand{\symb}[1]{\mathtt{#1}}  % Symbol
         \usetikzlibrary{matrix}
         \usetikzlibrary{fit}
-        \newcommand{\symb}[1]{\mathtt{#1}}  % Symbol
         \begin{document}
         \begin{tikzpicture}
         [baseline=-\the\dimexpr\fontdimen22\textfont2\relax,ampersand replacement=\&]
@@ -719,7 +718,7 @@ def matrix_to_tikz(M, node_format=None, boundary_dash_line=False, extra_code_aft
                minimum size=1.2ex,text width=1.2ex,
                text height=1.2ex,inner sep=3pt,draw={gray!20},align=center,
         ...
-        ... 4 lines not printed (790 characters in total) ...
+        4 lines not printed (790 characters in total).
         ...
         };
         \end{tikzpicture}
@@ -790,7 +789,6 @@ def table_to_discrete_plane_tikz(table, fill_color=None,
         sage: table = c.rectangular_subword(((0,3),(0,4)))
         sage: table_to_discrete_plane_tikz(table)
         \documentclass[tikz]{standalone}
-        \usepackage{amsmath}
         \begin{document}
         \begin{tikzpicture}
         \draw[fill=black!10] (0.000000000000000, 0.000000000000000) -- (0.866025403784439, 0.500000000000000) -- (0.000000000000000, 1.00000000000000) -- (-0.866025403784439, 0.500000000000000) -- (0.000000000000000, 0.000000000000000);
@@ -798,7 +796,7 @@ def table_to_discrete_plane_tikz(table, fill_color=None,
         \node[label=90:0] at (0.000000000000000, 0.000000000000000) {};
         \draw[fill=black!50] (0.000000000000000, 1.00000000000000) -- (0.866025403784439, 0.500000000000000) -- (0.866025403784439, 1.50000000000000) -- (0.000000000000000, 2.00000000000000) -- (0.000000000000000, 1.00000000000000);
         ...
-        ... 28 lines not printed (4613 characters in total) ...
+        28 lines not printed (4613 characters in total).
         ...
         \node[label=90:0] at (1.73205080756888, 3.00000000000000) {};
         \draw[fill=black!50] (1.73205080756888, 4.00000000000000) -- (2.59807621135332, 3.50000000000000) -- (2.59807621135332, 4.50000000000000) -- (1.73205080756888, 5.00000000000000) -- (1.73205080756888, 4.00000000000000);
@@ -806,7 +804,6 @@ def table_to_discrete_plane_tikz(table, fill_color=None,
         \node[label=30:2] at (1.73205080756888, 4.00000000000000) {};
         \end{tikzpicture}
         \end{document}
-
 
     """
     import itertools

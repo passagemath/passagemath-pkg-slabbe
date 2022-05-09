@@ -737,12 +737,11 @@ class MatrixCocycle(object):
             sage: t = ARP.tikz_n_cylinders(1, labels=True, scale=4)
             sage: t
             \documentclass[tikz]{standalone}
-            \usepackage{amsmath}
             \begin{document}
             \begin{tikzpicture}
             [scale=4]
             ...
-            ... 23 lines not printed (1317 characters in total) ...
+            23 lines not printed (1317 characters in total).
             ...
             \end{tikzpicture}
             \end{document}

@@ -598,11 +598,11 @@ class _MCFAlgorithm_methods(object):
             height=7cm,width=8cm,
             xmin=-1.1,xmax=1.1,ymin=-.6,ymax=1.20,
             ...
-            ... 4184 lines not printed (17... characters in total) ...
+            4184 lines not printed (17... characters in total).
             ...
-            \draw[draw=none] (group c2r1.center) --
+            \draw[draw=none] (group c2r1.center) -- 
             node {$\to$}     (group c3r1.center);
-            \draw[draw=none] (group c3r1.center) --
+            \draw[draw=none] (group c3r1.center) -- 
             node {$\times$}  (group c4r1.center);
             \end{tikzpicture}
             \end{document}

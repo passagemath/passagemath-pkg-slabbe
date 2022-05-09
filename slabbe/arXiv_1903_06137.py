@@ -304,8 +304,6 @@ def T0_shapes():
         sage: from slabbe.arXiv_1903_06137 import T0_shapes
         sage: T0_shapes()
         \documentclass[tikz]{standalone}
-        \standaloneconfig{border=2mm}
-        \usepackage{amsmath}
         \begin{document}
         \begin{tikzpicture}
         [scale=1,very thick]
@@ -313,7 +311,7 @@ def T0_shapes():
         % tile at position (x,y)=(0.0, 0.0)
         \node[black] at (0.5, 0.5) {0};
         ...
-        ... 60 lines not printed (5279 characters in total) ...
+        60 lines not printed (5279 characters in total).
         ...
         \draw[blue] (15.0, 0.0) -- ++ (0,.15) arc (-90:90:.1) -- ++ (0,.05) arc (-90:90:.1) -- ++ (0,.05) arc (-90:90:.1) -- ++ (0,.15);
         \draw[blue] (14.0, 1.0) -- ++ (.2,0) -- ++ (.1,.15) -- ++ (.1,-.15) -- ++ (.1,.15) -- ++ (.1,-.15) -- ++ (.1,.15) -- ++ (.1,-.15) -- ++ (.2,0);
@@ -338,8 +336,6 @@ def T0_tiles():
         sage: from slabbe.arXiv_1903_06137 import T0_tiles
         sage: T0_tiles()
         \documentclass[tikz]{standalone}
-        \standaloneconfig{border=2mm}
-        \usepackage{amsmath}
         \begin{document}
         \begin{tikzpicture}
         [scale=1]
@@ -347,7 +343,7 @@ def T0_tiles():
         % tile at position (x,y)=(0.0, 0.0)
         \fill[cyan] (1.0, 0.0) -- (0.5, 0.5) -- (1.0, 1.0);
         ...
-        ... 137 lines not printed (6927 characters in total) ...
+        137 lines not printed (6927 characters in total).
         ...
         \node[rotate=0,black] at (14.8, 0.5) {3};
         \node[rotate=0,black] at (14.5, 0.8) {3};

@@ -288,7 +288,6 @@ class ChristoffelGraph(DiscreteSubset):
             sage: tikz = C.tikz_kernel()
             sage: tikz
             \documentclass[tikz]{standalone}
-            \usepackage{amsmath}
             \begin{document}
             \begin{tikzpicture}
             [scale=1]
@@ -296,7 +295,7 @@ class ChristoffelGraph(DiscreteSubset):
             \draw[very thick, blue] (0.00000, 0.00000) -- (-0.86603, -0.50000);
             \draw[very thick, blue] (0.00000, 0.00000) -- (0.86603, -0.50000);
             ...
-            ... 296 lines not printed (24077 characters in total) ...
+            296 lines not printed (24077 characters in total).
             ...
             \node[circle,fill=black,draw=black,minimum size=0.8mm,inner sep=0pt,] at (-6.92820, 5.00000) {};
             \filldraw[fill=white,very thick,dotted,opacity=0.5,even odd rule]

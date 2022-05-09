@@ -1335,6 +1335,9 @@ class ExtensionType(object):
 
             sage: from slabbe.tikz_picture import TikzPicture
             sage: tikz = TikzPicture.from_poset(P)         # optional dot2tex
+            doctest:...: FutureWarning: This class/method/function is marked as experimental.
+            It, its functionality or its interface might change without a formal deprecation.
+            See http://trac.sagemath.org/20343 for details.
             sage: _ = tikz.pdf(view=False)                 # optional dot2tex
         """
         from sage.combinat.posets.posets import Poset

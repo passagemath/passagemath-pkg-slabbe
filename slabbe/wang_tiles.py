@@ -34,7 +34,7 @@ Using different kind of solvers::
     sage: tiling = W.solve(solver='GLPK')
     sage: tiling = W.solve(solver='dancing_links')
     sage: tiling = W.solve(solver='Gurobi')         # optional Gurobi
-    sage: tiling = W.solve(solver='cryptominisat')  # optional cryptominisat
+    sage: tiling = W.solve(solver='cryptominisat')  # optional cryptominisat pycryptosat
 
 ::
 
@@ -2888,8 +2888,8 @@ class WangTileSolver(object):
         Using cryptominisat solver::
 
             sage: W = WangTileSolver(tiles,3,4)
-            sage: tiling = W.solve('cryptominisat')  # optional cryptominisat
-            sage: tiling._table                      # optional cryptominisat
+            sage: tiling = W.solve('cryptominisat')  # optional cryptominisat pycryptosat
+            sage: tiling._table                      # optional cryptominisat pycryptosat
             [[1, 0, 1, 0], [0, 1, 0, 1], [1, 0, 1, 0]]
 
         REFERENCES:
@@ -2992,7 +2992,7 @@ class WangTileSolver(object):
         Using cryptominisat::
 
             sage: W = WangTileSolver(tiles,3,4)
-            sage: W.has_solution(solver='cryptominisat') # optional cryptominisat
+            sage: W.has_solution(solver='cryptominisat') # optional cryptominisat pycryptosat
             True
         """
         if solver == 'dancing_links':
@@ -4575,7 +4575,6 @@ class WangTiling(object):
             sage: t = tiling.tikz()
             sage: t
             \documentclass[tikz]{standalone}
-            \usepackage{amsmath}
             \begin{document}
             \begin{tikzpicture}
             [scale=1]
@@ -4583,7 +4582,7 @@ class WangTiling(object):
             % tile at position (x,y)=(0, 0)
             \node[] at (0.5, 0.5) {0};
             ...
-            ... 97 lines not printed (3571 characters in total) ...
+            97 lines not printed (3571 characters in total).
             ...
             \node[rotate=0,black] at (2.8, 3.5) {0};
             \node[rotate=0,black] at (2.5, 3.8) {0};

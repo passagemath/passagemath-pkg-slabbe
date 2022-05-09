@@ -316,12 +316,11 @@ class MarkovTransformation(object):
             sage: t = T.tikz_n_cylinders(1, labels=True, scale=4)
             sage: t
             \documentclass[tikz]{standalone}
-            \usepackage{amsmath}
             \begin{document}
             \begin{tikzpicture}
             [scale=4]
             ...
-            ... 56 lines not printed (2702 characters in total) ...
+            56 lines not printed (2702 characters in total).
             ...
             \end{tikzpicture}
             \end{document}

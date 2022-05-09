@@ -1711,7 +1711,6 @@ class DoubleSquare(SageObject):
             sage: s = cfibo2.tikz_reduction(scale=0.5,ncols=4,labels=True)
             sage: s
             \documentclass[tikz]{standalone}
-            \usepackage{amsmath}
             \usetikzlibrary{pgfplots.groupplots}
             \begin{document}
             \newcommand{\TRIM}{\textsc{trim}}
@@ -1720,7 +1719,7 @@ class DoubleSquare(SageObject):
             \newcommand{\SHIFT}{\textsc{shift}}
             \newcommand{\REVERSE}{\textsc{reverse}}
             ...
-            ... 103 lines not printed (6363 characters in total) ...
+            103 lines not printed (6363 characters in total).
             ...
             \path[->] (q1) edge node[midway, rectangle, fill=white, rotate=90] {$\TRIM_1$} (q2);
             \path[->] (q2) edge node[midway, rectangle, fill=white, rotate=90] {$\TRIM_3$} (q3);
@@ -1736,7 +1735,6 @@ class DoubleSquare(SageObject):
             sage: s = cSfibo2.tikz_reduction(scale=0.15,ncols=4,labels='T')
             sage: s
             \documentclass[tikz]{standalone}
-            \usepackage{amsmath}
             \usetikzlibrary{pgfplots.groupplots}
             \begin{document}
             \newcommand{\TRIM}{\textsc{trim}}
@@ -1745,7 +1743,7 @@ class DoubleSquare(SageObject):
             \newcommand{\SHIFT}{\textsc{shift}}
             \newcommand{\REVERSE}{\textsc{reverse}}
             ...
-            ... 93 lines not printed (9437 characters in total) ...
+            93 lines not printed (9437 characters in total).
             ...
             \path[thick, ->] (q1) edge node[midway, above] {$T_2$} (q2);
             \path[thick, ->] (q2) edge node[midway, above] {$T_3$} (q3);

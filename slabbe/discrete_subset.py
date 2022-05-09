@@ -1375,7 +1375,6 @@ class DiscreteSubset(SageObject):
             sage: tikz = I.tikz_noprojection(scale=0.5,point_kwds=point_kwds)
             sage: tikz
             \documentclass[tikz]{standalone}
-            \usepackage{amsmath}
             \begin{document}
             \begin{tikzpicture}
             [scale=0.500000000000000]
@@ -1383,7 +1382,7 @@ class DiscreteSubset(SageObject):
             \draw[very thick, blue] (0, 0) -- (0, 1);
             \draw[very thick, blue] (2, 0) -- (3, 0);
             ...
-            ... 40 lines not printed (2659 characters in total) ...
+            40 lines not printed (2659 characters in total).
             ...
             \node[circle,fill=black,draw=black,minimum size=0.8mm,inner sep=0pt,] at (-5, 2) {};
             \node[above right] at (-5, 2) {$0$};
@@ -1401,7 +1400,6 @@ class DiscreteSubset(SageObject):
             sage: s = I.tikz_noprojection()
             sage: s
             \documentclass[tikz]{standalone}
-            \usepackage{amsmath}
             \begin{document}
             \begin{tikzpicture}
              [x={(-0.866025cm,-0.500000cm)}, y={(0.866025cm,-0.500000cm)},
@@ -1409,7 +1407,7 @@ class DiscreteSubset(SageObject):
             \draw[very thick, blue] (0, 0, 0) -- (1, 0, 0);
             \draw[very thick, blue] (0, 0, 0) -- (0, 1, 0);
             ...
-            ... 311 lines not printed (20339 characters in total) ...
+            311 lines not printed (20339 characters in total).
             ...
             \end{tikzpicture}
             \end{document}
