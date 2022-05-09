@@ -29,7 +29,6 @@ Setting ``view=True``, which is the default, opens the pdf in a viewer.
 
     zage: t
     \documentclass[tikz]{standalone}
-    \usepackage{amsmath}
     \begin{document}
     \begin{tikzpicture}%
             [x={(0.249656cm, -0.577639cm)},
@@ -49,7 +48,7 @@ Adding a border avoids croping the vertices of a graph::
 
     sage: g = graphs.PetersenGraph()
     sage: s = latex(g)   # takes 3s but the result is cached
-    sage: t = TikzPicture(s, standalone_options=["border=4mm"], usepackage=['tkz-graph'])
+    sage: t = TikzPicture(s, standalone_config=["border=4mm"], usepackage=['tkz-graph'])
     sage: _ = t.pdf()    # not tested
 
 If dot2tex Sage optional package and graphviz are installed, then the following
@@ -89,18 +88,21 @@ except ImportError:
 from sage.misc.temporary_file import tmp_filename
 from sage.structure.sage_object import SageObject
 
+from sage.misc.decorators import rename_keyword
+from sage.misc.superseded import experimental
 
-class StandaloneTex(SageObject):
-    def __init__(self, content, standalone_options=None, usepackage=['amsmath'],
+class Standalone(SageObject):
+    @rename_keyword(standalone_options="standalone_config")
+    def __init__(self, content, standalone_config=None, usepackage=None,
             usetikzlibrary=None, macros=None, use_sage_preamble=False):
         r"""
         See the class documentation for full information.
 
         EXAMPLES::
 
-            sage: from slabbe import StandaloneTex
+            sage: from slabbe import Standalone
             sage: content = "\\section{Intro}\n\nTest\n"
-            sage: t = StandaloneTex(content)
+            sage: t = Standalone(content)
 
         ::
 
@@ -109,8 +111,8 @@ class StandaloneTex(SageObject):
             sage: t = TikzPicture(s)
         """
         self._content = content
-        self._standalone_options = [] if standalone_options is None else standalone_options
-        self._usepackage = usepackage
+        self._standalone_config = [] if standalone_config is None else standalone_config
+        self._usepackage = [] if usepackage is None else usepackage
         self._usetikzlibrary = [] if usetikzlibrary is None else usetikzlibrary
         self._macros = [] if macros is None else macros
         if use_sage_preamble:
@@ -129,7 +131,7 @@ class StandaloneTex(SageObject):
             sage: latex.extra_preamble('')
             sage: from slabbe import TikzPicture
             sage: s = "\\begin{tikzpicture}\n\\draw (0,0) -- (1,1);\n\\end{tikzpicture}"
-            sage: t = TikzPicture(s, standalone_options=["border=4mm"], usepackage=['tkz-graph'])
+            sage: t = TikzPicture(s, standalone_config=["border=4mm"], usepackage=['tkz-graph'])
             sage: t._latex_file_header_lines()[:6]
             ['\\documentclass[tikz]{standalone}',
              '\\standaloneconfig{border=4mm}',
@@ -137,7 +139,7 @@ class StandaloneTex(SageObject):
         """
         lines = []
         lines.append(r"\documentclass[tikz]{standalone}")
-        for config in self._standalone_options:
+        for config in self._standalone_config:
             lines.append(r"\standaloneconfig{{{}}}".format(config))
         for package in self._usepackage:
             lines.append(r"\usepackage{{{}}}".format(package))
@@ -166,7 +168,7 @@ class StandaloneTex(SageObject):
             \definecolor{clv0}{rgb}{0.0,0.0,0.0}
             \definecolor{cv1}{rgb}{0.0,0.0,0.0}
             ...
-            ... 65 lines not printed (3695 characters in total) ...
+            65 lines not printed (3695 characters in total).
             ...
             \Edge[lw=0.1cm,style={color=cv6v8,},](v6)(v8)
             \Edge[lw=0.1cm,style={color=cv6v9,},](v6)(v9)
@@ -183,7 +185,7 @@ class StandaloneTex(SageObject):
         else:
             lines.extend(L[:5])
             lines.append('...')
-            lines.append('... {} lines not printed ({} characters in total) ...'.format(len(L)-10, 
+            lines.append('{} lines not printed ({} characters in total).'.format(len(L)-10, 
                                                            len(self._content)))
             lines.append('...')
             lines.extend(L[-5:])
@@ -204,15 +206,19 @@ class StandaloneTex(SageObject):
             False
 
             sage: from slabbe import TikzPicture
-            sage: g = graphs.PetersenGraph()
-            sage: t = TikzPicture.from_graph(g)            # optional dot2tex
-            sage: g._rich_repr_(dm)      # random result is Text in doctest
+            sage: lines = []
+            sage: lines.append(r'\begin{tikzpicture}')
+            sage: lines.append(r'\draw[very thick,orange,->] (0,0) -- (1,1);')
+            sage: lines.append(r'\end{tikzpicture}')
+            sage: s = '\n'.join(lines)
+            sage: t = TikzPicture(s)
+            sage: t._rich_repr_(dm)      # random result is Text in doctest
             OutputImagePng container
 
         Using vector svg instead of png::
 
             sage: dm.preferences.graphics = 'vector'
-            sage: g._rich_repr_(dm)      # random result is Text in doctest
+            sage: t._rich_repr_(dm)      # random result is Text in doctest
             OutputImageSvg container
             sage: dm.preferences.graphics = 'raster'
         """
@@ -261,7 +267,6 @@ class StandaloneTex(SageObject):
             sage: print(t)
             \RequirePackage{luatex85}
             \documentclass[tikz]{standalone}
-            \usepackage{amsmath}
             \begin{document}
             \begin{tikzpicture}
             \draw (0,0) -- (1,1);
@@ -521,7 +526,7 @@ class StandaloneTex(SageObject):
 
         return _filename_svg
 
-    def tex(self, filename=None, include_header=True):
+    def tex(self, filename=None, content_only=False, include_header=None):
         """
         Writes the latex code to a file.
 
@@ -529,9 +534,9 @@ class StandaloneTex(SageObject):
 
         - ``filename`` -- string (default:``None``), the output filename.
           If ``None``, it saves the file in a temporary directory.
-        - ``include_header`` -- bool (default:``True``) whether to include
-          the header latex part. If ``False``, it prints only the
-          tikzpicture part to the file.
+        - ``content_only`` -- bool (default:``False``) whether to include
+          the header latex part. If ``True``, it prints only the
+          content to the file.
 
         OUTPUT:
 
@@ -548,7 +553,7 @@ class StandaloneTex(SageObject):
 
         Write only the tikzpicture without header and begin/end document::
 
-            sage: _ = t.tex(include_header=False)
+            sage: _ = t.tex(content_only=True)
 
         Write to a given filename::
 
@@ -558,14 +563,23 @@ class StandaloneTex(SageObject):
 
         """
         if filename is None:
-            filename = tmp_filename('tikz_','.tex')
+            from sage.misc.temporary_file import tmp_filename
+            filename = tmp_filename('tikz_', '.tex')
         else:
             filename = os.path.abspath(filename)
 
-        if include_header:
-            output = str(self)
+        if include_header is not None:
+            content_only = not include_header
+            from sage.misc.superseded import deprecation
+            deprecation(20343, "When merging this code from slabbe into "
+                    "SageMath the argument include_header=False was "
+                    "replaced by content_only=True. Please update your code "
+                    "before include_header option gets removed from SageMath.")
+
+        if content_only:
+            output = self.content()
         else:
-            output = self.tikz_picture_code()
+            output = str(self)
 
         with open(filename, 'w') as f:
             f.write(output)
@@ -573,7 +587,7 @@ class StandaloneTex(SageObject):
         return filename
 
 
-class TikzPicture(StandaloneTex):
+class TikzPicture(Standalone):
     r"""
     Creates a TikzPicture embedded in a LaTeX standalone document class.
 
@@ -581,7 +595,7 @@ class TikzPicture(StandaloneTex):
 
     - ``code`` -- string, tikzpicture code starting with ``r'\begin{tikzpicture}'``
       and ending with ``r'\end{tikzpicture}'``
-    - ``standalone_options`` -- list of strings (default: ``[]``),
+    - ``standalone_config`` -- list of strings (default: ``[]``),
       latex document class standalone configuration options.
     - ``usepackage`` -- list of strings (default: ``['amsmath']``), latex
       packages.
@@ -599,7 +613,7 @@ class TikzPicture(StandaloneTex):
         sage: from slabbe import TikzPicture
         sage: g = graphs.PetersenGraph()
         sage: s = latex(g)
-        sage: t = TikzPicture(s, standalone_options=["border=4mm"], usepackage=['tkz-graph'])
+        sage: t = TikzPicture(s, standalone_config=["border=4mm"], usepackage=['tkz-graph'])
         sage: _ = t.pdf(view=False)   # long time (2s)
 
     Here are standalone configurations, packages, tikz libraries and macros you
@@ -613,7 +627,7 @@ class TikzPicture(StandaloneTex):
         ....:      'positioning', 'pgfplots.groupplots', 'mindmap']
         sage: macros = [r'\newcommand{\ZZ}{\mathbb{Z}}']
         sage: s = "\\begin{tikzpicture}\n\\draw (0,0) -- (1,1);\n\\end{tikzpicture}"
-        sage: t = TikzPicture(s, standalone_options=options, usepackage=usepackage, 
+        sage: t = TikzPicture(s, standalone_config=options, usepackage=usepackage, 
         ....:        usetikzlibrary=tikzlib, macros=macros)
         sage: _ = t.pdf(view=False)   # long time (2s)
     """
@@ -664,10 +678,11 @@ class TikzPicture(StandaloneTex):
                                crop=True,
                                figonly='True',
                                prog=prog).strip()
-        return TikzPicture(tikz, standalone_options=["border=4mm"],
+        return TikzPicture(tikz, standalone_config=["border=4mm"],
                            usetikzlibrary=['shapes'])
 
     @classmethod
+    @experimental(trac_number=20343)
     def from_graph(cls, graph, merge_multiedges=True,
             merge_label_function=tuple, **kwds):
         r"""
@@ -706,7 +721,10 @@ class TikzPicture(StandaloneTex):
 
             sage: from slabbe import TikzPicture
             sage: g = graphs.PetersenGraph()
-            sage: tikz = TikzPicture.from_graph(g) # optional dot2tex # long time (3s)
+            sage: tikz = TikzPicture.from_graph(g) # optional dot2tex
+            doctest:...: FutureWarning: This class/method/function is marked as experimental.
+            It, its functionality or its interface might change without a formal deprecation.
+            See http://trac.sagemath.org/20343 for details.
             sage: _ = tikz.pdf()      # not tested
 
         Using ``prog``::
@@ -803,9 +821,10 @@ class TikzPicture(StandaloneTex):
 
         graph.latex_options().set_options(**default)
         tikz = graph._latex_()
-        return TikzPicture(tikz, standalone_options=["border=4mm"])
+        return TikzPicture(tikz, standalone_config=["border=4mm"])
 
     @classmethod
+    @experimental(trac_number=20343)
     def from_graph_with_pos(cls, graph, scale=1, merge_multiedges=True,
             merge_label_function=tuple):
         r"""
@@ -828,6 +847,12 @@ class TikzPicture(StandaloneTex):
             sage: from slabbe import TikzPicture
             sage: g = graphs.PetersenGraph()
             sage: tikz = TikzPicture.from_graph_with_pos(g)
+            doctest:...: FutureWarning: This class/method/function is marked as experimental.
+            It, its functionality or its interface might change without a formal deprecation.
+            See http://trac.sagemath.org/20343 for details.
+
+        ::
+
 
         ::
 
@@ -839,7 +864,6 @@ class TikzPicture(StandaloneTex):
             sage: TikzPicture.from_graph_with_pos(G, merge_label_function=f)
             \documentclass[tikz]{standalone}
             \standaloneconfig{border=4mm}
-            \usepackage{amsmath}
             \begin{document}
             \begin{tikzpicture}
             [auto,scale=1]
@@ -912,7 +936,7 @@ class TikzPicture(StandaloneTex):
 
         lines.append(r'\end{tikzpicture}')
         tikz = '\n'.join(lines)
-        return TikzPicture(tikz, standalone_options=["border=4mm"])
+        return TikzPicture(tikz, standalone_config=["border=4mm"])
 
     @classmethod
     def from_poset(cls, poset, **kwds):
