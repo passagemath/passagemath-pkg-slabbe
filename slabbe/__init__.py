@@ -22,7 +22,10 @@ from .joyal_bijection import Endofunctions, Endofunction, DoubleRootedTree
 from .bond_percolation import (BondPercolationSamples, 
                              BondPercolationSample, 
                              PercolationProbability)
-from .tikz_picture import TikzPicture, StandaloneTex
+try:
+    from sage.misc.latex_standalone import TikzPicture, Standalone
+except ImportError:
+    from .tikz_picture import TikzPicture, Standalone
 
 from .sturmian_subshift import SturmianSubshift
 from .ddim_sturmian_configuration import dSturmianConfiguration
