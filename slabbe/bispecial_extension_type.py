@@ -1119,7 +1119,10 @@ class ExtensionType(object):
 
             sage: G = E1.graph_under_sadic([132]*2+[123]*6, S)
             sage: from slabbe.tikz_picture import TikzPicture
-            sage: _ = TikzPicture.from_graph(G).pdf(view=False) # long time (9s)
+            sage: _ = TikzPicture.from_graph(G).pdf(view=False) # (9s)
+            doctest:...: FutureWarning: This class/method/function is marked as experimental.
+            It, its functionality or its interface might change without a formal deprecation.
+            See http://trac.sagemath.org/20343 for details.
         """
         R = self.rec_enum_set_under_sadic(substitutions,
                 substitutions_dict, keep_equal_length=keep_equal_length,
@@ -1335,9 +1338,6 @@ class ExtensionType(object):
 
             sage: from slabbe.tikz_picture import TikzPicture
             sage: tikz = TikzPicture.from_poset(P)         # optional dot2tex
-            doctest:...: FutureWarning: This class/method/function is marked as experimental.
-            It, its functionality or its interface might change without a formal deprecation.
-            See http://trac.sagemath.org/20343 for details.
             sage: _ = tikz.pdf(view=False)                 # optional dot2tex
         """
         from sage.combinat.posets.posets import Poset

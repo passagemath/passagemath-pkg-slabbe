@@ -54,7 +54,10 @@ Adding a border avoids croping the vertices of a graph::
 If dot2tex Sage optional package and graphviz are installed, then the following
 one liner works::
 
-    sage: t = TikzPicture.from_graph(g)  # optional: dot2tex # long time (3s)
+    sage: t = TikzPicture.from_graph(g)  # optional: dot2tex (3s)
+    doctest:...: FutureWarning: This class/method/function is marked as experimental.
+    It, its functionality or its interface might change without a formal deprecation.
+    See http://trac.sagemath.org/20343 for details.
 
 ::
 
@@ -143,9 +146,9 @@ class Standalone(SageObject):
             lines.append(r"\standaloneconfig{{{}}}".format(config))
         for package in self._usepackage:
             lines.append(r"\usepackage{{{}}}".format(package))
+        lines.extend(self._macros)
         for library in self._usetikzlibrary:
             lines.append(r"\usetikzlibrary{{{}}}".format(library))
-        lines.extend(self._macros)
         return lines
 
     def _repr_(self):
@@ -722,9 +725,6 @@ class TikzPicture(Standalone):
             sage: from slabbe import TikzPicture
             sage: g = graphs.PetersenGraph()
             sage: tikz = TikzPicture.from_graph(g) # optional dot2tex
-            doctest:...: FutureWarning: This class/method/function is marked as experimental.
-            It, its functionality or its interface might change without a formal deprecation.
-            See http://trac.sagemath.org/20343 for details.
             sage: _ = tikz.pdf()      # not tested
 
         Using ``prog``::
@@ -963,6 +963,9 @@ class TikzPicture(Standalone):
             sage: from slabbe import TikzPicture
             sage: P = posets.PentagonPoset()
             sage: tikz = TikzPicture.from_poset(P) # optional dot2tex # long time (3s)
+            doctest:...: FutureWarning: This class/method/function is marked as experimental.
+            It, its functionality or its interface might change without a formal deprecation.
+            See http://trac.sagemath.org/20343 for details.
             sage: tikz = TikzPicture.from_poset(P, prog='neato', color_by_label=True) # optional dot2tex # long time (3s)
 
         ::

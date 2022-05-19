@@ -1824,7 +1824,6 @@ class DoubleSquare(SageObject):
             sage: s = cfibo2.tikz_commutative_diagram(**options)     # long time (2s)
             sage: s                                                  # long time
             \documentclass[tikz]{standalone}
-            \usepackage{amsmath}
             \begin{document}
             \newcommand{\TRIM}{\textsc{trim}}
             \newcommand{\EXTEND}{\textsc{extend}}
@@ -1832,7 +1831,7 @@ class DoubleSquare(SageObject):
             \newcommand{\SHIFT}{\textsc{shift}}
             \newcommand{\REVERSE}{\textsc{reverse}}
             ...
-            ... 105 lines not printed (12001 characters in total) ...
+            105 lines not printed (12001 characters in total).
             ...
             \path[thick, ->] (q0) edge node[midway, left] {$\varphi$} (r0);
             \path[thick, ->] (q1) edge node[midway, left] {$\varphi$} (r1);

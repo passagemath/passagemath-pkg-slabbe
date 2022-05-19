@@ -235,7 +235,7 @@ def lyapunov_comparison_table(L, n_orbits=100, n_iterations=10000, ncpus=2):
         sage: import slabbe.mult_cont_frac as mcf
         sage: from slabbe.lyapunov import lyapunov_comparison_table
         sage: algos = [mcf.Brun(), mcf.ARP()]
-        sage: lyapunov_comparison_table(algos)    # abs tol 0.01
+        sage: lyapunov_comparison_table(algos)    # abs tol 0.05
           Algorithm                       \#Orbits   $\theta_1$ (std)   $\theta_2$ (std)   $1-\theta_2/\theta_1$ (std)
         +-------------------------------+----------+------------------+------------------+-----------------------------+
           Arnoux-Rauzy-Poincar\'e (d=3)   100        0.44 (0.014)       -0.173 (0.0060)    1.389 (0.0051)
