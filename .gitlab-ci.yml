@@ -1,8 +1,9 @@
 before_script:
   - export MAKEFLAGS="-j2"
 
-test:dev: &test
-  image: sagemath/sagemath-dev:develop
+test:9.0:
+test:9.0: &test
+  image: sagemath/sagemath-dev:9.0
   script:
     - sudo apt update
     # https://github.com/moby/moby/issues/27988
@@ -33,42 +34,44 @@ test:dev: &test
 
 # les images qui sont sur https://hub.docker.com/r/sagemath/sagemath-dev/
 
-# this image is broken as it takes more than one hour to unpack and test
-#test:9.5:
-#  << : *test
-#  image: sagemath/sagemath-dev:9.5
-
-test:9.4:
+test:9.1.rc5:
   << : *test
-  image: sagemath/sagemath-dev:9.4
-
-test:9.3:
-  << : *test
-  image: sagemath/sagemath-dev:9.3
-
-# Pour 9.3.beta8 et 9.3.beta3, it needs the memlimit
-#- sage -t --force-lib --long --memlimit=4000 ${DIRECTORY} # broken in 9.3 and 9.4
-#test:9.3.beta8:
-#  << : *test
-#  image: sagemath/sagemath-dev:9.3.beta8
-#
-#test:9.3.beta3:
-#  << : *test
-#  image: sagemath/sagemath-dev:9.3.beta3
-
-test:9.2.beta3:
-  << : *test
-  image: sagemath/sagemath-dev:9.2.beta3
+  image: sagemath/sagemath-dev:9.1.rc5
 
 test:9.1.rc5-py3:
   << : *test
   image: sagemath/sagemath-dev:9.1.rc5-py3
 
-test:9.1.rc5:
+test:9.2.beta3:
   << : *test
-  image: sagemath/sagemath-dev:9.1.rc5
+  image: sagemath/sagemath-dev:9.2.beta3
 
-test:9.0:
+# Pour 9.3.beta8 et 9.3.beta3, it needs the memlimit
+#- sage -t --force-lib --long --memlimit=4000 ${DIRECTORY} # broken in 9.3 and 9.4
+#test:9.3.beta3:
+#  << : *test
+#  image: sagemath/sagemath-dev:9.3.beta3
+#
+#test:9.3.beta8:
+#  << : *test
+#  image: sagemath/sagemath-dev:9.3.beta8
+#
+
+test:9.3:
   << : *test
-  image: sagemath/sagemath-dev:9.0
+  image: sagemath/sagemath-dev:9.3
+
+test:9.4:
+  << : *test
+  image: sagemath/sagemath-dev:9.4
+
+# this image is broken as it takes more than one hour to unpack and test
+#test:9.5:
+#  << : *test
+#  image: sagemath/sagemath-dev:9.5
+#
+#test:dev:
+#  << : *test
+#  image: sagemath/sagemath-dev:develop
+
 
