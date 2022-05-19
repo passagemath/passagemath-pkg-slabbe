@@ -965,9 +965,6 @@ class TikzPicture(Standalone):
             sage: from slabbe import TikzPicture
             sage: P = posets.PentagonPoset()
             sage: tikz = TikzPicture.from_poset(P) # optional dot2tex # long time (3s)
-            doctest:...: FutureWarning: This class/method/function is marked as experimental.
-            It, its functionality or its interface might change without a formal deprecation.
-            See http://trac.sagemath.org/20343 for details.
             sage: tikz = TikzPicture.from_poset(P, prog='neato', color_by_label=True) # optional dot2tex # long time (3s)
 
         ::
