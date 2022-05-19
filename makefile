@@ -12,11 +12,11 @@ develop:
 test:
 	sage -t --force-lib --show-skipped --log=logs/test.log slabbe demos
 testlong:
-	sage -t --force-lib --long --show-skipped --log=logs/testlong.log .
+	sage -t --force-lib --long --show-skipped --log=logs/testlong.log slabbe demos
 ptest:
 	sage -tp --force-lib --show-skipped --log=logs/ptest.log slabbe demos
 ptestlong:
-	sage -tp --force-lib --long --show-skipped --log=logs/ptestlong.log .
+	sage -tp --force-lib --long --show-skipped --log=logs/ptestlong.log slabbe demos
 
 coverage:
 	sage -coverage slabbe/*
