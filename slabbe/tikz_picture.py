@@ -821,7 +821,9 @@ class TikzPicture(Standalone):
 
         graph.latex_options().set_options(**default)
         tikz = graph._latex_()
-        return TikzPicture(tikz, standalone_config=["border=4mm"])
+        usepackage = ['amsmath']
+        return TikzPicture(tikz, standalone_config=["border=4mm"],
+                usepackage=usepackage)
 
     @classmethod
     @experimental(trac_number=20343)

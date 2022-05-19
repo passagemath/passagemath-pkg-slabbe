@@ -48,7 +48,12 @@ This allows to create the transducer graph of `U` shown at Figure 4:
 
     sage: G = U.to_transducer_graph(); G
     Looped digraph on 10 vertices
-    sage: _ = TikzPicture.from_graph(G).pdf(view=False)
+    sage: t = TikzPicture.from_graph(G)
+    doctest:...: FutureWarning: This class/method/function is marked as experimental.
+    It, its functionality or its interface might change without a formal deprecation.
+    See http://trac.sagemath.org/20343 for details.
+    sage: if not 'amsmath' in t._usepackage: t._usepackage.append('amsmath')
+    sage: _ = t.pdf(view=False)
 
 *Proof of Lemma 13*. We compute the number of dominoes in the direction $e_2$
 allowing a surrounding of radius $1,2,3$ in $\Omega_U$. We obtain 35 dominoes
