@@ -531,6 +531,8 @@ class ExtensionType(object):
             return 'weak'
         elif self.is_ordinaire():
             return 'ord.'
+        elif self.is_dendric():
+            return 'dendric'
         else:
             return "neutral"
     def equivalence_class(self):
@@ -1944,6 +1946,20 @@ class ExtensionType1to1(ExtensionType):
             return False
         return True
 
+    def is_dendric(self):
+        r"""
+        EXAMPLES::
+
+            sage: from slabbe import ExtensionType1to1
+            sage: L = [(1,3), (2,3), (3,1), (3,2), (3,3)]
+            sage: E = ExtensionType1to1(L, [1,2,3])
+            sage: E.is_dendric()
+            True
+        """
+        if not self.is_neutral():
+            return False
+        return self.extension_graph().is_tree()
+
     def cardinality(self):
         r"""
         EXAMPLES::
@@ -1990,9 +2006,9 @@ class ExtensionType1to1(ExtensionType):
         """
         return set(a for a,b in self if a == b)
 
-    def extension_digraph(self):
+    def extension_graph(self):
         r"""
-        Return the extension directed graph made of edges
+        Return the bipartite extension graph made of edges
 
             (-1,a) -> (+1,b)
 
@@ -2003,7 +2019,7 @@ class ExtensionType1to1(ExtensionType):
             sage: from slabbe import ExtensionType1to1
             sage: L = [(1,3), (2,3), (3,1), (3,2), (3,3)]
             sage: E = ExtensionType1to1(L, alphabet=(1,2,3))
-            sage: E.extension_digraph()
+            sage: E.extension_graph()
             Bipartite graph on 6 vertices
         """
         left, right = zip(*self)
@@ -2017,26 +2033,30 @@ class ExtensionType1to1(ExtensionType):
         right = list(right)
         return BipartiteGraph(G, partition=(left,right))
 
-    def extension_graph(self, loops=False):
+    def _extension_graph(self, loops=False):
         r"""
         Return the extension graph made of edges (a,b)
         for each pair (a,b) in the extension set.
+
+        .. WARNING::
+
+            This is not the good definition.
 
         EXAMPLES::
 
             sage: from slabbe import ExtensionType1to1
             sage: L = [(1,3), (2,3), (3,1), (3,2), (3,3)]
             sage: E = ExtensionType1to1(L, alphabet=(1,2,3))
-            sage: E.extension_graph()
+            sage: E._extension_graph()
             Graph on 3 vertices
-            sage: E.extension_graph(loops=True)
+            sage: E._extension_graph(loops=True)
             Looped graph on 3 vertices
 
         ::
 
             sage: L = [(1,1), (1,2), (2,1), (3,3)]
             sage: E = ExtensionType1to1(L, alphabet=(1,2,3))
-            sage: G = E.extension_graph()
+            sage: G = E._extension_graph()
             sage: G.is_connected()
             False
         """
@@ -2709,6 +2729,25 @@ class ExtensionTypeLong(ExtensionType):
             False
         """
         return self.extension_type_1to1().is_ordinaire()
+
+    def is_dendric(self):
+        r"""
+        EXAMPLES::
+
+            sage: from slabbe import ExtensionTypeLong
+            sage: L = [((2, 2), (1,)), ((2, 3), (1,)), ((2, 1), (2,)), ((1,
+            ....:          2), (1,)), ((1, 2), (2,)), ((1, 2), (3,)), ((3, 1), (2,))]
+            sage: E = ExtensionTypeLong(L, (1,2,3))
+            sage: E.extension_type_1to1()
+              E(w)   1   2   3
+               1         X
+               2     X   X   X
+               3     X
+             m(w)=0, neutral
+            sage: E.is_dendric()
+            False
+        """
+        return self.extension_type_1to1().is_dendric()
 
     def left_extensions(self):
         r"""
