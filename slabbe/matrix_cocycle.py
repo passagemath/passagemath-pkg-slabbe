@@ -204,6 +204,9 @@ class MatrixCocycle(object):
         values = list(self._gens.values())
         return values[0].parent().one()
 
+    def dimension(self):
+        return self.identity_matrix().nrows()
+
     def word_to_matrix(self, w):
         r"""
         EXAMPLES::
@@ -670,9 +673,16 @@ class MatrixCocycle(object):
         from sage.plot.text import text
         from sage.plot.colors import hue
         from sage.modules.free_module_element import vector
-        from .matrices import M3to2
+        if self.dimension() == 3:
+            from .matrices import M3to2
+            projection = M3to2
+        elif self.dimension() == 4:
+            from .matrices import M4to3
+            projection = M4to3
+        else:
+            raise NotImplementedError("when dimension={}".format(self.dimension()))
         R = self.n_matrices_eigenvectors(n)
-        L = [(w, M3to2*(a/sum(a)), M3to2*(b/sum(b))) for (w,a,b) in R]
+        L = [(w, projection*(a/sum(a)), projection*(b/sum(b))) for (w,a,b) in R]
         G = Graphics()
         alphabet = self._language._alphabet
         color_ = dict( (letter, hue(i/float(len(alphabet)))) for i,letter in
@@ -690,10 +700,15 @@ class MatrixCocycle(object):
         if draw_line:
             for (a,b) in L:
                 G += line([a,b], color='black', linestyle=":")
-        G += line([M3to2*vector(a) for a in [(1,0,0), (0,1,0), (0,0,1), (1,0,0)]]) 
-        title = "%s eigenvectors, colored by letter w[%s] of cylinder w" % (side, color_index)
-        G += text(title, (0.5, 1.05), axis_coords=True)
-        G.axes(False)
+        
+        ID = self.identity_matrix()
+        for p,q in itertools.combinations(ID.columns(), 2):
+            G += line([projection*p, projection*q])
+
+        if self.dimension() == 3:
+            title = "%s eigenvectors, colored by letter w[%s] of cylinder w" % (side, color_index)
+            G += text(title, (0.5, 1.05), axis_coords=True)
+            G.axes(False)
         return G
 
     def plot_pisot_conjugates(self, n):
