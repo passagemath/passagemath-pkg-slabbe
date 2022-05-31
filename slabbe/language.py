@@ -309,7 +309,7 @@ class FiniteLanguage(Language):
 
 class FactorialLanguage(Language):
     r"""
-    Finite language
+    Factorial language, the set of factors of the provided list of words.
 
     INPUT:
 
