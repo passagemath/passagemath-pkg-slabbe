@@ -114,6 +114,20 @@ class Language(object):
         """
         return set(self.words_of_length_iterator(length))
 
+    def alphabet(self):
+        r"""
+        Return the alphabet of the language
+
+        EXAMPLES::
+
+            sage: from slabbe.language import Language
+            sage: L = Language(alphabet=['a'])
+            sage: L.alphabet()
+            ['a']
+
+        """
+        return self._alphabet
+
     def factors_extensions(self, n):
         r"""
         Return a dict of factors to list of extensions
@@ -176,6 +190,79 @@ class Language(object):
         bispecials = [(w,L) for (w,L) in d.items() if len(set(a for (a,b) in L)) >= 2
                                               and len(set(b for (a,b) in L)) >= 2]
         return bispecials
+
+    def bispecial_table(self, max_length):
+        r"""
+        Return the table of the bispecial factors of a word.
+
+        INPUT:
+
+        - ``max_length`` -- integer
+
+        OUTPUT:
+
+            table
+
+        EXAMPLES::
+
+            sage: from slabbe.language import FactorialLanguage
+            sage: alphabet = [0, 1]
+            sage: w = words.FibonacciWord()
+            sage: L = FactorialLanguage(alphabet, [w[:10000]])
+            sage: L.bispecial_table(20)
+              |w|   word                  m(w)   info   d^-(w)   d^+(w)
+            +-----+---------------------+------+------+--------+--------+
+              0                           0      ord.   2        2
+              1     0                     0      ord.   2        2
+              3     010                   0      ord.   2        2
+              6     010010                0      ord.   2        2
+              11    01001010010           0      ord.   2        2
+              19    0100101001001010010   0      ord.   2        2
+
+        ::
+
+            sage: w = words.ThueMorseWord()
+            sage: L = FactorialLanguage(alphabet, [w[:10000]])
+            sage: L.bispecial_table(20)
+              |w|   word               m(w)   info     d^-(w)   d^+(w)
+            +-----+------------------+------+--------+--------+--------+
+              0                        1      strong   2        2
+              1     0                  0      ord.     2        2
+              1     1                  0      ord.     2        2
+              2     01                 1      strong   2        2
+              2     10                 1      strong   2        2
+              3     010                -1     weak     2        2
+              3     101                -1     weak     2        2
+              4     0110               1      strong   2        2
+              4     1001               1      strong   2        2
+              6     011001             -1     weak     2        2
+              6     100110             -1     weak     2        2
+              8     01101001           1      strong   2        2
+              8     10010110           1      strong   2        2
+              12    011010010110       -1     weak     2        2
+              12    100101101001       -1     weak     2        2
+              16    0110100110010110   1      strong   2        2
+              16    1001011001101001   1      strong   2        2
+
+        """
+        from slabbe import ExtensionType1to1
+        rows = []
+        for n in range(max_length):
+            for w,L in self.bispecial_factors(n):
+                ext = ExtensionType1to1(L, self.alphabet(), factor=w)
+                mw = ext.multiplicity()
+                info = ext.information()
+                left_valence = ext.left_valence()
+                right_valence = ext.right_valence()
+                row = [w.length(), w, mw, info, left_valence, right_valence]
+                rows.append(row)
+        rows.sort(key=lambda row:row[1])
+        rows.sort(key=lambda row:row[0])
+
+        header_row=['|w|', 'word', 'm(w)','info', 'd^-(w)', 'd^+(w)']
+
+        from sage.misc.table import table
+        return table(rows=rows, header_row=header_row)
 
     def words_of_length_iterator(self, length):
         r"""
