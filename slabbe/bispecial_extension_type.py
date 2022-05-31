@@ -37,7 +37,7 @@ not ordinairy word::
        1        X
        2            X
        3    X   X   X
-     m(w)=0, neutral
+     m(w)=0, dendric
     sage: E1, E2 = E.apply(m)
     sage: E1
       E(w)  1   2   3
@@ -219,7 +219,7 @@ class ExtensionType(object):
                1         X    
                2             X
                3     X   X   X
-             m(w)=0, neutral
+             m(w)=0, dendric
 
         ::
 
@@ -340,7 +340,7 @@ class ExtensionType(object):
                12    X   X   X
                22    X
                23    X
-             m(w)=0, neutral
+             m(w)=0, dendric
         """
         mw = self.multiplicity()
         info = self.information()
@@ -399,7 +399,7 @@ class ExtensionType(object):
             $22$ & $\times$ &   &   \\
             $23$ & $\times$ &   &   \\
             \end{tabular}\\
-            $m(w) = 0$, neutral\\
+            $m(w) = 0$, dendric\\
             \end{tabular}
 
         With factor appearing::
@@ -416,7 +416,7 @@ class ExtensionType(object):
             $22$ & $\times$ &   &   \\
             $23$ & $\times$ &   &   \\
             \end{tabular}\\
-            $m(w) = 0$, neutral\\
+            $m(w) = 0$, dendric\\
             \end{tabular}
 
         With valence appearing::
@@ -432,7 +432,7 @@ class ExtensionType(object):
             $22$ & $\times$ &   &   \\
             $23$ & $\times$ &   &   \\
             \end{tabular}\\
-            $m(w) = 0$, neutral\\
+            $m(w) = 0$, dendric\\
             $d^-_1(w)=3$, $d^-_{2}(w)=5$\\
             \end{tabular}
 
@@ -776,7 +776,7 @@ class ExtensionType(object):
                32            X
                23    X   X   X
                33    X
-             m(w)=0, neutral
+             m(w)=0, dendric
         """
         L = []
         for e in self.apply(m):
@@ -825,7 +825,7 @@ class ExtensionType(object):
                  12    X   X   X
                  22            X
                  23    X
-              m(w)=0, neutral, word: , ())}
+              m(w)=0, dendric, word: , ())}
             sage: [len(R.graded_component(i)) for i in range(9)]
             [1, 2, 2, 2, 2, 2, 2, 2, 3]
 
@@ -1426,7 +1426,7 @@ class ExtensionType(object):
               |w|   w                      m(w)   d^-(w)   d2^-(w)   info
             +-----+----------------------+------+--------+---------+---------+
               0                            0      3        5         ord.
-              1     2                      0      3        4         neutral
+              1     2                      0      3        4         dendric
               2     22                     0      2        2         ord.
               4     2322                   0      2        3         ord.
               5     22322                  0      2        2         ord.
@@ -1788,7 +1788,7 @@ class ExtensionType1to1(ExtensionType):
                1             X
                2
                3
-             m(w)=0, neutral
+             m(w)=0, dendric
             sage: ar = WordMorphism({1:[1,3],2:[2,3],3:[3]})
             sage: E.apply(ar)
             ()
@@ -1908,7 +1908,7 @@ class ExtensionType1to1(ExtensionType):
                1     X
                2             X
                3     X   X   X
-             m(w)=0, neutral
+             m(w)=0, dendric
             sage: E.is_neutral()
             True
             sage: E.is_ordinaire()
@@ -2102,7 +2102,7 @@ class ExtensionTypeLong(ExtensionType):
            12    X   X   X
            22    X
            23    X
-        m(w)=0, neutral
+        m(w)=0, dendric
 
     """
     def __init__(self, L, alphabet, chignons=('',''), factor=Word(),
@@ -2156,7 +2156,7 @@ class ExtensionTypeLong(ExtensionType):
                31        X
                12    X   X   X
                3     X
-            m(w)=0, neutral
+            m(w)=0, dendric
             sage: G.is_subset(E)
             True
         """
@@ -2343,7 +2343,7 @@ class ExtensionTypeLong(ExtensionType):
                12    X   X   X
                22    X
                23    X
-             m(w)=0, neutral
+             m(w)=0, dendric
         """
         lines = []
         L = sorted(self.left_word_extensions(), key=lambda w:w.reversal())
@@ -2507,7 +2507,7 @@ class ExtensionTypeLong(ExtensionType):
                 1     X   X   X
                 2             X
                 3     X
-             m(w)=0, neutral,   
+             m(w)=0, dendric,   
                E(w)   1   2   3
                 1     X   X   X
                 3     X   X   X
@@ -2527,7 +2527,7 @@ class ExtensionTypeLong(ExtensionType):
                12    X   X   X
                22    X
                23    X
-             m(w)=0, neutral
+             m(w)=0, dendric
             sage: b12 = WordMorphism({1:[1,2],2:[2],3:[3]})
             sage: E.apply(b12)
             (  E(w)   1   2   3
@@ -2536,7 +2536,7 @@ class ExtensionTypeLong(ExtensionType):
                 12        X
                 22    X   X   X
                 23    X
-              m(w)=0, neutral,
+              m(w)=0, dendric,
                E(w)   1   2   3
                 21        X
                 31        X
@@ -2568,7 +2568,7 @@ class ExtensionTypeLong(ExtensionType):
                 32            X
                 23    X   X   X
                 33    X
-              m(w)=0, neutral,
+              m(w)=0, dendric,
                E(w)   1   2   3
                 12    X   X   X
                 32    X
@@ -2593,7 +2593,7 @@ class ExtensionTypeLong(ExtensionType):
                 21    X
                 12    X
                 13        X
-             m(w)=0, neutral,
+             m(w)=0, dendric,
                E(w)   1   2   3
                 11    X   X   X
                 21    X
@@ -2617,7 +2617,7 @@ class ExtensionTypeLong(ExtensionType):
                21    X
                12    X
                13        X
-            m(w)=0, neutral
+            m(w)=0, dendric
         """
         F = self.factors_length_k(l+r)
 
@@ -2691,7 +2691,7 @@ class ExtensionTypeLong(ExtensionType):
                1         X
                2     X   X   X
                3     X
-             m(w)=0, neutral
+             m(w)=0, dendric
 
         """
         pairs = set((a[-1],b[0]) for a,b in self)
@@ -2724,7 +2724,7 @@ class ExtensionTypeLong(ExtensionType):
                1         X
                2     X   X   X
                3     X
-             m(w)=0, neutral
+             m(w)=0, dendric
             sage: E.is_ordinaire()
             False
         """
@@ -2743,9 +2743,9 @@ class ExtensionTypeLong(ExtensionType):
                1         X
                2     X   X   X
                3     X
-             m(w)=0, neutral
+             m(w)=0, dendric
             sage: E.is_dendric()
-            False
+            True
         """
         return self.extension_type_1to1().is_dendric()
 
