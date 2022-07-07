@@ -1857,6 +1857,24 @@ class WangTileSet(object):
         EXAMPLES::
 
             sage: from slabbe import WangTileSet
+            sage: tiles = [(3,0,1,2), (1,0,3,2), (4,2,5,0), (5,2,4,0), (1,2,3,4)]
+            sage: T = WangTileSet(tiles)
+            sage: T.find_markers(i=1)
+            []
+            sage: T.find_markers(i=2)
+            [[0, 1], [2, 3]]
+
+        No markers::
+
+            sage: tiles = ['ABCD', 'EFGH', 'AXCY', 'ABAB']
+            sage: T = WangTileSet(tiles)
+            sage: T.find_markers(i=1)
+            []
+            sage: T.find_markers(i=2)
+            []
+
+        The Jeandel-Rao tile set::
+
             sage: tiles = [(2,4,2,1), (2,2,2,0), (1,1,3,1), (1,2,3,2), (3,1,3,3),
             ....: (0,1,3,1), (0,0,0,1), (3,1,0,2), (0,2,1,2), (1,2,1,4), (3,3,1,2)]
             sage: tiles = [[str(a) for a in t] for t in tiles]
@@ -1866,14 +1884,12 @@ class WangTileSet(object):
             sage: T.find_markers(i=2)
             [[0, 1]]
 
-        ::
+        The third example from Jeandel-Rao paper::
 
-            sage: tiles = ['ABCD', 'EFGH', 'AXCY', 'ABAB']
-            sage: T = WangTileSet(tiles)
-            sage: T.find_markers(i=1)
-            [[0], [1], [2]]
-            sage: T.find_markers(i=2)
-            [[0], [1], [2]]
+            sage: tiles = "1232 3133 3234 2421 2220 0001 3102 0210 3312 0131 1131"
+            sage: T = WangTileSet([tuple(tile) for tile in tiles.split()])
+            sage: T.find_markers(i=1, radius=1, solver='dancing_links')
+            []
 
         """
         from sage.sets.disjoint_set import DisjointSet
@@ -1886,7 +1902,10 @@ class WangTileSet(object):
         dominoes_j = self.dominoes_with_surrounding(i=3-i, radius=radius,
                                         solver=solver, ncpus=ncpus)
 
-        union_find = DisjointSet(len(self))
+        # start only with tiles which appear in dominoes_j
+        tiles = set(a for (a,b) in dominoes_j)
+        tiles.update(b for (a,b) in dominoes_j)
+        union_find = DisjointSet(tiles)
         for A, B in dominoes_j:
             union_find.union(A, B)
 
