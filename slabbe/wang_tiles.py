@@ -1886,10 +1886,12 @@ class WangTileSet(object):
 
         The third example from Jeandel-Rao paper::
 
-            sage: tiles = "1232 3133 3234 2421 2220 0001 3102 0210 3312 0131 1131"
+            sage: tiles = "1232 3133 3234 2421 2220 0001 3102 0212 3312 0131 1131"
             sage: T = WangTileSet([tuple(tile) for tile in tiles.split()])
             sage: T.find_markers(i=1, radius=1, solver='dancing_links')
             []
+            sage: T.find_markers(i=2, radius=1, solver='dancing_links')
+            [[3, 4]]
 
         """
         from sage.sets.disjoint_set import DisjointSet
