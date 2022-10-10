@@ -877,12 +877,34 @@ def galois_conjugate(f):
         sage: galois_conjugate(f)
               [-phi + 1        0]     [-phi + 1]
         x |-> [       0 -phi + 1] x + [       0]
+        sage: f = F(identity_matrix(2), (phi,0))
+        sage: galois_conjugate(f)
+              [1 0]     [-phi + 1]
+        x |-> [0 1] x + [       0]
+
+    It is not always defined::
+
+        sage: F = AffineGroup(2, AA)
+        sage: entries = [1/2*sqrt(5) + 1/2, 0, 0, 0, sqrt(2) + 1, 0, 0, 0, 1]
+        sage: M = matrix(3, entries)
+        sage: f = F(M)
+        sage: galois_conjugate(f)
+        Traceback (most recent call last):
+        ...
+        ValueError: can't take the galois conjugate of value 1/2*sqrt(5) +
+        1/2 with parent Algebraic Real Field
 
     """
     from sage.matrix.constructor import matrix
     F = f.parent()
     dim = F.degree() + 1
-    M = matrix(dim,[a.galois_conjugate() for a in f.matrix().list()])
+    entries = []
+    for a in f.matrix().list():
+        if hasattr(a, 'galois_conjugate'):
+            entries.append(a.galois_conjugate())
+        else:
+            raise ValueError("can't take the galois conjugate of value {} with parent {}".format(a, a.parent()))
+    M = matrix(dim, entries)
     return F(M)
 
 
