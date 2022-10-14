@@ -891,8 +891,8 @@ def galois_conjugate(f):
         sage: galois_conjugate(f)
         Traceback (most recent call last):
         ...
-        ValueError: can't take the galois conjugate of value 1/2*sqrt(5) +
-        1/2 with parent Algebraic Real Field
+        ValueError: can't take the galois conjugate of value
+        1.618033988749895? with parent Algebraic Real Field
 
     """
     from sage.matrix.constructor import matrix
