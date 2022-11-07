@@ -1,6 +1,9 @@
 r"""
 Hypercubic billiard subshifts
 
+The construction of a billiard word in this module is made by lifting a
+certain set of projected sturmian sequences.
+
 EXAMPLES::
 
     sage: from slabbe import HypercubicBilliardSubshift
@@ -8,7 +11,7 @@ EXAMPLES::
     sage: L = s.language(6, prefix_length=10000)
     sage: len(L)
     43
-    sage: v = list(sqrt(p) for p in primes(start=2, stop=18))
+    sage: v = [sqrt(p) for p in primes_first_n(7)]
     sage: s = HypercubicBilliardSubshift(v)
     sage: K = s.language(2, prefix_length=10000)
     sage: len(K)
@@ -34,6 +37,45 @@ An open question is to find a bijection between L and K::
      word: 40, word: 42, word: 41, word: 45, word: 43, word: 46,
      word: 10, word: 12, word: 13, word: 14, word: 15, word: 16,
      word: 51, word: 50, word: 53, word: 56, word: 52, word: 54}
+
+::
+
+    sage: v = [sqrt(p) for p in primes_first_n(4)]
+    sage: s = HypercubicBilliardSubshift(v)
+    sage: L = s.language(4, prefix_length=18000)
+    sage: len(L)
+    73
+    sage: v = [sqrt(p) for p in primes_first_n(5)]
+    sage: t = HypercubicBilliardSubshift(v)
+    sage: K = t.language(3, prefix_length=10000)
+    sage: len(K)
+    73
+    sage: L
+    {word: 0123, word: 1330, word: 3031, word: 1332, word: 3032, word: 2303,
+     word: 2301, word: 2302, word: 2310, word: 3120, word: 0213, word: 0132, 
+     word: 0133, word: 1023, word: 3123, word: 3203, word: 2313, word: 3201, 
+     word: 2312, word: 1032, word: 2320, word: 1033, word: 3130, word: 3132, 
+     word: 3213, word: 2323, word: 3210, word: 2321, word: 2013, word: 0231,
+     word: 2330, word: 2331, word: 0233, word: 0232, word: 0313, word: 0312,
+     word: 1203, word: 3301, word: 3302, word: 2332, word: 0321, word: 3310,
+     word: 0323, word: 3312, word: 3232, word: 3230, word: 3231, word: 2103,
+     word: 2031, word: 2032, word: 2033, word: 1303, word: 0332, word: 0331,
+     word: 1302, word: 3320, word: 3321, word: 1230, word: 1231, word: 1232,
+     word: 1233, word: 3012, word: 3013, word: 3021, word: 3102, word: 2132,
+     word: 3103, word: 1321, word: 1323, word: 1320, word: 3023, word: 2133,
+     word: 2130}
+    sage: K
+    {word: 012, word: 013, word: 014, word: 410, word: 412, word: 413, word: 414, 
+     word: 102, word: 103, word: 104, word: 021, word: 024, word: 023, word: 341, 
+     word: 343, word: 344, word: 342, word: 424, word: 423, word: 340, word: 421, 
+     word: 031, word: 032, word: 034, word: 431, word: 430, word: 432, word: 434, 
+     word: 120, word: 201, word: 041, word: 123, word: 124, word: 440, word: 441, 
+     word: 442, word: 044, word: 042, word: 043, word: 203, word: 204, word: 443, 
+     word: 210, word: 130, word: 132, word: 213, word: 134, word: 214, word: 301, 
+     word: 140, word: 302, word: 142, word: 143, word: 144, word: 304, word: 310, 
+     word: 230, word: 312, word: 231, word: 314, word: 234, word: 401, word: 402, 
+     word: 403, word: 404, word: 320, word: 321, word: 324, word: 244, word: 243, 
+     word: 240, word: 241, word: 420}
 
 AUTHORS:
 
@@ -270,4 +312,341 @@ class HypercubicBilliardSubshift:
         d = self.dimension()
         return sum([factorial(k)*binomial(n,k)*binomial(d-1,k) 
                    for k in range(0, min(d-1,n)+1)])
+
+    def abelian_complexity(self, n):
+        r"""
+        Return the number abelian factors of length ``n`` of the hypercubic
+        billiard word
+
+        INPUT:
+
+        - ``n`` -- integer
+
+        OUTPUT:
+
+            integer
+
+        EXAMPLES::
+
+            sage: from slabbe import HypercubicBilliardSubshift
+            sage: s = HypercubicBilliardSubshift((1,sqrt(2),pi))
+            sage: [s.abelian_complexity(i) for i in range(10)]
+            [1, 3, 4, 4, 4, 4, 4, 4, 4, 4]
+
+        Indeed we compute 4 abelian vectors of factors of length 10::
+
+            sage: L = s.language(6, prefix_length=10000)
+            sage: set(tuple(w.abelian_vector()) for w in L)
+            {(0, 2, 4), (1, 1, 4), (1, 2, 3), (2, 1, 3)}
+            sage: from collections import Counter
+            sage: Counter(tuple(w.abelian_vector()) for w in L)
+            Counter({(1, 2, 3): 18,
+                     (1, 1, 4): 18,
+                     (2, 1, 3): 4,
+                     (0, 2, 4): 3})
+
+        ::
+
+            sage: s = HypercubicBilliardSubshift((1,sqrt(2),pi,sqrt(3)))
+            sage: [s.abelian_complexity(i) for i in range(10)]
+            [1, 4, 7, 8, 8, 8, 8, 8, 8, 8]
+
+        """
+        from sage.functions.other import factorial, binomial
+        d = self.dimension()
+        return sum([binomial(d-1,k) for k in range(0, min(d-1,n)+1)])
+
+    def complexity_vs_abelian_classes(self, n, prefix_length=10000):
+        r"""
+        Compare the formula with the actual number of abelian classes
+
+        INPUT:
+
+        - ``n`` -- integer
+
+        EXAMPLES::
+
+            sage: from slabbe import HypercubicBilliardSubshift
+            sage: s = HypercubicBilliardSubshift((1,sqrt(2),pi))
+
+        It may seem that something makes sense between the number of
+        factors with given abelian vector and the complexity formula::
+
+            sage: s.complexity_vs_abelian_classes(2)
+            Factor Complexity:
+               p(2) = 7
+                    = 1*1*1 + 1*2*2 + 2*1*1
+                    = 1*1 + 2*2 + 2*1
+            Counting each abelian factor:
+              abelian vector   number of factors
+            +----------------+-------------------+
+              (0, 0, 2)        1
+              (1, 0, 1)        2
+              (1, 1, 0)        2
+              (0, 1, 1)        2
+
+        ::
+
+            sage: s.complexity_vs_abelian_classes(3)
+            Factor Complexity:
+               p(3) = 13
+                    = 1*1*1 + 1*3*2 + 2*3*1
+                    = 1*1 + 3*2 + 6*1
+            Counting each abelian factor:
+              abelian vector   number of factors
+            +----------------+-------------------+
+              (0, 0, 3)        1
+              (0, 1, 2)        3
+              (1, 0, 2)        3
+              (1, 1, 1)        6
+
+        ::
+
+            sage: s.complexity_vs_abelian_classes(4)
+            Factor Complexity:
+               p(4) = 21
+                    = 1*1*1 + 1*4*2 + 2*6*1
+                    = 1*1 + 4*2 + 12*1
+            Counting each abelian factor:
+              abelian vector   number of factors
+            +----------------+-------------------+
+              (0, 2, 2)        1
+              (1, 0, 3)        4
+              (0, 1, 3)        4
+              (1, 1, 2)        12
+
+        But everything breaks down when looking at factors of length 5 or
+        more::
+
+            sage: s.complexity_vs_abelian_classes(5)
+            Factor Complexity:
+               p(5) = 31
+                    = 1*1*1 + 1*5*2 + 2*10*1
+                    = 1*1 + 5*2 + 20*1
+            Counting each abelian factor:
+              abelian vector   number of factors
+            +----------------+-------------------+
+              (0, 2, 3)        3
+              (0, 1, 4)        3
+              (1, 2, 2)        5
+              (1, 1, 3)        20
+
+        ::
+
+            sage: s.complexity_vs_abelian_classes(6)
+            Factor Complexity:
+               p(6) = 43
+                    = 1*1*1 + 1*6*2 + 2*15*1
+                    = 1*1 + 6*2 + 30*1
+            Counting each abelian factor:
+              abelian vector   number of factors
+            +----------------+-------------------+
+              (0, 2, 4)        3
+              (2, 1, 3)        4
+              (1, 2, 3)        18
+              (1, 1, 4)        18
+
+        ::
+
+            sage: s.complexity_vs_abelian_classes(7)
+            Factor Complexity:
+               p(7) = 57
+                    = 1*1*1 + 1*7*2 + 2*21*1
+                    = 1*1 + 7*2 + 42*1
+            Counting each abelian factor:
+              abelian vector   number of factors
+            +----------------+-------------------+
+              (2, 2, 3)        7
+              (2, 1, 4)        9
+              (1, 1, 5)        10
+              (1, 2, 4)        31
+
+        ::
+
+            sage: v = [sqrt(p) for p in primes_first_n(7)]
+            sage: s = HypercubicBilliardSubshift(v)
+            sage: s.complexity_vs_abelian_classes(2)
+            Factor Complexity:
+               p(2) = 43
+                    = 1*1*1 + 1*2*6 + 2*1*15
+                    = 1*1 + 2*6 + 2*15
+            Counting each abelian factor:
+              abelian vector          number of factors
+            +-----------------------+-------------------+
+              (0, 0, 0, 0, 0, 0, 2)   1
+              (1, 0, 1, 0, 0, 0, 0)   2
+              (0, 1, 1, 0, 0, 0, 0)   2
+              (0, 0, 1, 1, 0, 0, 0)   2
+              (0, 0, 1, 0, 1, 0, 0)   2
+              (0, 0, 1, 0, 0, 1, 0)   2
+              (0, 0, 1, 0, 0, 0, 1)   2
+              (1, 0, 0, 0, 0, 0, 1)   2
+              (0, 1, 0, 0, 0, 0, 1)   2
+              (0, 0, 0, 1, 0, 0, 1)   2
+              (0, 0, 0, 0, 1, 0, 1)   2
+              (0, 0, 0, 0, 0, 1, 1)   2
+              (1, 0, 0, 1, 0, 0, 0)   2
+              (0, 1, 0, 1, 0, 0, 0)   2
+              (0, 0, 0, 1, 1, 0, 0)   2
+              (0, 0, 0, 1, 0, 1, 0)   2
+              (1, 1, 0, 0, 0, 0, 0)   2
+              (1, 0, 0, 0, 1, 0, 0)   2
+              (1, 0, 0, 0, 0, 1, 0)   2
+              (0, 1, 0, 0, 1, 0, 0)   2
+              (0, 0, 0, 0, 1, 1, 0)   2
+              (0, 1, 0, 0, 0, 1, 0)   2
+
+        ::
+
+            sage: v = [sqrt(p) for p in primes_first_n(8)]
+            sage: s = HypercubicBilliardSubshift(v)
+            sage: s.complexity_vs_abelian_classes(2)
+            Factor Complexity:
+               p(2) = 57
+                    = 1*1*1 + 1*2*7 + 2*1*21
+                    = 1*1 + 2*7 + 2*21
+            Counting each abelian factor:
+              abelian vector             number of factors
+            +--------------------------+-------------------+
+              (0, 0, 0, 0, 0, 0, 0, 2)   1
+              (1, 0, 1, 0, 0, 0, 0, 0)   2
+              (0, 1, 1, 0, 0, 0, 0, 0)   2
+              (0, 0, 1, 1, 0, 0, 0, 0)   2
+              (0, 0, 1, 0, 1, 0, 0, 0)   2
+              (0, 0, 1, 0, 0, 1, 0, 0)   2
+              (0, 0, 1, 0, 0, 0, 1, 0)   2
+              (0, 0, 1, 0, 0, 0, 0, 1)   2
+              (1, 0, 0, 0, 0, 0, 1, 0)   2
+              (0, 0, 0, 0, 1, 0, 1, 0)   2
+              (0, 1, 0, 0, 0, 0, 1, 0)   2
+              (0, 0, 0, 0, 0, 0, 1, 1)   2
+              (0, 0, 0, 1, 0, 0, 1, 0)   2
+              (0, 0, 0, 0, 0, 1, 1, 0)   2
+              (1, 0, 0, 1, 0, 0, 0, 0)   2
+              (0, 1, 0, 1, 0, 0, 0, 0)   2
+              (0, 0, 0, 1, 1, 0, 0, 0)   2
+              (0, 0, 0, 1, 0, 1, 0, 0)   2
+              (0, 0, 0, 1, 0, 0, 0, 1)   2
+              (1, 0, 0, 0, 0, 0, 0, 1)   2
+              (0, 1, 0, 0, 0, 0, 0, 1)   2
+              (0, 0, 0, 0, 1, 0, 0, 1)   2
+              (0, 0, 0, 0, 0, 1, 0, 1)   2
+              (1, 1, 0, 0, 0, 0, 0, 0)   2
+              (1, 0, 0, 0, 1, 0, 0, 0)   2
+              (1, 0, 0, 0, 0, 1, 0, 0)   2
+              (0, 0, 0, 0, 1, 1, 0, 0)   2
+              (0, 1, 0, 0, 1, 0, 0, 0)   2
+              (0, 1, 0, 0, 0, 1, 0, 0)   2
+
+        """
+        from sage.functions.other import factorial, binomial
+        from sage.misc.table import table
+
+        d = self.dimension()
+
+        print("Factor Complexity:\n   p({}) = {}".format(n,self.complexity(n)))
+        S = ["{}*{}*{}".format(factorial(k), binomial(n,k), binomial(d-1,k))
+             for k in range(0, min(d-1,n)+1)]
+        print("        =", ' + '.join(S))
+        S = ["{}*{}".format(factorial(k)*binomial(n,k), binomial(d-1,k))
+             for k in range(0, min(d-1,n)+1)]
+        print("        =", ' + '.join(S))
+
+        print("Counting each abelian factor:")
+        L = self.language(n, prefix_length)
+        c = Counter(tuple(w.abelian_vector()) for w in L)
+        rows = sorted(c.items(), key=lambda row:row[1])
+        header_row=["abelian vector", "number of factors"]
+        print(table(rows=rows, header_row=header_row))
+
+def check_open_question(d, n, prefix_length=10000):
+    r"""
+    INPUT:
+
+    - ``d`` -- integer, dimension of billiard table
+    - ``n`` -- integer, length of words
+    - ``prefix_length`` -- integer (default:10000)
+
+    EXAMPLES::
+
+        sage: from slabbe.billiard_nD import check_open_question
+        sage: check_open_question(5, 5, prefix_length=180000)
+        WARNING: Factor complexity is p(5)=501, but only 496 factors found in the prefix of length 180000
+        Factor Complexity:
+           p(5) = 501
+                = 1*1*1 + 1*5*4 + 2*10*6 + 6*10*4 + 24*5*1
+                = 1*1 + 5*4 + 20*6 + 60*4 + 120*1
+        Counting each abelian factor:
+        WARNING: Factor complexity is p(5)=501, but only 496 factors found in the prefix of length 180000
+          abelian vector    number of factors
+        +-----------------+-------------------+
+          (0, 0, 2, 2, 1)   3
+          (0, 2, 1, 1, 1)   6
+          (0, 0, 2, 1, 2)   7
+          (0, 1, 2, 1, 1)   10
+          (1, 0, 2, 1, 1)   10
+          (0, 1, 0, 2, 2)   15
+          (0, 0, 1, 2, 2)   15
+          (1, 0, 0, 2, 2)   15
+          (1, 1, 0, 2, 1)   20
+          (0, 1, 1, 2, 1)   20
+          (1, 0, 1, 2, 1)   20
+          (1, 1, 1, 0, 2)   55
+          (1, 1, 0, 1, 2)   60
+          (1, 0, 1, 1, 2)   60
+          (0, 1, 1, 1, 2)   60
+          (1, 1, 1, 1, 1)   120
+        Factor Complexity:
+           p(4) = 501
+                = 1*1*1 + 1*4*5 + 2*6*10 + 6*4*10 + 24*1*5
+                = 1*1 + 4*5 + 12*10 + 24*10 + 24*5
+        Counting each abelian factor:
+        WARNING: Factor complexity is p(4)=501, but only 476 factors found in the prefix of length 180000
+          abelian vector       number of factors
+        +--------------------+-------------------+
+          (0, 0, 0, 2, 1, 1)   2
+          (0, 0, 0, 0, 2, 2)   3
+          (1, 0, 0, 0, 2, 1)   4
+          (0, 1, 0, 0, 2, 1)   4
+          (0, 0, 0, 1, 2, 1)   4
+          (0, 0, 1, 0, 2, 1)   4
+          (1, 1, 0, 0, 0, 2)   6
+          (1, 0, 1, 0, 0, 2)   7
+          (0, 1, 0, 1, 0, 2)   8
+          (0, 0, 1, 1, 0, 2)   8
+          (0, 1, 1, 0, 0, 2)   9
+          (1, 0, 0, 1, 0, 2)   9
+          (1, 0, 0, 0, 1, 2)   12
+          (0, 1, 0, 0, 1, 2)   12
+          (0, 0, 1, 0, 1, 2)   12
+          (0, 0, 0, 1, 1, 2)   12
+          (1, 1, 1, 1, 0, 0)   24
+          (1, 1, 1, 0, 1, 0)   24
+          (1, 1, 1, 0, 0, 1)   24
+          (1, 1, 0, 1, 0, 1)   24
+          (1, 1, 0, 1, 1, 0)   24
+          (1, 1, 0, 0, 1, 1)   24
+          (1, 0, 1, 0, 1, 1)   24
+          (1, 0, 0, 1, 1, 1)   24
+          (0, 1, 0, 1, 1, 1)   24
+          (0, 1, 1, 0, 1, 1)   24
+          (1, 0, 1, 1, 0, 1)   24
+          (1, 0, 1, 1, 1, 0)   24
+          (0, 1, 1, 1, 1, 0)   24
+          (0, 1, 1, 1, 0, 1)   24
+          (0, 0, 1, 1, 1, 1)   24
+
+    """
+    from sage.arith.misc import primes_first_n
+    from sage.misc.functional import sqrt
+
+    v = [sqrt(p) for p in primes_first_n(d)]
+    s = HypercubicBilliardSubshift(v)
+    L = s.language(n, prefix_length=prefix_length)
+    s.complexity_vs_abelian_classes(n, prefix_length=prefix_length)
+
+    v2 = [sqrt(p) for p in primes_first_n(n+1)]
+    s2 = HypercubicBilliardSubshift(v2)
+    L2 = s.language(d-1, prefix_length=prefix_length)
+    s2.complexity_vs_abelian_classes(d-1, prefix_length=prefix_length)
 
