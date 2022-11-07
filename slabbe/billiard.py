@@ -19,6 +19,13 @@ TODO:
     - Fix issue with the assertion error in the step iterator
     - not robust for non integral start point
 
+TODO:
+
+    - (November 7 with Mélodie) Change the limit of the interval of
+      discrete plane to be the evaluations at (-1,0) and (0,-1).
+      Check that this gives Characteristic Sturmian sequences when
+      erasing one of the three letters.
+
 """
 
 #*****************************************************************************
