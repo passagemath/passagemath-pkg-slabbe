@@ -1,25 +1,9 @@
 r"""
+Hypercubic billiard subshifts
 
 EXAMPLES::
 
     sage: from slabbe import HypercubicBilliardSubshift
-    sage: s = HypercubicBilliardSubshift((1,sqrt(2),pi))
-    sage: L15 = s.language(15, prefix_length=8292)
-    sage: len(L15)
-    241
-
-    sage: v = list(sqrt(p) for p in primes(start=2, stop=54))
-    sage: s = HypercubicBilliardSubshift(v)
-    sage: s.complexity(2)
-    241
-    sage: L = s.language(2, prefix_length=290000)
-    WARNING: Factor complexity is p(2)=241, but only 240 factors found in
-    the prefix of length 290000
-    sage: len(L)
-    240
-
-::
-
     sage: s = HypercubicBilliardSubshift((1,sqrt(2),pi))
     sage: L = s.language(6, prefix_length=10000)
     sage: len(L)
@@ -51,12 +35,25 @@ An open question is to find a bijection between L and K::
      word: 10, word: 12, word: 13, word: 14, word: 15, word: 16,
      word: 51, word: 50, word: 53, word: 56, word: 52, word: 54}
 
+AUTHORS:
+
+- Initial version, Mélodie Andrieu et Sébastien Labbé, Novembre 7, 2022
+
 """
+#*****************************************************************************
+#       Copyright (C) 2022 Sébastien Labbé <slabqc@gmail.com>
+#
+#  Distributed under the terms of the GNU General Public License version 2 (GPLv2)
+#
+#  The full text of the GPLv2 is available at:
+#
+#                  http://www.gnu.org/licenses/
+#*****************************************************************************
 import itertools
 from collections import Counter
 
+from sage.modules.free_module_element import vector
 from sage.combinat.words.word_generators import words
-
 
 class HypercubicBilliardSubshift:
     def __init__(self, v):
@@ -148,6 +145,8 @@ class HypercubicBilliardSubshift:
         - Mélodie Andrieu et Sébastien Labbé, Novembre 7, 2022
 
         """
+        from sage.combinat.words.words import InfiniteWords
+
         dim = len(self._v)
         speed_ratio = {(i,j): self._v[j]/(self._v[i]+self._v[j]) for (i,j) in
                 itertools.combinations(range(dim), 2)}
@@ -178,8 +177,8 @@ class HypercubicBilliardSubshift:
         iterators = [iter(w) for w in d.values()]
         letters = [next(it) for it in iterators]
 
-        return Word(_the_iterator(letters, iterators))
-
+        W = InfiniteWords(alphabet=list(range(dim)))
+        return W(_the_iterator(letters, iterators))
 
     def language(self, n, prefix_length=1000):
         r"""

@@ -22,7 +22,7 @@ from .joyal_bijection import Endofunctions, Endofunction, DoubleRootedTree
 from .bond_percolation import (BondPercolationSamples, 
                              BondPercolationSample, 
                              PercolationProbability)
-from billiard_nD import HypercubicBilliardSubshift
+from .billiard_nD import HypercubicBilliardSubshift
 
 try:
     from sage.misc.latex_standalone import TikzPicture, Standalone
