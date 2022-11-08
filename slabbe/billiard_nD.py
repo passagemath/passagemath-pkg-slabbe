@@ -638,7 +638,10 @@ def check_open_question(d, n, prefix_length=10000):
 
     """
     from sage.arith.misc import primes_first_n
-    from sage.misc.functional import sqrt
+    try:
+        from sage.misc.functional import sqrt
+    except ImportError:
+        from sage.functions.other import sqrt
 
     v = [sqrt(p) for p in primes_first_n(d)]
     s = HypercubicBilliardSubshift(v)
