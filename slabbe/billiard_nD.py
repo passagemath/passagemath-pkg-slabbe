@@ -4,10 +4,22 @@ Hypercubic billiard subshifts
 The construction of a billiard word in this module is made by lifting a
 certain set of projected sturmian sequences.
 
-EXAMPLES::
+EXAMPLES:
+
+The Fibonacci word::
 
     sage: from slabbe import HypercubicBilliardSubshift
+    sage: s = HypercubicBilliardSubshift((golden_ratio,1))
+    sage: s.characteristic_word()
+    word: 0100101001001010010100100101001001010010...
+    sage: words.FibonacciWord()
+    word: 0100101001001010010100100101001001010010...
+
+A 3-dimensional example::
+
     sage: s = HypercubicBilliardSubshift((1,sqrt(2),pi))
+    sage: s.characteristic_word()
+    word: 2212021220122120221202122102212021220212...
     sage: L = s.language(6, prefix_length=10000)
     sage: len(L)
     43
@@ -76,6 +88,13 @@ An open question is to find a bijection between L and K::
      word: 230, word: 312, word: 231, word: 314, word: 234, word: 401, word: 402, 
      word: 403, word: 404, word: 320, word: 321, word: 324, word: 244, word: 243, 
      word: 240, word: 241, word: 420}
+
+The following illustrates that we may need to go very far to get all factors::
+
+    sage: s = HypercubicBilliardSubshift((sqrt(3),sqrt(2),sqrt(5)))
+    sage: L = s.language(6, prefix_length=1000000)     # not tested
+    WARNING: Factor complexity is p(6)=43, but only 41 factors found in
+    the prefix of length 1000000
 
 AUTHORS:
 
@@ -356,7 +375,7 @@ class HypercubicBilliardSubshift:
         d = self.dimension()
         return sum([binomial(d-1,k) for k in range(0, min(d-1,n)+1)])
 
-    def complexity_vs_abelian_classes(self, n, prefix_length=10000):
+    def print_factor_complexity_by_abelian(self, n, prefix_length=10000):
         r"""
         Compare the formula with the actual number of abelian classes
 
@@ -364,15 +383,41 @@ class HypercubicBilliardSubshift:
 
         - ``n`` -- integer
 
-        EXAMPLES::
+        EXAMPLES:
+
+        Even with Fibonacci word, it does not work well::
 
             sage: from slabbe import HypercubicBilliardSubshift
+            sage: s = HypercubicBilliardSubshift((golden_ratio,1))
+            sage: s.print_factor_complexity_by_abelian(3)
+            Factor Complexity:
+               p(3) = 4
+                    = 1*1*1 + 1*3*1
+                    = 1*1 + 3*1
+            Counting each abelian factor:
+              abelian vector   number of factors
+            +----------------+-------------------+
+              (1, 2)           1
+              (2, 1)           3
+            sage: s.print_factor_complexity_by_abelian(4)
+            Factor Complexity:
+               p(4) = 5
+                    = 1*1*1 + 1*4*1
+                    = 1*1 + 4*1
+            Counting each abelian factor:
+              abelian vector   number of factors
+            +----------------+-------------------+
+              (3, 1)           2
+              (2, 2)           3
+
+        In 3 dimensions::
+
             sage: s = HypercubicBilliardSubshift((1,sqrt(2),pi))
 
         It may seem that something makes sense between the number of
         factors with given abelian vector and the complexity formula::
 
-            sage: s.complexity_vs_abelian_classes(2)
+            sage: s.print_factor_complexity_by_abelian(2)
             Factor Complexity:
                p(2) = 7
                     = 1*1*1 + 1*2*2 + 2*1*1
@@ -387,7 +432,7 @@ class HypercubicBilliardSubshift:
 
         ::
 
-            sage: s.complexity_vs_abelian_classes(3)
+            sage: s.print_factor_complexity_by_abelian(3)
             Factor Complexity:
                p(3) = 13
                     = 1*1*1 + 1*3*2 + 2*3*1
@@ -402,7 +447,7 @@ class HypercubicBilliardSubshift:
 
         ::
 
-            sage: s.complexity_vs_abelian_classes(4)
+            sage: s.print_factor_complexity_by_abelian(4)
             Factor Complexity:
                p(4) = 21
                     = 1*1*1 + 1*4*2 + 2*6*1
@@ -418,7 +463,7 @@ class HypercubicBilliardSubshift:
         But everything breaks down when looking at factors of length 5 or
         more::
 
-            sage: s.complexity_vs_abelian_classes(5)
+            sage: s.print_factor_complexity_by_abelian(5)
             Factor Complexity:
                p(5) = 31
                     = 1*1*1 + 1*5*2 + 2*10*1
@@ -433,7 +478,7 @@ class HypercubicBilliardSubshift:
 
         ::
 
-            sage: s.complexity_vs_abelian_classes(6)
+            sage: s.print_factor_complexity_by_abelian(6)
             Factor Complexity:
                p(6) = 43
                     = 1*1*1 + 1*6*2 + 2*15*1
@@ -448,7 +493,7 @@ class HypercubicBilliardSubshift:
 
         ::
 
-            sage: s.complexity_vs_abelian_classes(7)
+            sage: s.print_factor_complexity_by_abelian(7)
             Factor Complexity:
                p(7) = 57
                     = 1*1*1 + 1*7*2 + 2*21*1
@@ -465,7 +510,7 @@ class HypercubicBilliardSubshift:
 
             sage: v = [sqrt(p) for p in primes_first_n(7)]
             sage: s = HypercubicBilliardSubshift(v)
-            sage: s.complexity_vs_abelian_classes(2)
+            sage: s.print_factor_complexity_by_abelian(2)
             Factor Complexity:
                p(2) = 43
                     = 1*1*1 + 1*2*6 + 2*1*15
@@ -500,7 +545,7 @@ class HypercubicBilliardSubshift:
 
             sage: v = [sqrt(p) for p in primes_first_n(8)]
             sage: s = HypercubicBilliardSubshift(v)
-            sage: s.complexity_vs_abelian_classes(2)
+            sage: s.print_factor_complexity_by_abelian(2)
             Factor Complexity:
                p(2) = 57
                     = 1*1*1 + 1*2*7 + 2*1*21
@@ -570,7 +615,7 @@ def check_open_question(d, n, prefix_length=10000):
     EXAMPLES::
 
         sage: from slabbe.billiard_nD import check_open_question
-        sage: check_open_question(5, 5, prefix_length=180000)
+        sage: check_open_question(5, 5, prefix_length=180000)   # long time
         WARNING: Factor complexity is p(5)=501, but only 496 factors found in the prefix of length 180000
         Factor Complexity:
            p(5) = 501
@@ -646,10 +691,10 @@ def check_open_question(d, n, prefix_length=10000):
     v = [sqrt(p) for p in primes_first_n(d)]
     s = HypercubicBilliardSubshift(v)
     L = s.language(n, prefix_length=prefix_length)
-    s.complexity_vs_abelian_classes(n, prefix_length=prefix_length)
+    s.print_factor_complexity_by_abelian(n, prefix_length=prefix_length)
 
     v2 = [sqrt(p) for p in primes_first_n(n+1)]
     s2 = HypercubicBilliardSubshift(v2)
     L2 = s.language(d-1, prefix_length=prefix_length)
-    s2.complexity_vs_abelian_classes(d-1, prefix_length=prefix_length)
+    s2.print_factor_complexity_by_abelian(d-1, prefix_length=prefix_length)
 
