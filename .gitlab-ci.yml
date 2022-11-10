@@ -67,11 +67,13 @@ test:9.0: &test
 #  << : *test
 #  image: sagemath/sagemath-dev:9.3
 
+# Set entry point in bash, not in sage
+# https://docs.gitlab.com/ee/ci/yaml/#imageentrypoint
 test:9.3:
   << : *test
   image: 
     name: sagemath/sagemath:9.3
-    entrypoint: ["bash"]
+    entrypoint: [""]
 
 # tmp disable
 # test:9.4:
