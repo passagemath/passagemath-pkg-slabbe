@@ -57,9 +57,13 @@ test:9.2.beta3:
 #  image: sagemath/sagemath-dev:9.3.beta8
 #
 
-test:9.3:
+test:sagemath-dev-9.3:
   << : *test
   image: sagemath/sagemath-dev:9.3
+
+test:9.3:
+  << : *test
+  image: sagemath/sagemath:9.3
 
 test:9.4:
   << : *test
