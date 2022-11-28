@@ -1,3 +1,5 @@
+# see https://gitlab.com/modulispaces/admcycles/-/blob/master/.gitlab-ci.yml
+# to use conda instead of docker images
 before_script:
   - export MAKEFLAGS="-j2"
 
@@ -34,17 +36,20 @@ test:9.0: &test
 
 # les images qui sont sur https://hub.docker.com/r/sagemath/sagemath-dev/
 
-test:9.1.rc5:
-  << : *test
-  image: sagemath/sagemath-dev:9.1.rc5
+# tmp disable
+#test:9.1.rc5:
+#  << : *test
+#  image: sagemath/sagemath-dev:9.1.rc5
 
-test:9.1.rc5-py3:
-  << : *test
-  image: sagemath/sagemath-dev:9.1.rc5-py3
+# tmp disable
+#test:9.1.rc5-py3:
+#  << : *test
+#  image: sagemath/sagemath-dev:9.1.rc5-py3
 
-test:9.2.beta3:
-  << : *test
-  image: sagemath/sagemath-dev:9.2.beta3
+# tmp disable
+#test:9.2.beta3:
+#  << : *test
+#  image: sagemath/sagemath-dev:9.2.beta3
 
 # Pour 9.3.beta8 et 9.3.beta3, it needs the memlimit
 #- sage -t --force-lib --long --memlimit=4000 ${DIRECTORY} # broken in 9.3 and 9.4
@@ -57,13 +62,23 @@ test:9.2.beta3:
 #  image: sagemath/sagemath-dev:9.3.beta8
 #
 
+# tmp disable
+#test:sagemath-dev-9.3:
+#  << : *test
+#  image: sagemath/sagemath-dev:9.3
+
+# Set entry point in bash, not in sage
+# https://docs.gitlab.com/ee/ci/yaml/#imageentrypoint
 test:9.3:
   << : *test
-  image: sagemath/sagemath-dev:9.3
+  image: 
+    name: sagemath/sagemath:9.3
+    entrypoint: [""]
 
-test:9.4:
-  << : *test
-  image: sagemath/sagemath-dev:9.4
+# tmp disable
+# test:9.4:
+#   << : *test
+#   image: sagemath/sagemath-dev:9.4
 
 # this image is broken as it takes more than one hour to unpack and test
 #test:9.5:
