@@ -57,8 +57,8 @@ Direct Product of 2 Fibonacci::
     sage: fibo2_ifs = GIFS.from_two_dimensional_substitution(s)
     sage: fibo2_ifs
     GIFS defined by 9 maps on Vector space of dimension 2 over 
-    Number Field in rootX with defining polynomial y^2 - y - 1 with 
-    rootX = 1.618033988749895?
+    Number Field in a with defining polynomial y^2 - y - 1 with 
+    a = 1.618033988749895?
 
 REFERENCES:
 
@@ -235,46 +235,48 @@ class GraphDirectedIteratedFunctionSystem(object):
             sage: ifs = GIFS.from_two_dimensional_substitution(s)
             sage: ifs.pp()
             GIFS defined by 9 maps on Vector space of dimension 2 over 
-            Number Field in rootX with defining polynomial y^2 - y - 1 with 
-            rootX = 1.618033988749895?
+            Number Field in a with defining polynomial y^2 - y - 1 with 
+            a = 1.618033988749895?
             edge (0,3):
-                  [rootX     0]     [0]
-            x |-> [    0 rootX] x + [0]
+                  [a 0]     [0]
+            x |-> [0 a] x + [0]
             edge (1,3):
-                  [rootX     0]     [0]
-            x |-> [    0 rootX] x + [0]
+                  [a 0]     [0]
+            x |-> [0 a] x + [0]
             edge (1,2):
-                  [rootX     0]     [rootX]
-            x |-> [    0 rootX] x + [    0]
+                  [a 0]     [a]
+            x |-> [0 a] x + [0]
             edge (2,3):
-                  [rootX     0]     [0]
-            x |-> [    0 rootX] x + [0]
+                  [a 0]     [0]
+            x |-> [0 a] x + [0]
             edge (2,1):
-                  [rootX     0]     [    0]
-            x |-> [    0 rootX] x + [rootX]
+                  [a 0]     [0]
+            x |-> [0 a] x + [a]
             edge (3,3):
-                  [rootX     0]     [0]
-            x |-> [    0 rootX] x + [0]
+                  [a 0]     [0]
+            x |-> [0 a] x + [0]
             edge (3,1):
-                  [rootX     0]     [    0]
-            x |-> [    0 rootX] x + [rootX]
+                  [a 0]     [0]
+            x |-> [0 a] x + [a]
             edge (3,2):
-                  [rootX     0]     [rootX]
-            x |-> [    0 rootX] x + [    0]
+                  [a 0]     [a]
+            x |-> [0 a] x + [0]
             edge (3,0):
-                  [rootX     0]     [rootX]
-            x |-> [    0 rootX] x + [rootX]
+                  [a 0]     [a]
+            x |-> [0 a] x + [a]
 
         """
         from sage.matrix.constructor import matrix
         from sage.groups.affine_gps.affine_group import AffineGroup
+        from sage.rings.qqbar import number_field_elements_from_algebraics, AA
 
         rootX, rootY, shapes = s.stone_inflation_shapes()
         KX = rootX.parent()
         KY = rootY.parent()
-        inflation_matrix = matrix.diagonal([rootX, rootY])
-        base_ring = inflation_matrix.base_ring()
-        F = AffineGroup(2, base_ring)
+        numbers = [AA(rootX), AA(rootY)]
+        KXY, (rootX_, rootY_), homo = number_field_elements_from_algebraics(numbers, minimal=True, embedded=True)
+        inflation_matrix = matrix.diagonal(KXY, [rootX, rootY])
+        F = AffineGroup(2, KXY)
         vector_space = F.vector_space()
 
         alphabet = s.domain_alphabet()
@@ -286,7 +288,7 @@ class GraphDirectedIteratedFunctionSystem(object):
             # compute the X positions of marker points
             lower_word = [col[0] for col in s_a]
             X_pos = []
-            pos = base_ring.zero()
+            pos = KXY.zero()
             for b in lower_word:
                 X_pos.append(pos)
                 pos += shapes[b][0]
@@ -294,7 +296,7 @@ class GraphDirectedIteratedFunctionSystem(object):
             # compute the Y positions of marker points
             left_word = s_a[0]
             Y_pos = []
-            pos = base_ring.zero()
+            pos = KXY.zero()
             for b in left_word:
                 Y_pos.append(pos)
                 pos += shapes[b][1]
@@ -449,8 +451,8 @@ class GraphDirectedIteratedFunctionSystem(object):
             sage: ifs = GIFS.from_two_dimensional_substitution(s)
             sage: ifs.galois_conjugate()
             GIFS defined by 9 maps on Vector space of dimension 2 over 
-            Number Field in rootX with defining polynomial y^2 - y - 1 with 
-            rootX = 1.618033988749895?
+            Number Field in a with defining polynomial y^2 - y - 1 with 
+            a = 1.618033988749895?
 
         """
         edges = [(u,v,galois_conjugate(f)) for (u,v,f) in self._edges]
@@ -480,8 +482,8 @@ class GraphDirectedIteratedFunctionSystem(object):
             sage: ifs = GIFS.from_two_dimensional_substitution(s)
             sage: ifs.inverse()
             GIFS defined by 9 maps on Vector space of dimension 2 over
-            Number Field in rootX with defining polynomial y^2 - y - 1 with
-            rootX = 1.618033988749895?
+            Number Field in a with defining polynomial y^2 - y - 1 with
+            a = 1.618033988749895?
 
         """
         edges = [(v,u,f.inverse()) for (u,v,f) in self._edges]
