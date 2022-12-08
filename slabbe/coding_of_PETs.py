@@ -326,5 +326,76 @@ class PETsCoding(object):
 
         return Q, key_to_word
 
+    def to_wang_tiles(self):
+        r"""
+        Recover the Wang tile sets associated to the atoms of the partition.
+
+        EXAMPLES::
+
+            sage: from slabbe import PolyhedronExchangeTransformation as PET
+            sage: from slabbe.arXiv_1903_06137 import self_similar_19_atoms_partition
+            sage: from slabbe import PETsCoding
+            sage: z = polygen(QQ, 'z')
+            sage: K.<phi> = NumberField(z**2-z-1, 'phi', embedding=RR(1.6))
+            sage: Gamma0 = matrix.column([(1,0), (0,1)])
+            sage: PU = self_similar_19_atoms_partition()
+            sage: RUe1 = PET.toral_translation(Gamma0, vector((phi^-2,0)))
+            sage: RUe2 = PET.toral_translation(Gamma0, vector((0,phi^-2)))
+            sage: X_PU_RU = PETsCoding((RUe1,RUe2), PU)
+            sage: TU = X_PU_RU.to_wang_tiles()
+            sage: TU
+            Wang tile set of cardinality 19
+
+        For some reason (the partition ``PU`` should be simplified by
+        removing one vertical at ``x==phi^-1`` as noticed by Jana), we need
+        to merge colors 2,6 and 4,0::
+
+            sage: horiz_merge = {a:a for a in '01234567'}
+            sage: horiz_merge.update({'6':'2','4':'0'})
+            sage: tiles = [(E,horiz_merge[N],W,horiz_merge[S]) for (E,N,W,S) in TU.tiles()]
+            sage: from slabbe import WangTileSet
+            sage: TU = WangTileSet(tiles)
+
+        We compare the above computed one with the original one::
+
+            sage: tiles = ["FOJO", "FOHL", "JMFP", "DMFK", "HPJP", "HPHN", "HKFP", "HKDP",
+            ....:          "BOIO", "GLEO", "GLCL", "ALIO", "EPGP", "EPIP", "IPGK", "IPIK",
+            ....:          "IKBM", "IKAK", "CNIP"]
+            sage: U = WangTileSet([tuple(tile) for tile in tiles])
+            sage: TU.is_equivalent(U)
+            True
+
+        """
+        from sage.graphs.digraph import DiGraph
+        def dominoes_to_wang_color(dominoes):
+            edges = [((a,'left'),(b,'right')) for (a,b) in dominoes]
+            G = DiGraph(edges, format='list_of_edges')
+            C = G.connected_components()
+            color_left = {}
+            color_right = {}
+            for i,c in enumerate(C):
+                for (a,code) in c:
+                    if code == 'right':
+                        color_left[a] = i
+                    elif code == 'left':
+                        color_right[a] = i
+                    else:
+                        raise ValueError
+            return color_right,color_left
+
+        Q,d = self.partition_for_patterns((2,1))
+        horizontal_dominoes = [(a,b) for [[a],[b]] in d.values()]
+        color_right,color_left = dominoes_to_wang_color(horizontal_dominoes)
+
+        Q,d = self.partition_for_patterns((1,2))
+        vertical_dominoes = [(a,b) for [[a,b]] in d.values()]
+        color_top,color_bottom = dominoes_to_wang_color(vertical_dominoes)
+
+        alphabet = sorted(self._partition.alphabet())
+        tiles = [(color_right[a],color_top[a],color_left[a],color_bottom[a])
+                 for a in alphabet]
+        tiles = [tuple(str(b) for b in tile) for tile in tiles]
+        from slabbe import WangTileSet
+        return WangTileSet(tiles)
 
 
