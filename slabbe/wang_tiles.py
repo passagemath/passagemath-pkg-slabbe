@@ -664,26 +664,26 @@ class WangTileSet(object):
 
         The edge labels are clean::
 
-            sage: G.edges()
+            sage: G.edges(sort=True)
             [('C', 'A', ('D|B', 'Y|X')), ('G', 'E', ('H|F',))]
 
         Using ``label_function``::
 
             sage: fn = lambda L: ','.join(map(str, L))
             sage: G = T.to_transducer_graph(label_function=fn)
-            sage: G.edges()
+            sage: G.edges(sort=True)
             [('C', 'A', 'D|B,Y|X'), ('G', 'E', 'H|F')]
 
         Using ``label_function`` with latex expressions::
 
             sage: fn = lambda L: LatexExpr(','.join(map(str, L)))
             sage: G = T.to_transducer_graph(label_function=fn)
-            sage: G.edges()
+            sage: G.edges(sort=True)
             [('C', 'A', D|B,Y|X), ('G', 'E', H|F)]
 
         This is to compared to::
 
-            sage: T.to_transducer().graph().edges()
+            sage: T.to_transducer().graph().edges(sort=True)
             [('C', 'A', "'D'|'B'"), ('C', 'A', "'Y'|'X'"), ('G', 'E', "'H'|'F'")]
 
         It works for integers entries::
@@ -693,7 +693,7 @@ class WangTileSet(object):
             sage: G = T.to_transducer_graph()
             sage: G
             Digraph on 2 vertices
-            sage: G.edges()
+            sage: G.edges(sort=True)
             [(2, 0, ('3|1', '3|5'))]
         """
         def edge_labels(t):
@@ -1177,7 +1177,7 @@ class WangTileSet(object):
         G = self.to_transducer().graph(edge_labels)
         G = clean_sources_and_sinks(G)
         tiles = []
-        for (u,v,(word_in, word_out)) in G.edges():
+        for (u,v,(word_in, word_out)) in G.edges(sort=True):
             left = u
             right = v
             bottom = word_in
@@ -1259,7 +1259,7 @@ class WangTileSet(object):
 
         from functools import reduce
         tiles = []
-        for (u,v,(word_in, word_out)) in G.edges():
+        for (u,v,(word_in, word_out)) in G.edges(sort=True):
             left = reduce(function, (a.label() for a in u), initial)
             right = reduce(function, (a.label() for a in v), initial)
             bottom = reduce(function, word_in, initial)

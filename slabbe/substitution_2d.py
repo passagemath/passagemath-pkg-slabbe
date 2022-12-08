@@ -1322,7 +1322,7 @@ class Substitution2d(object):
         result = []
         for s in G.strongly_connected_components_subgraphs():
             if s.num_edges() > 0:
-                for v in s.vertices():
+                for v in s.vertices(sort=True):
                     result.append(v)
         return result
 

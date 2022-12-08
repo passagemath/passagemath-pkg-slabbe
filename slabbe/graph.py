@@ -38,7 +38,7 @@ def projection_graph(G, proj_fn, filename=None, verbose=False):
 
         sage: from slabbe.graph import projection_graph
         sage: g = graphs.PetersenGraph()
-        sage: g.vertices()
+        sage: g.vertices(sort=True)
         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         sage: f = lambda i: i % 5
         sage: projection_graph(g, f)
@@ -55,10 +55,10 @@ def projection_graph(G, proj_fn, filename=None, verbose=False):
           3                    0
         Looped multi-digraph on 4 vertices
     """
-    edges = set((proj_fn(A),proj_fn(B)) for A,B,_ in G.edges())
+    edges = set((proj_fn(A),proj_fn(B)) for A,B,_ in G.edges(sort=False))
     G_proj = DiGraph(edges, format='list_of_edges', loops=True, multiedges=True)
     if verbose:
-        d = dict(Counter(proj_fn(s) for s in G.vertices()))
+        d = dict(Counter(proj_fn(s) for s in G.vertices(sort=False)))
         rows = [(value, key) for key,value in d.items()]
         rows.sort(reverse=True,key=lambda row:row[1])
         header_row = ['Number of vertices', 'Projected vertices']
@@ -99,13 +99,13 @@ def digraph_move_label_to_edge(G, label_function=None, loops=True,
         sage: GG = digraph_move_label_to_edge(G, label_function=f)
         sage: GG
         Looped digraph on 10 vertices
-        sage: GG.edges()[0]
+        sage: GG.edges(sort=True)[0]
         (0, 1, 'Aplusone')
     """
     if label_function:
-        edges = [(u,v,label_function(label)) for ((u,_), (v,label), _) in G.edges()]
+        edges = [(u,v,label_function(label)) for ((u,_), (v,label), _) in G.edges(sort=False)]
     else:
-        edges = [(u,v,label) for ((u,_), (v,label), _) in G.edges()]
+        edges = [(u,v,label) for ((u,_), (v,label), _) in G.edges(sort=False)]
     return DiGraph(edges, format='list_of_edges', loops=loops,
             multiedges=multiedges)
 
@@ -130,7 +130,7 @@ def induced_subgraph(G, filter):
         Digraph on 30 vertices
         sage: GG
         Digraph on 15 vertices
-        sage: GG.edges()[0]
+        sage: GG.edges(sort=True)[0]
         ((0, ''), (2, 'plustwo'), None)
 
     .. TODO::
@@ -139,7 +139,7 @@ def induced_subgraph(G, filter):
     """
     GG = G.copy()
     loops = dict((u, label) for (u,v,label) in GG.loop_edges())
-    for v in GG.vertices():
+    for v in GG.vertices(sort=False):
         if filter(v):
             continue
         incoming = [(x,y,l) for (x,y,l) in GG.incoming_edges(v) if x != y]
@@ -181,7 +181,7 @@ def merge_multiedges(G, label_function=tuple):
         sage: GG = merge_multiedges(G)
         sage: GG
         Digraph on 2 vertices
-        sage: GG.edges()
+        sage: GG.edges(sort=True)
         [(0, 1, ('alpha', 'one', 'two'))]
 
     A graph::
@@ -193,19 +193,19 @@ def merge_multiedges(G, label_function=tuple):
         sage: GG = merge_multiedges(G)
         sage: GG
         Graph on 2 vertices
-        sage: GG.edges()
+        sage: GG.edges(sort=True)
         [(0, 1, ('alpha', 'one', 'two'))]
 
     Using ``label_function``::
 
         sage: fn = lambda L: LatexExpr(','.join(map(str, L)))
         sage: GG = merge_multiedges(G, label_function=fn)
-        sage: GG.edges()
+        sage: GG.edges(sort=True)
         [(0, 1, alpha,one,two)]
 
     """
     d = defaultdict(list)
-    for (u,v,label) in G.edges():
+    for (u,v,label) in G.edges(sort=True):
         d[(u,v)].append(label)
 
     edges = [(u,v,label_function(label_list)) for (u,v),label_list in d.items()]
@@ -229,7 +229,7 @@ def clean_sources_and_sinks(G):
         sage: H = clean_sources_and_sinks(G)
         sage: H
         Digraph on 3 vertices
-        sage: H.vertices()
+        sage: H.vertices(sort=True)
         [3, 4, 5]
 
     ::
@@ -239,7 +239,7 @@ def clean_sources_and_sinks(G):
         sage: H = clean_sources_and_sinks(G)
         sage: H
         Digraph on 6 vertices
-        sage: H.vertices()
+        sage: H.vertices(sort=True)
         [0, 1, 2, 3, 4, 5]
 
     """
@@ -247,7 +247,7 @@ def clean_sources_and_sinks(G):
     done = False
     while not done:
         done = True
-        for v in H.vertices():
+        for v in H.vertices(sort=False):
             if H.in_degree(v) == 0 or H.out_degree(v) == 0:
                 done = False
                 H.delete_vertex(v)
@@ -269,7 +269,7 @@ def get_funnel(G):
         sage: get_funnel(G)
         ('0', '1')
     """
-    for (u,v,_) in G.edges(): 
+    for (u,v,_) in G.edges(sort=True): 
         if (u != v and G.in_degree(v) == 1 and G.out_degree(u) == 1):
             return (u,v)
     else:
@@ -294,7 +294,7 @@ def reduce_funnel_edges(G, merge_function):
         sage: G = DiGraph([(str(a),str(a+1)) for a in range(5)], format='list_of_edges')
         sage: merge_function = lambda a,b:a+b
         sage: GG = reduce_funnel_edges(G, merge_function)
-        sage: GG.vertices()
+        sage: GG.vertices(sort=True)
         ['012345']
 
     ::
@@ -302,7 +302,7 @@ def reduce_funnel_edges(G, merge_function):
         sage: G = DiGraph([(str(a),str((a+1)%5)) for a in range(5)], format='list_of_edges')
         sage: merge_function = lambda a,b:a+b
         sage: GG = reduce_funnel_edges(G, merge_function)
-        sage: GG.vertices()
+        sage: GG.vertices(sort=True)
         ['01234']
 
     The following result does not seem right::
@@ -311,7 +311,7 @@ def reduce_funnel_edges(G, merge_function):
         sage: G = w.rauzy_graph(11)
         sage: merge_function = lambda a,b:a+b[-1:]
         sage: GG = reduce_funnel_edges(G, merge_function)
-        sage: GG.vertices()
+        sage: GG.vertices(sort=True)
         [word: 01001010010, word: 100101001001, word: 100101001011]
 
     """
@@ -366,7 +366,7 @@ def get_left_special_vertex(G):
         True
 
     """
-    for v in G.vertices():
+    for v in G.vertices(sort=True):
         if G.in_degree(v) > 1 and G.out_degree(v) <= 1:
             return v
     else:
@@ -398,7 +398,7 @@ def get_right_special_vertex(G):
         True
 
     """
-    for v in G.vertices():
+    for v in G.vertices(sort=True):
         if G.in_degree(v) <= 1 and G.out_degree(v) > 1:
             return v
     else:
@@ -430,7 +430,7 @@ def get_bispecial_vertex(G):
         True
 
     """
-    for v in G.vertices():
+    for v in G.vertices(sort=True):
         if G.in_degree(v) > 1 and G.out_degree(v) > 1:
             return v
     else:
@@ -456,7 +456,7 @@ def bispecial_vertices(G):
         []
 
     """
-    return [v for v in G.vertices() if G.in_degree(v) > 1 and G.out_degree(v) > 1]
+    return [v for v in G.vertices(sort=False) if G.in_degree(v) > 1 and G.out_degree(v) > 1]
 
 def reduce_left_special_vertices(G, merge_function):
     r"""
@@ -481,7 +481,7 @@ def reduce_left_special_vertices(G, merge_function):
         sage: G = DiGraph(edges, format='list_of_edges')
         sage: merge_function = lambda u,v:u+v
         sage: GG = reduce_left_special_vertices(G, merge_function)
-        sage: sorted((a,b) for (a,b,_) in GG.edges())
+        sage: sorted((a,b) for (a,b,_) in GG.edges(sort=False))
         [('2', '3'),
          ('2', '5'),
          ('3', '401'),
@@ -537,7 +537,7 @@ def reduce_right_special_vertices(G, merge_function):
         sage: G = DiGraph(edges, format='list_of_edges')
         sage: merge_function = lambda u,v:u+v
         sage: GG = reduce_right_special_vertices(G, merge_function)
-        sage: sorted((a,b) for (a,b,_) in GG.edges())
+        sage: sorted((a,b) for (a,b,_) in GG.edges(sort=False))
         [('0', '123'),
          ('0', '125'),
          ('123', '4'),
@@ -599,7 +599,7 @@ def reduce_bispecial_vertices(G, merge_function, filter=None):
         sage: merge_function = lambda u,v:u+v
         sage: GG = reduce_left_special_vertices(G, merge_function)
         sage: GGG = reduce_bispecial_vertices(GG, merge_function)
-        sage: sorted((a,b) for (a,b,_) in GGG.edges())
+        sage: sorted((a,b) for (a,b,_) in GGG.edges(sort=False))
         [('3', '4012'),
          ('4012', '3'),
          ('4012', '5'),

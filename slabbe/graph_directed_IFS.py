@@ -379,12 +379,24 @@ class GraphDirectedIteratedFunctionSystem(object):
                 multiedges=True)
 
     def to_line_digraph(self):
+        r"""
+        EXAMPLES::
+
+            sage: from slabbe import GraphDirectedIteratedFunctionSystem as GIFS
+            sage: F = AffineGroup(1, QQ)
+            sage: f1 = F.linear(1/3)
+            sage: f2 = F(1/3, vector([2/3]))
+            sage: cantor_ifs = GIFS(QQ^1, [(0,0,f1),(0,0,f2)])
+            sage: cantor_ifs.to_line_digraph()
+            Looped digraph on 2 vertices
+
+        """
         from sage.graphs.digraph import DiGraph
         n = len(self._edges)
         G = self.to_digraph()
         L = DiGraph(n, loops=True, multiedges=False)
         indices = {(u,v): i for i,(u,v,_) in enumerate(self._edges)}
-        for v in G.vertices():
+        for v in G.vertices(sort=False):
             for e0 in G.incoming_edges(v, labels=False):
                 for e1 in G.outgoing_edges(v, labels=False):
                     L.add_edge(indices[e0], indices[e1])
