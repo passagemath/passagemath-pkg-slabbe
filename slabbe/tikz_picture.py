@@ -13,9 +13,11 @@ standalone LaTeX document class.
 EXAMPLES::
 
     sage: from slabbe import TikzPicture
-    sage: V = [[1,0,1],[1,0,0],[1,1,0],[0,0,-1],[0,1,0],[-1,0,0],[0,1,1],[0,0,1],[0,-1,0]]
-    sage: P = Polyhedron(vertices=V).polar()
-    sage: s = P.projection().tikz([674,108,-731],112)
+    sage: lines = []
+    sage: lines.append(r'\begin{tikzpicture}')
+    sage: lines.append(r'\draw[very thick,orange,->] (0,0) -- (1,1);')
+    sage: lines.append(r'\end{tikzpicture}')
+    sage: s = '\n'.join(lines)
     sage: t = TikzPicture(s)
 
 Creation of a pdf in a temporary directory. The returned value is a string
@@ -30,15 +32,8 @@ Setting ``view=True``, which is the default, opens the pdf in a viewer.
     zage: t
     \documentclass[tikz]{standalone}
     \begin{document}
-    \begin{tikzpicture}%
-            [x={(0.249656cm, -0.577639cm)},
-            y={(0.777700cm, -0.358578cm)},
-            z={(-0.576936cm, -0.733318cm)},
-    ...
-    \node[vertex] at (0.00000, -1.00000, 0.00000)     {};
-    \node[vertex] at (-0.50000, -0.50000, -0.50000)     {};
-    %%
-    %%
+    \begin{tikzpicture}
+    \draw[very thick,orange,->] (0,0) -- (1,1);
     \end{tikzpicture}
     \end{document}
 
@@ -325,9 +320,11 @@ class Standalone(SageObject):
         EXAMPLES::
 
             sage: from slabbe import TikzPicture
-            sage: V = [[1,0,1],[1,0,0],[1,1,0],[0,0,-1],[0,1,0],[-1,0,0],[0,1,1],[0,0,1],[0,-1,0]]
-            sage: P = Polyhedron(vertices=V).polar()
-            sage: s = P.projection().tikz([674,108,-731],112)
+            sage: lines = []
+            sage: lines.append(r'\begin{tikzpicture}')
+            sage: lines.append(r'\draw[very thick,orange,->] (0,0) -- (1,1);')
+            sage: lines.append(r'\end{tikzpicture}')
+            sage: s = '\n'.join(lines)
             sage: t = TikzPicture(s)
             sage: _ = t.pdf()    # not tested
 
@@ -408,9 +405,11 @@ class Standalone(SageObject):
         EXAMPLES::
 
             sage: from slabbe import TikzPicture
-            sage: V = [[1,0,1],[1,0,0],[1,1,0],[0,0,-1],[0,1,0],[-1,0,0],[0,1,1],[0,0,1],[0,-1,0]]
-            sage: P = Polyhedron(vertices=V).polar()
-            sage: s = P.projection().tikz([674,108,-731],112)
+            sage: lines = []
+            sage: lines.append(r'\begin{tikzpicture}')
+            sage: lines.append(r'\draw[very thick,orange,->] (0,0) -- (1,1);')
+            sage: lines.append(r'\end{tikzpicture}')
+            sage: s = '\n'.join(lines)
             sage: t = TikzPicture(s)
             sage: _ = t.png()    # not tested
 
@@ -484,9 +483,11 @@ class Standalone(SageObject):
         EXAMPLES::
 
             sage: from slabbe import TikzPicture
-            sage: V = [[1,0,1],[1,0,0],[1,1,0],[0,0,-1],[0,1,0],[-1,0,0],[0,1,1],[0,0,1],[0,-1,0]]
-            sage: P = Polyhedron(vertices=V).polar()
-            sage: s = P.projection().tikz([674,108,-731],112)
+            sage: lines = []
+            sage: lines.append(r'\begin{tikzpicture}')
+            sage: lines.append(r'\draw[very thick,orange,->] (0,0) -- (1,1);')
+            sage: lines.append(r'\end{tikzpicture}')
+            sage: s = '\n'.join(lines)
             sage: t = TikzPicture(s)
             sage: _ = t.svg()    # not tested
 
@@ -548,9 +549,11 @@ class Standalone(SageObject):
         EXAMPLES::
 
             sage: from slabbe import TikzPicture
-            sage: V = [[1,0,1],[1,0,0],[1,1,0],[0,0,-1],[0,1,0],[-1,0,0],[0,1,1],[0,0,1],[0,-1,0]]
-            sage: P = Polyhedron(vertices=V).polar()
-            sage: s = P.projection().tikz([674,108,-731],112)
+            sage: lines = []
+            sage: lines.append(r'\begin{tikzpicture}')
+            sage: lines.append(r'\draw[very thick,orange,->] (0,0) -- (1,1);')
+            sage: lines.append(r'\end{tikzpicture}')
+            sage: s = '\n'.join(lines)
             sage: t = TikzPicture(s)
             sage: _ = t.tex()
 
