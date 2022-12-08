@@ -61,6 +61,7 @@ Combinatorics on words
    ostrowski
    beta_numeration_system
    ddim_sturmian_configuration
+   billiard_nD
 
 Digital Geometry
 ----------------
