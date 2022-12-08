@@ -168,6 +168,20 @@ __ https://trac.sagemath.org/
 Release history
 ---------------
 
+*Version 0.7 (December 8, 2022)*
+  New module on d-dimensional Sturmian configurations, to draw figures from `arXiv:2204.06413`__.
+  New module on Hypercubic billiard words (written with Mélodie Andrieu).
+  The module ``TikzPicture`` got merged in SageMath 9.6 into
+  `sage.misc.latex_standalone` through ticket `#20343`__ during which many
+  improvements were made. The line ``from slabbe import TikzPicture`` now uses
+  the one in SageMath by default. All tests passed on version 9.7 of SageMath.
+  Up to recently, all tests passed on versions 9.0, 9.1, 9.2, 9.3 and 9.4 of SageMath;
+  can't test those earlier versions of SageMath anymore because gitlab continuous
+  integration tests is not free anymore.
+
+__ https://arxiv.org/abs/2204.06413
+__ https://trac.sagemath.org/ticket/20343
+
 *Version 0.6.3 (November 1, 2021)*
   New module on Ostrowski numeration system (basic stuff).
   New module on EkEkStar (written with Milton Minvervino).
