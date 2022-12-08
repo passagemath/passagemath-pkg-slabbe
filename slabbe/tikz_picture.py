@@ -297,7 +297,7 @@ class Standalone(SageObject):
         return self._content
 
     def pdf(self, filename=None, view=True, program=None):
-        """
+        r"""
         Compiles the latex code with pdflatex and create a pdf file.
 
         INPUT:
@@ -383,7 +383,7 @@ class Standalone(SageObject):
         return _filename_pdf
 
     def png(self, filename=None, density=150, view=True):
-        """
+        r"""
         Compiles the latex code with pdflatex and converts to a png file.
 
         INPUT:
@@ -464,7 +464,7 @@ class Standalone(SageObject):
         return _filename_png
 
     def svg(self, filename=None, view=True):
-        """
+        r"""
         Compiles the latex code with pdflatex and converts to a svg file.
 
         INPUT:
@@ -531,7 +531,7 @@ class Standalone(SageObject):
         return _filename_svg
 
     def tex(self, filename=None, content_only=False, include_header=None):
-        """
+        r"""
         Writes the latex code to a file.
 
         INPUT:
@@ -855,9 +855,6 @@ class TikzPicture(Standalone):
             doctest:...: FutureWarning: This class/method/function is marked as experimental.
             It, its functionality or its interface might change without a formal deprecation.
             See http://trac.sagemath.org/20343 for details.
-
-        ::
-
 
         ::
 

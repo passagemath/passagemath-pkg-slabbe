@@ -116,7 +116,7 @@ def number_of_partial_injection(n, algorithm='binomial'):
 
     REFERENCE:
 
-        https://oeis.org/A144084
+        :oeis:`A144084`
     """
     if algorithm == 'binomial':
         return [binomial(n,k)**2*factorial(k) for k in range(n+1)]

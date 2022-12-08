@@ -257,7 +257,7 @@ def integral_points_count_union_of_polytopes(L):
     r"""
     Return the cardinality of an union of polytopes.
 
-    See https://en.wikipedia.org/wiki/Inclusion–exclusion_principle
+    See :wikipedia:`Inclusion-exclusion_principle`
 
     INPUT:
 

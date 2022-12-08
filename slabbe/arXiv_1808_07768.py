@@ -10,7 +10,7 @@ REFERENCES:
 .. [Lab2021a] S. Labbé. Substitutive structure of Jeandel-Rao aperiodic tilings,
    *Discrete & Computational Geometry* 65 (2021) 800-855.
    https://doi.org/10.1007/s00454-019-00153-3
-   http://arxiv.org/abs/1808.07768
+   :arxiv:`1808.07768`
 
 EXAMPLES:
 

@@ -77,7 +77,8 @@ REFERENCES:
    Press, Cambridge, 2013. http://www.ams.org/mathscinet-getitem?mr=3136260.
 
 .. [BFG19] Michael Baake, Natalie Priebe Frank, Uwe Grimm. Three variations on a
-   theme by Fibonacci. http://arxiv.org/abs/1910.00988
+   theme by Fibonacci. 
+   :arxiv:`1910.00988`
 
 """
 #*****************************************************************************

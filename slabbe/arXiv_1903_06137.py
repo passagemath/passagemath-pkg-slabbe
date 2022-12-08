@@ -8,12 +8,12 @@ REFERENCES:
    `\mathbb{Z}^2`-rotations featuring Jeandel-Rao Wang shift and model
    sets, *Annales Henri Lebesgue* 4 (2021) 283-324. 
    https://doi.org/10.5802/ahl.73
-   https://arxiv.org/abs/1903.06137
+   :arxiv:`1903.06137`
 
 .. [Lab2018] S. Labbé. A self-similar aperiodic set of 19 Wang
    tiles. Geom. Dedicata, 201 (2019) 81-109 
    https://doi.org/10.1007/s10711-018-0384-8.
-   http://arxiv.org/abs/1802.03265
+   :arxiv:`1802.03265`
 
 EXAMPLES:
 

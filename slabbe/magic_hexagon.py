@@ -13,7 +13,7 @@ It allows to compare the efficiency of LP solvers::
     sage: _ = solve_magic_hexagon(solver='GLPK')   # not tested (90s)
     sage: _ = solve_magic_hexagon(solver='Gurobi') # not tested (<1s)
 
-See https://en.wikipedia.org/wiki/Magic_hexagon
+See :wikipedia:`Magic_hexagon`
 """
 #*****************************************************************************
 #       Copyright (C) 2018 Sébastien Labbé <slabqc@gmail.com>
