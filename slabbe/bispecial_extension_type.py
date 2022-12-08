@@ -1339,8 +1339,8 @@ class ExtensionType(object):
         ::
 
             sage: from slabbe import TikzPicture
-            sage: tikz = TikzPicture.from_poset(P)         # optional dot2tex
-            sage: _ = tikz.pdf(view=False)                 # optional dot2tex
+            sage: tikz = TikzPicture.from_poset(P)         # optional dot2tex # not tested
+            sage: _ = tikz.pdf(view=False)                 # optional dot2tex # not tested
         """
         from sage.combinat.posets.posets import Poset
         is_suffix = lambda w,u: Word(w).is_suffix(Word(u))
