@@ -365,6 +365,11 @@ class PETsCoding(object):
             sage: TU.is_equivalent(U)
             True
 
+        .. TODO::
+
+            Code a method more general than `is_equivalent` for Wang tiles
+            that says if one is the image of the other.
+
         """
         from sage.graphs.digraph import DiGraph
         def dominoes_to_wang_color(dominoes):
