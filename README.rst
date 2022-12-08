@@ -11,12 +11,13 @@ It contains modules on the following topics.
 **Discrete dynamical systems**
   diophantine approximation, Markov transformations, Wang tilings, Lyapunov
   exponents, matrix cocycles, multidimensional continued fraction algorithms,
-  polyhedron exchange transformations, GIFS.
+  polyhedron exchange transformations (PETs), GIFS,
 
 **Combinatorics**
   2d substitutions, bispecial factors, bond percolation, Dyck word in 3D,
   words, Joyal bijection, languages, Oldenburger sequence, ostrowski
-  numeration, partial injections,
+  numeration, partial injections, d-dimensional Sturmian configurations,
+  hypercubic billiard words
 
 **Digital geometry**
   Christoffel graph, discrete subset, discrete plane, double square tiles,
@@ -172,7 +173,7 @@ Release history
   New module on d-dimensional Sturmian configurations, to draw figures from `arXiv:2204.06413`__.
   New module on Hypercubic billiard words (written with Mélodie Andrieu).
   The module ``TikzPicture`` got merged in SageMath 9.6 into
-  `sage.misc.latex_standalone` through ticket `#20343`__ during which many
+  ``sage.misc.latex_standalone`` through ticket `#20343`__ during which many
   improvements were made. The line ``from slabbe import TikzPicture`` now uses
   the one in SageMath by default. All tests passed on version 9.7 of SageMath.
   Up to recently, all tests passed on versions 9.0, 9.1, 9.2, 9.3 and 9.4 of SageMath;
