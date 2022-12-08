@@ -131,7 +131,6 @@ from sage.plot.plot3d.shapes2 import text3d
 from sage.plot.line import line
 from sage.plot.text import text
 from sage.plot.plot3d.platonic import cube
-from slabbe.tikz_picture import TikzPicture
 from slabbe.matrices import M3to2
 
 ################################################
@@ -1433,6 +1432,7 @@ class DiscreteSubset(SageObject):
             s += self.tikz_points(**point_kwds)
         s += extra_code
         s += '\\end{tikzpicture}\n'
+        from slabbe import TikzPicture
         return TikzPicture(s)
 
     def tikz(self, projmat=M3to2, scale=1, clip=[], contour=[],
@@ -1502,6 +1502,7 @@ class DiscreteSubset(SageObject):
         if axes:
             s += self.tikz_axes(projmat=projmat,**axes_kwds)
         s += '\\end{tikzpicture}\n'
+        from slabbe import TikzPicture
         return TikzPicture(s)
 
 class Intersection(DiscreteSubset):

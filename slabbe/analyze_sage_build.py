@@ -25,7 +25,6 @@ from __future__ import absolute_import, print_function
 import os
 import datetime
 import re
-from slabbe.tikz_picture import TikzPicture
 from pytimeparse.timeparse import timeparse
 
 
@@ -299,4 +298,5 @@ def draw_sage_build(start=None, stop=None, consider='last', verbose=False):
         lines.append(str_node.format('right',Bf,-i-.5,file))
 
     lines.append('\\end{tikzpicture}')
+    from slabbe import TikzPicture
     return TikzPicture('\n'.join(lines))
