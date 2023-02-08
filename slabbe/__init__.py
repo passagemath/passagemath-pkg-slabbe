@@ -53,6 +53,11 @@ from .beta_numeration_system import BetaTransformation
 
 from .EkEkstar import kFace, kPatch, GeoSub
 
+from .cut_and_project_scheme import (CutAndProjectScheme, 
+                                     ModelSet, 
+                                     cut_and_project_schemes, 
+                                     model_sets)
+
 # BUG (sometimes, cython code does not work properly)
 try:
     from .kolakoski_word import KolakoskiWord
@@ -66,3 +71,4 @@ except ImportError:
 
 # do not import module names just the above stuff
 #__all__ = []
+
