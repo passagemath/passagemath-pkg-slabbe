@@ -614,6 +614,7 @@ class ModelSet(SageObject):
                       if M * p in physical_window]
         return successors
 
+    @cached_method
     def cut(self, physical_window):
         r"""
         Return the lattice points that are projected in the internal space
