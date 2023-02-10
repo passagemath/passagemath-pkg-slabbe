@@ -368,6 +368,252 @@ class ModelSet(SageObject):
         window = self.window()
         return [p for p in cap.lattice_neighbors(v) if M * p in window]
 
+    def internal_space_window_preimage(self):
+        r"""
+        Return the preimage of the window in the internal space by the
+        projection in the internal space.
+
+        EXAMPLES::
+
+            sage: from slabbe import model_sets
+            sage: m = model_sets.Fibonacci()
+            sage: m.internal_space_window_preimage()
+            A 2-dimensional polyhedron in (Number Field in phi with defining polynomial z^2 - z - 1
+            with phi = 1.618033988749895?)^2 defined as the convex hull of 2 vertices and 1 line
+
+        Penrose tiling::
+
+            sage: m = model_sets.Penrose()
+            sage: strip = m.internal_space_window_preimage()
+            sage: strip
+            A 5-dimensional polyhedron in (Number Field in a with defining
+            polynomial z^4 - 5*z^2 + 5 with a = 1.175570504584947?)^5
+            defined as the convex hull of 22 vertices and 2 lines
+            sage: vector((0,0,0,0,0)) in strip
+            True
+
+        We move the window to force a resolution of the Conway worms::
+
+            sage: shift = vector((1,-1,2,-1,-1)) / 1000
+            sage: m = model_sets.Penrose(shift)
+            sage: strip = m.internal_space_window_preimage()
+            sage: vector((0,0,0,0,0)) in strip
+            False
+            sage: vector((1,1,1,1,1)) in strip
+            False
+
+        """
+        from sage.geometry.polyhedron.constructor import Polyhedron
+        from sage.matrix.special import identity_matrix
+        from sage.matrix.constructor import matrix
+
+        cap = self.cut_and_project_scheme()
+        M_int = cap.internal_space_projection()
+        n_d = cap.internal_space_dimension()
+        d = cap.physical_space_dimension()
+
+        # identity matrix augmented by zeros
+        # first entries are for the physical space, last are for the internal
+        rows = []
+        row_of_zero = [0]*n_d
+        for _ in range(d):
+            rows.append(row_of_zero)
+        rows.extend(identity_matrix(n_d).rows())
+        Q = matrix(rows)
+
+        vertices = [Q * v.vector() for v in self.window().vertices()]
+        lines = M_int.right_kernel().basis()
+        strip = Polyhedron(vertices=vertices, lines=lines)
+        return strip
+
+    def physical_space_window_preimage(self, physical_window):
+        r"""
+        Return the preimage of the window in the internal space by the
+        projection in the internal space.
+
+        INPUT:
+
+        - ``physical_window`` -- polyhedron
+
+        EXAMPLES::
+
+            sage: from slabbe import model_sets
+            sage: m = model_sets.Fibonacci()
+            sage: W = Polyhedron([(0,),(10,)])
+            sage: m.physical_space_window_preimage(W)
+            A 2-dimensional polyhedron in (Number Field in phi with defining polynomial z^2 - z - 1
+            with phi = 1.618033988749895?)^2 defined as the convex hull of 2 vertices and 1 line
+
+        Penrose tiling::
+
+            sage: m = model_sets.Penrose()
+            sage: W = polytopes.hypercube(2, intervals=[(-10,10), (-10,10)])
+            sage: strip = m.physical_space_window_preimage(W)
+            sage: strip
+            A 5-dimensional polyhedron in (Number Field in a with defining
+            polynomial z^4 - 5*z^2 + 5 with a = 1.175570504584947?)^5
+            defined as the convex hull of 4 vertices and 3 lines
+
+        We move the window to force a resolution of the Conway worms::
+
+            sage: shift = vector((1,-1,2,-1,-1)) / 1000
+            sage: m = model_sets.Penrose(shift)
+            sage: W = polytopes.hypercube(2, intervals=[(-10,10), (-10,10)])
+            sage: strip = m.physical_space_window_preimage(W)
+            sage: strip
+            A 5-dimensional polyhedron in (Number Field in a with defining
+            polynomial z^4 - 5*z^2 + 5 with a = 1.175570504584947?)^5
+            defined as the convex hull of 4 vertices and 3 lines
+
+        """
+        from sage.geometry.polyhedron.constructor import Polyhedron
+        from sage.matrix.special import identity_matrix
+        from sage.matrix.constructor import matrix
+
+        cap = self.cut_and_project_scheme()
+        M = cap.physical_space_projection()
+        n_d = cap.internal_space_dimension()
+        d = cap.physical_space_dimension()
+
+        # identity matrix augmented by zeros
+        # first entries are for the physical space, last are for the internal
+        rows = []
+        rows.extend(identity_matrix(d).rows())
+        row_of_zero = [0]*d
+        for _ in range(n_d):
+            rows.append(row_of_zero)
+        Q = matrix(rows)
+
+        vertices = [Q * v.vector() for v in physical_window.vertices()]
+        lines = M.right_kernel().basis()
+        strip = Polyhedron(vertices=vertices, lines=lines)
+        return strip
+
+    def ambiant_compact_strip(self, physical_window):
+        r"""
+        Return the preimage of the window in the internal space by the
+        projection in the internal space.
+
+        INPUT:
+
+        - ``physical_window`` -- polyhedron
+
+        EXAMPLES::
+
+            sage: from slabbe import model_sets
+            sage: m = model_sets.Fibonacci()
+            sage: W = Polyhedron([(0,),(10,)])
+            sage: m.ambiant_compact_strip(W)
+            A 2-dimensional polyhedron in (Number Field in phi with
+            defining polynomial z^2 - z - 1 with phi =
+            1.618033988749895?)^2 defined as the convex hull of 4 vertices
+
+        Penrose tiling::
+
+            sage: m = model_sets.Penrose()
+            sage: W = polytopes.hypercube(2, intervals=[(-10,10), (-10,10)])
+            sage: m.ambiant_compact_strip(W)
+            A 5-dimensional polyhedron in (Number Field in a with
+            defining polynomial z^4 - 5*z^2 + 5 with a =
+            1.175570504584947?)^5 defined as the convex hull of 88
+            vertices
+
+        We move the window to force a resolution of the Conway worms::
+
+            sage: shift = vector((1,-1,2,-1,-1)) / 1000
+            sage: m = model_sets.Penrose(shift)
+            sage: W = polytopes.hypercube(2, intervals=[(-10,10), (-10,10)])
+            sage: m.ambiant_compact_strip(W)
+            A 5-dimensional polyhedron in (Number Field in a with defining
+            polynomial z^4 - 5*z^2 + 5 with a = 1.175570504584947?)^5
+            defined as the convex hull of 88 vertices
+
+        """
+        strip_i = self.internal_space_window_preimage()
+        strip_p = self.physical_space_window_preimage(physical_window)
+        return strip_i.intersection(strip_p)
+
+    def some_element_of_lattice_in_the_strip(self, physical_window):
+        r"""
+        Return the lattice points that are projected in the internal space
+        window (and that are projected to the provided physical space
+        window).
+
+        INPUT:
+
+        - ``physical_window`` -- polyhedron
+
+        OUTPUT:
+
+            vector
+
+        EXAMPLES::
+
+            sage: from slabbe import model_sets
+            sage: m = model_sets.Fibonacci()
+            sage: W = Polyhedron([(0,),(10,)])
+            sage: m.some_element_of_lattice_in_the_strip(W)
+            (3, 2)
+
+        Penrose tiling::
+
+            sage: m = model_sets.Penrose()
+            sage: W = polytopes.hypercube(2, intervals=[(-10,10), (-10,10)])
+            sage: m.some_element_of_lattice_in_the_strip(W)
+            (0, 0, 0, 0, 0)
+
+        """
+        from sage.modules.free_module_element import vector
+
+        cap = self.cut_and_project_scheme()
+        strip = self.ambiant_compact_strip(physical_window)
+        c = strip.center()
+        L = cap.lattice()
+        Linv_c = L.inverse() * c
+        v = vector((a.floor() for a in Linv_c))
+        L_v = L*v
+        L_v.set_immutable()
+
+        # search for a seed lattice point in the strip
+        from sage.sets.recursively_enumerated_set import RecursivelyEnumeratedSet
+        seeds = [L_v]
+        #successors = self.successor_map(physical_window)
+        successors = cap.lattice_neighbors
+        R = RecursivelyEnumeratedSet(seeds, successors, structure='symmetric')
+
+        M_int = cap.internal_space_projection()
+        M = cap.physical_space_projection()
+
+        for p in R.breadth_first_search_iterator():
+            if M*p in physical_window and M_int*p in self.window():
+                return p
+
+    def successor_map(self, physical_window):
+        r"""
+        Return the successor map of points in the lattice
+        projected in both windows.
+
+        INPUT:
+
+        - ``physical_window`` -- polyhedron
+
+        EXAMPLES::
+
+            sage: from slabbe import model_sets
+            sage: m = model_sets.Fibonacci()
+            sage: W = Polyhedron([(0,),(10,)])
+            sage: succ = m.successor_map(W)
+            sage: succ(vector((0,0)))
+            [(1, 0)]
+
+        """
+        cap = self.cut_and_project_scheme()
+        M = cap.physical_space_projection()
+        def successors(v): 
+            return [p for p in self.lattice_neighbors_projected_in_window(v) 
+                      if M * p in physical_window]
+        return successors
+
     def cut(self, physical_window):
         r"""
         Return the lattice points that are projected in the internal space
@@ -384,24 +630,54 @@ class ModelSet(SageObject):
             sage: m = model_sets.Fibonacci()
             sage: W = Polyhedron([(0,),(10,)])
             sage: m.cut(W)
-            [(0, 0), (1, 0), (1, 1), (2, 1), (3, 1), (3, 2), (4, 2), (4, 3),
-             (5, 3), (6, 3), (6, 4), (7, 4)]
+            [(3, 2), (4, 2), (3, 1), (4, 3), (2, 1), (5, 3), (1, 1), (6,
+            3), (1, 0), (6, 4), (0, 0), (7, 4)]
 
         """
-        cap = self.cut_and_project_scheme()
-        V = cap.ambiant_space()
-        zero = V(0)
-        zero.set_immutable()
-        seeds = [zero]
-
-        M = cap.physical_space_projection()
-        def successors(v): 
-            return [p for p in self.lattice_neighbors_projected_in_window(v) 
-                      if M * p in physical_window]
-
         from sage.sets.recursively_enumerated_set import RecursivelyEnumeratedSet
+        p = self.some_element_of_lattice_in_the_strip(physical_window)
+        seeds = [p]
+        successors = self.successor_map(physical_window)
         R = RecursivelyEnumeratedSet(seeds, successors, structure='symmetric')
         return list(R)
+
+    def cut_edges(self, physical_window):
+        r"""
+        Return the edges linking lattice points that are projected in the
+        internal space window (and that are projected to the provided
+        physical space window).
+
+        INPUT:
+
+        - ``physical_window`` -- polyhedron
+
+        EXAMPLES::
+
+            sage: from slabbe import model_sets
+            sage: m = model_sets.Fibonacci()
+            sage: W = Polyhedron([(0,),(10,)])
+            sage: sorted(sorted(edge) for edge in m.cut_edges(W))
+            [[(0, 0), (1, 0)],
+             [(1, 0), (1, 1)],
+             [(1, 1), (2, 1)],
+             [(2, 1), (3, 1)],
+             [(3, 1), (3, 2)],
+             [(3, 2), (4, 2)],
+             [(4, 2), (4, 3)],
+             [(4, 3), (5, 3)],
+             [(5, 3), (6, 3)],
+             [(6, 3), (6, 4)],
+             [(6, 4), (7, 4)]]
+
+        """
+        successors = self.successor_map(physical_window)
+
+        edges = set()
+        for p in self.cut(physical_window):
+            for q in successors(p):
+                p_q = frozenset((p,q))
+                edges.add(p_q)
+        return [tuple(edge) for edge in edges]
 
     def cut_and_project(self, physical_window):
         r"""
@@ -420,7 +696,7 @@ class ModelSet(SageObject):
             sage: from slabbe import model_sets
             sage: m = model_sets.Fibonacci()
             sage: W = Polyhedron([(0,),(10,)])
-            sage: m.cut_and_project(W)
+            sage: sorted(m.cut_and_project(W))
             [(0),
              (1),
              (phi),
@@ -494,11 +770,7 @@ class ModelSet(SageObject):
         G = Graphics()
 
         # the strip (alternate way using polyhedron)
-        #M_int = cap.internal_space_projection()
-        #vertices = [(0,b) for (b,) in self.window().vertices()]
-        #lines = M_int.right_kernel().basis()
-        #from sage.geometry.polyhedron.constructor import Polyhedron
-        #strip = Polyhedron(vertices=vertices, lines=lines)
+        #strip = self.internal_space_window_preimage()
         #G += strip.plot(fill='lightyellow')
 
         wp_vertices = sorted(b for (b,) in physical_window.vertices())
@@ -558,6 +830,21 @@ class ModelSet(SageObject):
             sage: G = m.plot_in_physical_space(W)
             sage: G.show(aspect_ratio=1, figsize=20)
 
+        Penrose tiling::
+
+            sage: m = model_sets.Penrose()
+            sage: W = polytopes.hypercube(2, intervals=[(-10,10), (-10,10)])
+            sage: G = m.plot_in_physical_space(W)
+            sage: G.show(aspect_ratio=1, figsize=20)
+
+        We move the window to force a resolution of the Conway worms::
+
+            sage: shift = vector((1,-1,2,-1,-1)) / 1000
+            sage: m = model_sets.Penrose(shift)
+            sage: W = polytopes.hypercube(2, intervals=[(-10,10), (-10,10)])
+            sage: G = m.plot_in_physical_space(W)
+            sage: G.show(aspect_ratio=1, figsize=20)
+
         TESTS::
 
             sage: m = model_sets.Fibonacci()
@@ -567,16 +854,26 @@ class ModelSet(SageObject):
             ...
             NotImplementedError: when physical space dimension is 1
 
+        .. TODO::
+
+            The current method currently calls ``cut`` twice.
+
         """
         from sage.plot.point import point
+        from sage.plot.line import line
         cap = self.cut_and_project_scheme()
         if cap.physical_space_dimension() != 2:
             raise NotImplementedError("when physical space dimension "
                     "is {}".format(cap.physical_space_dimension()))
 
         L = self.cut_and_project(physical_window)
-        return point(L, size=pointsize)
+        G = point(L, size=pointsize)
 
+        M = cap.physical_space_projection()
+        for (p,q) in self.cut_edges(physical_window):
+            edge = (M*p, M*q)
+            G += line(edge)
+        return G
 
 class CutAndProjectSchemeGenerator():
     r"""
@@ -678,6 +975,37 @@ class CutAndProjectSchemeGenerator():
         lattice = identity_matrix(4)
         return CutAndProjectScheme(K, pi, pi_int, lattice)
 
+    def Penrose(self):
+        r"""
+        Return the Penrose cut and project scheme
+
+        EXAMPLES::
+
+            sage: from slabbe import cut_and_project_schemes
+            sage: cut_and_project_schemes.Penrose()
+            5-to-2 cut and project scheme
+
+        """
+        from sage.rings.rational_field import QQ
+        from sage.rings.real_mpfr import RR
+        from sage.rings.polynomial.polynomial_ring import polygen
+        from sage.rings.number_field.number_field import NumberField
+        from sage.matrix.constructor import matrix
+        from sage.matrix.special import identity_matrix
+        from sage.symbolic.constants import pi
+        from sage.functions.trig import cos, sin
+
+        z = polygen(QQ, 'z')
+        K = NumberField(z**4 - 5*z**2 + 5, 'a', embedding=RR(1.17))
+        #a = K.gen()
+
+        entries = [(cos(2*pi*n/5), sin(2*pi*n/5)) for n in range(5)]
+        projection_phys = matrix.column(K, entries)
+        projection_int = projection_phys.right_kernel_matrix()
+        lattice = identity_matrix(5)
+        return CutAndProjectScheme(K, projection_phys, projection_int, lattice)
+
+
 cut_and_project_schemes = CutAndProjectSchemeGenerator()
 class ModelSetGenerator():
     r"""
@@ -746,17 +1074,38 @@ class ModelSetGenerator():
 
 
 
-    def Penrose(self):
+    def Penrose(self, shift=None):
         r"""
         Return the Penrose cut and project scheme
+
+        INPUT:
+
+        - ``shift`` -- 5-dimensional vector translating the internal window
+          to avoid singular tilings and Conway worms
 
         EXAMPLES::
 
             sage: from slabbe import model_sets
-            sage: model_sets.Penrose()    # not tested
+            sage: model_sets.Penrose()
+            Model Set of a 5-to-2 cut and project scheme
+
+        ::
+
+            sage: shift = vector((1,-1,2,-1,-1)) / 1000
+            sage: model_sets.Penrose(shift)
             Model Set of a 5-to-2 cut and project scheme
 
         """
-        raise NotImplementedError
+        from sage.modules.free_module_element import vector
+        from sage.geometry.polyhedron.library import polytopes
+        cap = cut_and_project_schemes.Penrose()
+        pi_int = cap.internal_space_projection()
+        H = polytopes.hypercube(5, intervals='zero_one')
+        if shift is None:
+            shift = vector((0,0,0,0,0))
+        else:
+            shift = vector(shift)
+        window = pi_int * (H+shift)
+        return ModelSet(cap, window)
 
 model_sets = ModelSetGenerator()
