@@ -160,16 +160,17 @@ class Substitution2d(object):
                                     for (key,val) in self._d.items()))
         return hash(sorted_items)
 
-    def _latex_(self, ncolumns=8, align='l', variableA=None,
-            variableB=None):
+    def _latex_(self, ncolumns=5, align='l', variableA=None,
+            variableB=None, arraycolsep='1.4pt'):
         r"""
         INPUT:
 
-        - ``ncolumns`` -- integer
+        - ``ncolumns`` -- integer (default: ``5``)
         - ``align`` -- character (default:``'l'``), latex alignment symbol
           ``'l'``, ``'r'`` or ``'c'``.
         - ``variableA`` -- string or ``None``
         - ``variableB`` -- string or ``None``
+        - ``arraycolsep`` -- string (default: ``'1.4pt'``)
 
         EXAMPLES::
 
@@ -179,7 +180,8 @@ class Substitution2d(object):
             sage: d = {0:A, 1:B}
             sage: s = Substitution2d(d)
             sage: latex(s)
-            \begin{array}{llllllll}
+            {\arraycolsep=1.4pt
+            \begin{array}{lllll}
             0\mapsto \left(\begin{array}{rr}
             1 & 3 \\
             0 & 2
@@ -191,10 +193,12 @@ class Substitution2d(object):
             \end{array}\right)
             .
             \end{array}
+            }
 
         ::
 
             sage: s._latex_(2, 'c', variableA='x', variableB='y')
+            {\arraycolsep=1.4pt
             \begin{array}{cc}
             x_{0}\mapsto \left(\begin{array}{rr}
             y_{1} & y_{3} \\
@@ -207,6 +211,7 @@ class Substitution2d(object):
             \end{array}\right)
             .
             \end{array}
+            }
 
         """
         from sage.matrix.constructor import matrix
@@ -216,6 +221,7 @@ class Substitution2d(object):
         from sage.calculus.var import var
         from slabbe.matrices import map_coefficients_to_variable_index
         lines = []
+        lines.append(r'{{\arraycolsep={}'.format(arraycolsep))
         lines.append(r'\begin{{array}}{{{}}}'.format(align*ncolumns))
         for i,(key,table) in enumerate(self._d.items()):
             M = matrix.column([col[::-1] for col in table])
@@ -234,6 +240,7 @@ class Substitution2d(object):
             else:
                 lines.append(r',&')
         lines.append(r'\end{array}')
+        lines.append(r'}') # arraycolsep
         return LatexExpr('\n'.join(lines))
 
     @classmethod
