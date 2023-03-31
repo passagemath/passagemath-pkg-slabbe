@@ -3174,7 +3174,6 @@ class WangTileSolver(object):
               (0, 1, 2),
               (0, 1, 3),
               (0, 1, 4)])
-
         """
         from math import log, ceil
 
@@ -3470,6 +3469,24 @@ class WangTileSolver(object):
             sage: W = WangTileSolver(tiles,2,2)
             sage: W.number_of_solutions()
             3
+
+        TESTS::
+
+            sage: tiles = [('E', 'F', 'G', 'H'), ('A', 'B', 'C', 'D')]
+            sage: preassigned_color = [{(0, 0): 'A'}, {(0, 0): 'B'}, {(0, 0): 'C'}, {(0, 0): 'D'}]
+            sage: W = WangTileSolver(tiles, 1, 1, preassigned_color=preassigned_color)
+            sage: W.number_of_solutions()     # known bug
+            1
+            sage: tiles = [('E', 'F', 'G', 'H'), ('A', 'B', 'C', 'D')]
+            sage: preassigned_color = [{(0, 0): 'A'}, {}, {}, {}]
+            sage: W = WangTileSolver(tiles, 1, 1, preassigned_color=preassigned_color)
+            sage: W.number_of_solutions()     # known bug
+            1
+            sage: preassigned_color = [{}, {}, {(0, 0): 'C'}, {}]
+            sage: W = WangTileSolver(tiles, 1, 1, preassigned_color=preassigned_color)
+            sage: W.number_of_solutions()     # known bug
+            1
+
         """
         return self.dlx_solver().number_of_solutions(ncpus=ncpus)
 
