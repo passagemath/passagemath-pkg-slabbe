@@ -1194,8 +1194,8 @@ class PolyhedronPartition(object):
 
         - ``other`` -- a polyhedron partition
         - ``include_empty_interior_atom`` -- boolean (default:``False``),
-          whether to include in the partition the atom that are not full
-          dimensional (that is, points, lines, etc.)
+          whether to include in the partition the atom that are non empty
+          but not full dimensional (that is, points, lines, etc.)
         - ``certificate`` -- boolean (default:``False``), return a
           dictionnary for i:(p,q) if atom number i was obtained as the
           intersection of atoms p in self and q in other
@@ -1234,7 +1234,7 @@ class PolyhedronPartition(object):
             sage: P.refinement(P)
             Polyhedron partition of 4 atoms with 4 letters
             sage: P.refinement(P, include_empty_interior_atom=True)
-            Polyhedron partition of 16 atoms with 16 letters
+            Polyhedron partition of 14 atoms with 14 letters
 
         """
         if not isinstance(other, PolyhedronPartition):
@@ -1244,7 +1244,7 @@ class PolyhedronPartition(object):
         d = {}
         for ((a,p),(b,q)) in itertools.product(self, other):
             p_q = p.intersection(q)
-            if include_empty_interior_atom or p_q.is_full_dimensional():
+            if (include_empty_interior_atom and not p_q.is_empty()) or p_q.is_full_dimensional():
                 if certificate:
                     d[len(L)] = (a,b)
                 L.append(p_q)

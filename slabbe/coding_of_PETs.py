@@ -340,8 +340,7 @@ class PETsCoding(object):
 
         OUTPUT:
 
-            polyhedron partition (containing probably only one atom, or
-            more to handle the case of union of polyhedrons)
+            list of patterns
 
         EXAMPLES::
 
@@ -358,41 +357,28 @@ class PETsCoding(object):
             sage: Re2 = PET.toral_translation(base, vector((0, 1/4)))
             sage: from slabbe import PETsCoding
             sage: X_P_R = PETsCoding((Re1,Re2), P)
-            sage: X_P_R.coincidence_patterns((2,1))
-            [[[0], [0]],
-             [[0], [1]],
-             [[0], [2]],
-             [[0], [3]],
-             [[0], [3]],
-             [[1], [0]],
-             [[1], [1]],
-             [[1], [2]],
-             [[1], [3]],
-             [[2], [2]],
-             [[2], [3]],
-             [[2], [3]],
-             [[3], [0]],
-             [[3], [2]],
-             [[3], [3]]]
-            sage: X_P_R.coincidence_patterns((1,2))
-            [[[0, 1]],
-             [[0, 2]],
-             [[0, 2]],
-             [[0, 3]],
-             [[0, 3]],
+            sage: L21 = X_P_R.coincidence_patterns((2,1))
+            sage: L21
+            [[[0], [0]], [[1], [0]], [[1], [1]], [[2], [2]], [[2], [3]], [[3], [3]]]
+            sage: L12 = X_P_R.coincidence_patterns((1,2))
+            sage: L12
+            [[[0, 2]],
              [[1, 2]],
              [[1, 2]],
-             [[1, 3]],
              [[1, 3]],
              [[2, 0]],
              [[2, 1]],
              [[2, 1]],
-             [[2, 3]],
-             [[3, 0]],
-             [[3, 1]],
-             [[3, 1]],
-             [[3, 2]],
-             [[3, 3]]]
+             [[3, 1]]]
+
+        TESTS:
+
+        This should be all zero::
+
+            sage: [X_P_R.cylinder(p).volume() for p in L21]
+            [0, 0, 0, 0, 0, 0]
+            sage: [X_P_R.cylinder(p).volume() for p in L12]
+            [0, 0, 0, 0, 0, 0, 0, 0]
 
         """
         Q, key_to_word = self.partition_for_patterns(sizes,
