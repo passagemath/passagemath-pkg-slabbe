@@ -222,14 +222,16 @@ class PETsCoding(object):
         return region
 
 
-    def partition_for_patterns(self, sizes):
+    def partition_for_patterns(self, sizes, include_empty_interior_atom=False):
         r"""
         Return the coding region of the pattern.
 
         INPUT:
 
-        - ``pattern`` -- list of lists or dict of the form
-          ``{positions:code}``
+        - ``sizes`` -- tuple of integers
+        - ``include_empty_interior_atom`` -- boolean (default:``False``),
+          whether to include in the partition the atom that are not full
+          dimensional (that is, points, lines, etc.)
 
         OUTPUT:
 
@@ -313,7 +315,8 @@ class PETsCoding(object):
         #print("k",key_to_column)
 
         for j in range(sizes[1]-1):
-            P,d = self._partition.refinement(Re2_inv(P), certificate=True)
+            P,d = self._partition.refinement(Re2_inv(P), certificate=True,
+                    include_empty_interior_atom=include_empty_interior_atom)
             #print("d",d)
             key_to_column = {k:[d[k][0]]+key_to_column[d[k][1]] for k in d}
             #print("k",key_to_column)
@@ -321,10 +324,80 @@ class PETsCoding(object):
         Q = P
         key_to_word = {k:[col] for (k,col) in key_to_column.items()}
         for i in range(sizes[0]-1):
-            Q,d = P.refinement(Re1_inv(Q), certificate=True)
+            Q,d = P.refinement(Re1_inv(Q), certificate=True,
+                    include_empty_interior_atom=include_empty_interior_atom)
             key_to_word = {k:[key_to_column[d[k][0]]]+key_to_word[d[k][1]] for k in d}
 
         return Q, key_to_word
+
+    def coincidence_patterns(self, sizes):
+        r"""
+        Return the coincidences for pattern of given shape.
+
+        INPUT:
+
+        - ``sizes`` -- tuple of integers
+
+        OUTPUT:
+
+            polyhedron partition (containing probably only one atom, or
+            more to handle the case of union of polyhedrons)
+
+        EXAMPLES::
+
+            sage: from slabbe import PolyhedronPartition
+            sage: h = 1/3
+            sage: p = Polyhedron([(0,h),(0,1),(h,1)])
+            sage: q = Polyhedron([(0,0), (0,h), (h,1), (h,0)])
+            sage: r = Polyhedron([(h,1), (1,1), (1,h), (h,0)])
+            sage: s = Polyhedron([(h,0), (1,0), (1,h)])
+            sage: P = PolyhedronPartition({0:p, 1:q, 2:r, 3:s})
+            sage: from slabbe import PolyhedronExchangeTransformation as PET
+            sage: base = identity_matrix(2)
+            sage: Re1 = PET.toral_translation(base, vector((2/3, 0)))
+            sage: Re2 = PET.toral_translation(base, vector((0, 1/4)))
+            sage: from slabbe import PETsCoding
+            sage: X_P_R = PETsCoding((Re1,Re2), P)
+            sage: X_P_R.coincidence_patterns((2,1))
+            [[[0], [0]],
+             [[0], [1]],
+             [[0], [2]],
+             [[0], [3]],
+             [[0], [3]],
+             [[1], [0]],
+             [[1], [1]],
+             [[1], [2]],
+             [[1], [3]],
+             [[2], [2]],
+             [[2], [3]],
+             [[2], [3]],
+             [[3], [0]],
+             [[3], [2]],
+             [[3], [3]]]
+            sage: X_P_R.coincidence_patterns((1,2))
+            [[[0, 1]],
+             [[0, 2]],
+             [[0, 2]],
+             [[0, 3]],
+             [[0, 3]],
+             [[1, 2]],
+             [[1, 2]],
+             [[1, 3]],
+             [[1, 3]],
+             [[2, 0]],
+             [[2, 1]],
+             [[2, 1]],
+             [[2, 3]],
+             [[3, 0]],
+             [[3, 1]],
+             [[3, 1]],
+             [[3, 2]],
+             [[3, 3]]]
+
+        """
+        Q, key_to_word = self.partition_for_patterns(sizes,
+                            include_empty_interior_atom=True)
+        return [key_to_word[a] for (a,p) in Q if not p.is_full_dimensional()]
 
     def to_wang_tiles(self):
         r"""
