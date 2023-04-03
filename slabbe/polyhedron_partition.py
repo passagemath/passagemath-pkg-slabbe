@@ -344,7 +344,7 @@ class PolyhedronPartition(object):
             up to a permutation of the coding. The meaning of == for
             polyhedron partition is now more strict. Please update your
             code to use method `is_equal_up_to_relabeling` instead.
-            See https://trac.sagemath.org/99999 for details.
+            See ... for details.
             False
 
         """
@@ -1183,7 +1183,7 @@ class PolyhedronPartition(object):
         B = self.refinement(other_half_partition)
         return PolyhedronPartition(A.atoms()+B.atoms())
 
-    def refinement(self, other, certificate=False):
+    def refinement(self, other, include_empty_interior_atom=False, certificate=False):
         r"""
         Return the polyhedron partition obtained by the intersection of the
         atoms of self with the atoms of other.
@@ -1193,6 +1193,9 @@ class PolyhedronPartition(object):
         INPUT:
 
         - ``other`` -- a polyhedron partition
+        - ``include_empty_interior_atom`` -- boolean (default:``False``),
+          whether to include in the partition the atom that are not full
+          dimensional (that is, points, lines, etc.)
         - ``certificate`` -- boolean (default:``False``), return a
           dictionnary for i:(p,q) if atom number i was obtained as the
           intersection of atoms p in self and q in other
@@ -1224,6 +1227,15 @@ class PolyhedronPartition(object):
             sage: Q = PolyhedronPartition([t1,t2])
             sage: P.refinement(Q)
             Polyhedron partition of 8 atoms with 8 letters
+
+        By default, atoms with empty interior are excluded, but we can
+        include them if necessary::
+
+            sage: P.refinement(P)
+            Polyhedron partition of 4 atoms with 4 letters
+            sage: P.refinement(P, include_empty_interior_atom=True)
+            Polyhedron partition of 16 atoms with 16 letters
+
         """
         if not isinstance(other, PolyhedronPartition):
             raise TypeError("other (of type={}) must a polyhedron"
@@ -1232,7 +1244,7 @@ class PolyhedronPartition(object):
         d = {}
         for ((a,p),(b,q)) in itertools.product(self, other):
             p_q = p.intersection(q)
-            if p_q.is_full_dimensional():
+            if include_empty_interior_atom or p_q.is_full_dimensional():
                 if certificate:
                     d[len(L)] = (a,b)
                 L.append(p_q)
