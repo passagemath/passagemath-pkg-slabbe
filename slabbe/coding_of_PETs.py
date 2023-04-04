@@ -235,8 +235,9 @@ class PETsCoding(object):
 
         OUTPUT:
 
-            polyhedron partition (containing probably only one atom, or
-            more to handle the case of union of polyhedrons)
+            - polyhedron partition (containing probably only one atom, or
+              more to handle the case of union of polyhedrons)
+            - dictionnary, key to patterns (tuple of tuples)
 
         EXAMPLES::
 
@@ -255,50 +256,50 @@ class PETsCoding(object):
             sage: X_P_R = PETsCoding((Re1,Re2), P)
             sage: X_P_R.partition_for_patterns((2,2))
             (Polyhedron partition of 24 atoms with 24 letters,
-             {0: [[0, 0], [2, 2]],
-              1: [[0, 1], [2, 2]],
-              2: [[0, 1], [2, 3]],
-              3: [[1, 0], [2, 2]],
-              4: [[1, 0], [3, 2]],
-              5: [[1, 1], [2, 2]],
-              6: [[1, 1], [3, 2]],
-              7: [[1, 1], [3, 3]],
-              8: [[1, 1], [2, 3]],
-              9: [[2, 2], [0, 0]],
-              10: [[2, 2], [1, 0]],
-              11: [[2, 2], [1, 1]],
-              12: [[2, 2], [2, 2]],
-              13: [[2, 2], [0, 1]],
-              14: [[2, 2], [1, 1]],
-              15: [[2, 2], [2, 2]],
-              16: [[2, 3], [0, 1]],
-              17: [[2, 3], [1, 1]],
-              18: [[2, 3], [2, 2]],
-              19: [[2, 3], [2, 3]],
-              20: [[3, 2], [1, 1]],
-              21: [[3, 2], [2, 2]],
-              22: [[3, 2], [3, 2]],
-              23: [[3, 3], [3, 2]]})
+            {0: ((0, 0), (2, 2)),
+             1: ((0, 1), (2, 2)),
+             2: ((0, 1), (2, 3)),
+             3: ((1, 0), (2, 2)),
+             4: ((1, 0), (3, 2)),
+             5: ((1, 1), (2, 2)),
+             6: ((1, 1), (3, 2)),
+             7: ((1, 1), (3, 3)),
+             8: ((1, 1), (2, 3)),
+             9: ((2, 2), (0, 0)),
+             10: ((2, 2), (1, 0)),
+             11: ((2, 2), (1, 1)),
+             12: ((2, 2), (2, 2)),
+             13: ((2, 2), (0, 1)),
+             14: ((2, 2), (1, 1)),
+             15: ((2, 2), (2, 2)),
+             16: ((2, 3), (0, 1)),
+             17: ((2, 3), (1, 1)),
+             18: ((2, 3), (2, 2)),
+             19: ((2, 3), (2, 3)),
+             20: ((3, 2), (1, 1)),
+             21: ((3, 2), (2, 2)),
+             22: ((3, 2), (3, 2)),
+             23: ((3, 3), (3, 2))})
             sage: X_P_R.partition_for_patterns((1,3))
             (Polyhedron partition of 18 atoms with 18 letters,
-             {0: [[0, 0, 0]],
-              1: [[0, 0, 1]],
-              2: [[0, 1, 0]],
-              3: [[0, 1, 1]],
-              4: [[1, 0, 0]],
-              5: [[1, 0, 1]],
-              6: [[1, 1, 0]],
-              7: [[1, 1, 1]],
-              8: [[1, 1, 1]],
-              9: [[1, 1, 1]],
-              10: [[2, 2, 2]],
-              11: [[2, 2, 2]],
-              12: [[2, 2, 2]],
-              13: [[2, 2, 3]],
-              14: [[2, 3, 2]],
-              15: [[2, 3, 3]],
-              16: [[3, 2, 2]],
-              17: [[3, 3, 2]]})
+            {0: ((0, 0, 0),),
+             1: ((0, 0, 1),),
+             2: ((0, 1, 0),),
+             3: ((0, 1, 1),),
+             4: ((1, 0, 0),),
+             5: ((1, 0, 1),),
+             6: ((1, 1, 0),),
+             7: ((1, 1, 1),),
+             8: ((1, 1, 1),),
+             9: ((1, 1, 1),),
+             10: ((2, 2, 2),),
+             11: ((2, 2, 2),),
+             12: ((2, 2, 2),),
+             13: ((2, 2, 3),),
+             14: ((2, 3, 2),),
+             15: ((2, 3, 3),),
+             16: ((3, 2, 2),),
+             17: ((3, 3, 2),)})
 
         """
         if len(sizes) != 2:
@@ -311,22 +312,22 @@ class PETsCoding(object):
         Re2_inv = Re2.inverse()
 
         P = self._partition
-        key_to_column = {k:[k] for (k,atoms) in P}
+        key_to_column = {k:(k,) for (k,atoms) in P}
         #print("k",key_to_column)
 
         for j in range(sizes[1]-1):
             P,d = self._partition.refinement(Re2_inv(P), certificate=True,
                     include_empty_interior_atom=include_empty_interior_atom)
             #print("d",d)
-            key_to_column = {k:[d[k][0]]+key_to_column[d[k][1]] for k in d}
+            key_to_column = {k:(d[k][0],)+key_to_column[d[k][1]] for k in d}
             #print("k",key_to_column)
 
         Q = P
-        key_to_word = {k:[col] for (k,col) in key_to_column.items()}
+        key_to_word = {k:(col,) for (k,col) in key_to_column.items()}
         for i in range(sizes[0]-1):
             Q,d = P.refinement(Re1_inv(Q), certificate=True,
                     include_empty_interior_atom=include_empty_interior_atom)
-            key_to_word = {k:[key_to_column[d[k][0]]]+key_to_word[d[k][1]] for k in d}
+            key_to_word = {k:(key_to_column[d[k][0]],)+key_to_word[d[k][1]] for k in d}
 
         return Q, key_to_word
 
@@ -359,31 +360,30 @@ class PETsCoding(object):
             sage: X_P_R = PETsCoding((Re1,Re2), P)
             sage: L21 = X_P_R.coincidence_patterns((2,1))
             sage: L21
-            [[[0], [0]], [[1], [0]], [[1], [1]], [[2], [2]], [[2], [3]], [[3], [3]]]
+            [((0,), (0,)), ((1,), (0,)), ((1,), (1,)), ((2,), (3,))]
             sage: L12 = X_P_R.coincidence_patterns((1,2))
             sage: L12
-            [[[0, 2]],
-             [[1, 2]],
-             [[1, 2]],
-             [[1, 3]],
-             [[2, 0]],
-             [[2, 1]],
-             [[2, 1]],
-             [[3, 1]]]
+            [((0, 2),), ((1, 2),), ((1, 3),), ((2, 0),), ((2, 1),), ((3, 1),)]
 
         TESTS:
 
         This should be all zero::
 
             sage: [X_P_R.cylinder(p).volume() for p in L21]
-            [0, 0, 0, 0, 0, 0]
+            [0, 0, 0, 0]
             sage: [X_P_R.cylinder(p).volume() for p in L12]
-            [0, 0, 0, 0, 0, 0, 0, 0]
+            [0, 0, 0, 0, 0, 0]
 
         """
         Q, key_to_word = self.partition_for_patterns(sizes,
                             include_empty_interior_atom=True)
-        return [key_to_word[a] for (a,p) in Q if not p.is_full_dimensional()]
+        # sometimes one key is mapped to a non-full dimensional polygon
+        # and the same key is mapped to a full dimensional polygon
+        # we want to ignore those keys!
+        candidate_patterns = set(key_to_word[a] for (a,p) in Q if not p.is_full_dimensional())
+        valid_patterns = set(key_to_word[a] for (a,p) in Q if p.is_full_dimensional())
+        return sorted(candidate_patterns-valid_patterns)
+
 
     def to_wang_tiles(self):
         r"""
