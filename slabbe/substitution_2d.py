@@ -1340,7 +1340,7 @@ class Substitution2d(object):
 
         OUTPUT:
 
-            list of tuple (2x2 matrix, integer)
+            graph
 
         EXAMPLES::
 
@@ -1385,6 +1385,64 @@ class Substitution2d(object):
             M.set_immutable()
             return [M]
         R = RecursivelyEnumeratedSet(seeds, children)
+        return R.to_digraph(multiedges=False)
+
+    def seeds_graph(self):
+        r"""
+        Return the directed graph of 2x2 factors where (u,v) is an edge if
+        v appear in the image of u under self.
+
+        OUTPUT:
+
+            graph of matrices
+
+        EXAMPLES::
+
+            sage: d = {0: [[17]],
+            ....:  1: [[16]],
+            ....:  2: [[15], [11]],
+            ....:  3: [[13], [9]],
+            ....:  4: [[17], [8]],
+            ....:  5: [[16], [8]],
+            ....:  6: [[15], [8]],
+            ....:  7: [[14], [8]],
+            ....:  8: [[14, 6]],
+            ....:  9: [[17, 3]],
+            ....:  10: [[16, 3]],
+            ....:  11: [[14, 2]],
+            ....:  12: [[15, 7], [11, 1]],
+            ....:  13: [[14, 6], [11, 1]],
+            ....:  14: [[13, 7], [9, 1]],
+            ....:  15: [[12, 6], [9, 1]],
+            ....:  16: [[18, 5], [10, 1]],
+            ....:  17: [[13, 4], [9, 1]],
+            ....:  18: [[14, 2], [8, 0]]}
+            sage: from slabbe import Substitution2d
+            sage: omega = Substitution2d(d)
+            sage: G = omega.seeds_graph()           # long time (10 s)
+            sage: G                                 # long time (10 s)
+            Looped digraph on 10825 vertices
+
+        """
+        from sage.matrix.constructor import matrix
+        from sage.sets.recursively_enumerated_set import RecursivelyEnumeratedSet
+        alphabet = self.domain_alphabet()
+        roots = [matrix(2,[a,b,c,d]) for (a,b,c,d) in itertools.product(alphabet, repeat=4)]
+        for m in roots: m.set_immutable()
+        shape = [(0,0), (1,0), (0,1), (1,1)]
+        def children(m):
+            b,d,a,c = m.list()
+            table = ((a,b),(c,d))
+            try:
+                image = self(table)
+            except ValueError:
+                return None
+            else:
+                for ((A,C,B,D)) in set_of_factors(image, shape=shape):
+                    M = matrix.column(((B,A),(D,C)))
+                    M.set_immutable()
+                    yield M
+        R = RecursivelyEnumeratedSet(roots, children)
         return R.to_digraph(multiedges=False)
 
     prolongable_origins = deprecated_function_alias(123456, prolongable_seeds_graph)
