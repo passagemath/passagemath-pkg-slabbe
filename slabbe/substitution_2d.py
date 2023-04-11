@@ -1389,12 +1389,12 @@ class Substitution2d(object):
 
     def seeds_graph(self):
         r"""
-        Return the directed graph of 2x2 factors where (u,v) is an edge if
+        Return the directed graph of 2x2 patterns where (u,v) is an edge if
         v appear in the image of u under self.
 
         OUTPUT:
 
-            graph of matrices
+            graph of matrices (without source and sink vertices)
 
         EXAMPLES::
 
@@ -1421,7 +1421,7 @@ class Substitution2d(object):
             sage: omega = Substitution2d(d)
             sage: G = omega.seeds_graph()           # long time (10 s)
             sage: G                                 # long time (10 s)
-            Looped digraph on 10825 vertices
+            Looped digraph on 327 vertices
 
         """
         from sage.matrix.constructor import matrix
@@ -1443,7 +1443,9 @@ class Substitution2d(object):
                     M.set_immutable()
                     yield M
         R = RecursivelyEnumeratedSet(roots, children)
-        return R.to_digraph(multiedges=False)
+        G = R.to_digraph(multiedges=False)
+        from slabbe.graph import clean_sources_and_sinks
+        return clean_sources_and_sinks(G)
 
     prolongable_origins = deprecated_function_alias(123456, prolongable_seeds_graph)
     def prolongable_seeds_list(self):
