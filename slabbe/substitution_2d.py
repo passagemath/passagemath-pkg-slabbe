@@ -1333,10 +1333,14 @@ class Substitution2d(object):
                     result.append(v)
         return result
 
-    def prolongable_seeds_graph(self):
+    def prolongable_seeds_graph(self, clean_sources=False):
         r"""
         Return the directed graph of 2x2 factors where (u,v) is an edge if
         v is the seed at the origin of the image of u under self.
+
+        INPUT:
+
+        - ``clean_sources`` -- bool (default:``False``)
 
         OUTPUT:
 
@@ -1365,87 +1369,54 @@ class Substitution2d(object):
             ....:  18: [[14, 2], [8, 0]]}
             sage: from slabbe import Substitution2d
             sage: omega = Substitution2d(d)
-            sage: G = omega.prolongable_seeds_graph()
-            sage: G
-            Looped digraph on 50 vertices
+            sage: omega.prolongable_seeds_graph()
+            Looped digraph on 1344 vertices
+            sage: omega.prolongable_seeds_graph(clean_sources=True)
+            Looped digraph on 256 vertices
 
         """
         from sage.matrix.constructor import matrix
         from sage.sets.recursively_enumerated_set import RecursivelyEnumeratedSet
-        seeds = self.list_2x2_factors(F=None)
-        seeds = [matrix.column(c[::-1] for c in columns) for columns in seeds]
-        for m in seeds: m.set_immutable()
+        # compute the letters appearing in the 4 corners
+        alphabet = self.domain_alphabet()
+        bottom_left  = sorted(set(self([[a]])[0][0] for a in alphabet))
+        bottom_right = sorted(set(self([[a]])[-1][0] for a in alphabet))
+        top_left     = sorted(set(self([[a]])[0][-1] for a in alphabet))
+        top_right    = sorted(set(self([[a]])[-1][-1] for a in alphabet))
+
+        # initialize the seeds with the cartesian product of these
+        seeds = []
+        for (a,b,c,d) in itertools.product(bottom_right, bottom_left,
+                                           top_right, top_left):
+            table = [(c,a), (d,b)]
+            try:
+                self(table)
+            except ValueError:
+                continue
+            else:
+                # consider only those for which the application of the
+                # substitution is defined
+                m = matrix(2,[a,b,c,d])
+                m.set_immutable()
+                seeds.append(m)
+
         def children(m):
             b,d,a,c = m.list()
-            A = self([[a]])[-1][-1] # bottom left
-            B = self([[b]])[-1][0] # top left
-            C = self([[c]])[0][-1] # bottom right
-            D = self([[d]])[0][0] # top right
+            A = self([[a]])[-1][-1] # bottom left  (in the seed)
+            B = self([[b]])[-1][0]  # top left     (in the seed)
+            C = self([[c]])[0][-1]  # bottom right (in the seed)
+            D = self([[d]])[0][0]   # top right    (in the seed)
             M = matrix.column(((B,A),(D,C)))
             M.set_immutable()
             return [M]
         R = RecursivelyEnumeratedSet(seeds, children)
-        return R.to_digraph(multiedges=False)
-
-    def seeds_graph(self):
-        r"""
-        Return the directed graph of 2x2 patterns where (u,v) is an edge if
-        v appear in the image of u under self.
-
-        OUTPUT:
-
-            graph of matrices (without source and sink vertices)
-
-        EXAMPLES::
-
-            sage: d = {0: [[17]],
-            ....:  1: [[16]],
-            ....:  2: [[15], [11]],
-            ....:  3: [[13], [9]],
-            ....:  4: [[17], [8]],
-            ....:  5: [[16], [8]],
-            ....:  6: [[15], [8]],
-            ....:  7: [[14], [8]],
-            ....:  8: [[14, 6]],
-            ....:  9: [[17, 3]],
-            ....:  10: [[16, 3]],
-            ....:  11: [[14, 2]],
-            ....:  12: [[15, 7], [11, 1]],
-            ....:  13: [[14, 6], [11, 1]],
-            ....:  14: [[13, 7], [9, 1]],
-            ....:  15: [[12, 6], [9, 1]],
-            ....:  16: [[18, 5], [10, 1]],
-            ....:  17: [[13, 4], [9, 1]],
-            ....:  18: [[14, 2], [8, 0]]}
-            sage: from slabbe import Substitution2d
-            sage: omega = Substitution2d(d)
-            sage: G = omega.seeds_graph()           # long time (10 s)
-            sage: G                                 # long time (10 s)
-            Looped digraph on 327 vertices
-
-        """
-        from sage.matrix.constructor import matrix
-        from sage.sets.recursively_enumerated_set import RecursivelyEnumeratedSet
-        alphabet = self.domain_alphabet()
-        roots = [matrix(2,[a,b,c,d]) for (a,b,c,d) in itertools.product(alphabet, repeat=4)]
-        for m in roots: m.set_immutable()
-        shape = [(0,0), (1,0), (0,1), (1,1)]
-        def children(m):
-            b,d,a,c = m.list()
-            table = ((a,b),(c,d))
-            try:
-                image = self(table)
-            except ValueError:
-                return None
-            else:
-                for ((A,C,B,D)) in set_of_factors(image, shape=shape):
-                    M = matrix.column(((B,A),(D,C)))
-                    M.set_immutable()
-                    yield M
-        R = RecursivelyEnumeratedSet(roots, children)
         G = R.to_digraph(multiedges=False)
-        from slabbe.graph import clean_sources_and_sinks
-        return clean_sources_and_sinks(G)
+        if clean_sources:
+            from slabbe.graph import clean_sources_and_sinks
+            return clean_sources_and_sinks(G)
+        else:
+            return G
+
 
     prolongable_origins = deprecated_function_alias(123456, prolongable_seeds_graph)
     def prolongable_seeds_list(self):
