@@ -1668,6 +1668,7 @@ class Substitution2d(object):
 
         EXAMPLES::
 
+            sage: from slabbe import Substitution2d
             sage: d = {0: [[17]],
             ....:  1: [[16]],
             ....:  2: [[15], [11]],
@@ -1687,23 +1688,23 @@ class Substitution2d(object):
             ....:  16: [[18, 5], [10, 1]],
             ....:  17: [[13, 4], [9, 1]],
             ....:  18: [[14, 2], [8, 0]]}
-            sage: from slabbe import Substitution2d
             sage: omega = Substitution2d(d)
             sage: omega.has_unique_self_similar_subshift()
             False
 
         """
+        from slabbe.graph import vertices_in_a_cycle
         result = True
 
         # for unicity to hold, all prolongable seeds need to be
         # in the language of the substitution
-        from sage.misc.flatten import flatten
-        seeds = flatten(self.prolongable_seeds_list())
+        G = self.prolongable_seeds_graph()
+        seeds = vertices_in_a_cycle(G)
         seeds_as_table = [[list(col[::-1]) for col in m.columns()] for m in seeds]
         F = self.list_2x2_factors()
         if not all(seed in F for seed in seeds_as_table):
             if verbose:
-                print(("2x2 seeds preserved by the substitution which are not in the language "
+                print(("2x2 seeds preserved by the substitution, but which are not in the language "
                     "of the substitution:"), [seed for seed in seeds_as_table if seed not in F])
                 result = False
             else:
@@ -1712,11 +1713,11 @@ class Substitution2d(object):
         # for unicity to hold, all horizontal dominos seeds need to be
         # in the language of the substitution
         G_h = self.periodic_horizontal_domino_seeds_graph(clean_sources=True)
-        seeds_h = set([v for cycle in G_h.all_simple_cycles() for v in cycle[:-1]])
+        seeds_h = set(vertices_in_a_cycle(G_h))
         dominoes_h = set(self.list_dominoes(direction='horizontal'))
         if not seeds_h <= dominoes_h:
             if verbose:
-                print(("Horizontal domino seeds preserved by the substitution which are "
+                print(("Horizontal domino seeds preserved by the substitution, but which are "
                     "not in the language of the substitution:"), seeds_h - dominoes_h)
                 result = False
             else:
@@ -1725,11 +1726,11 @@ class Substitution2d(object):
         # for unicity to hold, all vertical dominos seeds need to be
         # in the language of the substitution
         G_v = self.periodic_vertical_domino_seeds_graph(clean_sources=True)
-        seeds_v = set([v for cycle in G_v.all_simple_cycles() for v in cycle[:-1]])
+        seeds_v = set(vertices_in_a_cycle(G_v))
         dominoes_v = set(self.list_dominoes(direction='vertical'))
         if not seeds_v <= dominoes_v:
             if verbose:
-                print(("Vertical domino seeds preserved by the substitution which are "
+                print(("Vertical domino seeds preserved by the substitution, but which are "
                     "not in the language of the substitution:"), seeds_v - dominoes_v)
                 result = False
             else:

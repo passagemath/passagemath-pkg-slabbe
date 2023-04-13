@@ -637,3 +637,59 @@ def reduce_bispecial_vertices(G, merge_function, filter=None):
         GG.delete_vertex(v)
     return GG
 
+def vertices_in_a_cycle(G, verbose=False):
+    r"""
+    Return the set of vertices belonging to a cycle.
+
+    INPUT:
+
+    - ``G`` -- digraph
+    - ``verbose`` -- bool (default:``False``)
+
+    OUTPUT:
+
+    list or set of vertices
+
+    EXAMPLES::
+
+        sage: from slabbe.graph import vertices_in_a_cycle
+        sage: G = DiGraph()
+        sage: G.add_vertex(0)
+        sage: vertices_in_a_cycle(G)
+        []
+        sage: vertices_in_a_cycle(G, verbose=True)
+        ignoring vertex 0 because it has no loop
+        []
+
+    ::
+
+        sage: G = DiGraph(loops=True)
+        sage: G.add_edge(0, 0)
+        sage: vertices_in_a_cycle(G)
+        [0]
+
+    ::
+
+        sage: D = DiGraph({0:[1, 3], 1:[2], 2:[0,3], 4:[5, 6], 5:[6]})
+        sage: D.strongly_connected_components()
+        [[3], [0, 1, 2], [6], [5], [4]]
+        sage: vertices_in_a_cycle(D)
+        [0, 1, 2]
+
+    """
+    V = []
+    for c in G.strongly_connected_components():
+        if len(c) > 1:
+            V.extend(c)
+        elif len(c) == 1:
+            v, = c
+            if G.has_edge(v,v):
+                V.append(v)
+            else:
+                if verbose:
+                    print("ignoring vertex {} because "
+                          "it has no loop".format(v))
+        else:
+            continue
+    return V
+
