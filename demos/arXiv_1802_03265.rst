@@ -51,7 +51,7 @@ This allows to create the transducer graph of `U` shown at Figure 4:
     sage: t = TikzPicture.from_graph(G)
     doctest:...: FutureWarning: This class/method/function is marked as experimental.
     It, its functionality or its interface might change without a formal deprecation.
-    See http://trac.sagemath.org/20343 for details.
+    See http...20343 for details.
     sage: if not 'amsmath' in t._usepackage: t._usepackage.append('amsmath')
     sage: _ = t.pdf(view=False)
 

@@ -226,9 +226,14 @@ def tile_to_tikz(tile, position, color=None, id=None, id_color='',
             lines.append(triangle.format(col1, (x,y+sy),c,(x+sx,y+sy)))
             lines.append(triangle.format(col2, (x,y),c,(x,y+sy)))
             lines.append(triangle.format(col3, (x,y),c,(x+sx,y)))
-        else:
+        elif draw_H is None and draw_V is None:
             square = r'\fill[{}] {} -- {} -- {} -- {} -- cycle;'
             lines.append(square.format(color, (x,y), (x+sx,y), (x+sx,y+sy), (x,y+sy)))
+        else:
+            # hacky way to fix issue with JR
+            half_square = r'\fill[{}] {} {} {};'
+            lines.append(half_square.format(color, (x,y), draw_H[tile[3]][14:-1], draw_V[tile[0]][14:-1]))
+            lines.append(half_square.format(color, (x,y), draw_V[tile[2]][14:-1], draw_H[tile[1]][14:-1]))
 
     if id is not None:
         c = (x+.5*sx,y+.5*sy)
@@ -4721,6 +4726,8 @@ class WangTiling(object):
                 top_edges = edges and (k == H - 1 or self._table[j][k+1] is None)
                 if color_by_tile_id:
                     this_color = color_by_tile_id[i]
+                elif isinstance(color, str):
+                    this_color = color
                 elif color is not None:
                     this_color = tuple(color[a] for a in tile)
                 else:
