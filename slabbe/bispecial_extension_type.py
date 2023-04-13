@@ -1124,7 +1124,7 @@ class ExtensionType(object):
             sage: _ = TikzPicture.from_graph(G).pdf(view=False) # (9s)
             doctest:...: FutureWarning: This class/method/function is marked as experimental.
             It, its functionality or its interface might change without a formal deprecation.
-            See http://trac.sagemath.org/20343 for details.
+            See http...20343 for details.
         """
         R = self.rec_enum_set_under_sadic(substitutions,
                 substitutions_dict, keep_equal_length=keep_equal_length,

@@ -52,7 +52,7 @@ one liner works::
     sage: t = TikzPicture.from_graph(g)  # optional: dot2tex (3s)
     doctest:...: FutureWarning: This class/method/function is marked as experimental.
     It, its functionality or its interface might change without a formal deprecation.
-    See http://trac.sagemath.org/20343 for details.
+    See http...20343 for details.
 
 ::
 
@@ -854,7 +854,7 @@ class TikzPicture(Standalone):
             sage: tikz = TikzPicture.from_graph_with_pos(g)
             doctest:...: FutureWarning: This class/method/function is marked as experimental.
             It, its functionality or its interface might change without a formal deprecation.
-            See http://trac.sagemath.org/20343 for details.
+            See http...20343 for details.
 
         ::
 
@@ -967,7 +967,7 @@ class TikzPicture(Standalone):
             sage: tikz = TikzPicture.from_poset(P) # optional dot2tex # long time (3s)
             doctest:...: FutureWarning: This class/method/function is marked as experimental.
             It, its functionality or its interface might change without a formal deprecation.
-            See http://trac.sagemath.org/20343 for details.
+            See http...20343 for details.
             sage: tikz = TikzPicture.from_poset(P, prog='neato', color_by_label=True) # optional dot2tex # long time (3s)
 
         ::

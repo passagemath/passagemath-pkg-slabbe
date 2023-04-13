@@ -39,7 +39,7 @@ Visualisation of the graph::
     sage: tikz = TikzPicture.from_graph(G)      # optional dot2tex
     doctest:...: FutureWarning: This class/method/function is marked as experimental.
     It, its functionality or its interface might change without a formal deprecation.
-    See http://trac.sagemath.org/20343 for details.
+    See http...20343 for details.
     sage: path_to_file = tikz.pdf()    # not tested
 
 REFERENCES:
