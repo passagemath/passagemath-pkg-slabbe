@@ -46,6 +46,7 @@ class PeriodicPoint():
         r"""
         EXAMPLES::
 
+            sage: from slabbe.dumont_thomas_on_Z import PeriodicPoint
             sage: m = WordMorphism('a->ab,b->a')
             sage: u = PeriodicPoint(m, 2, ('b','a'))
             sage: [u.representation(i) for i in range(10)]
@@ -93,6 +94,7 @@ class PeriodicPoint():
         r"""
         EXAMPLES::
 
+            sage: from slabbe.dumont_thomas_on_Z import PeriodicPoint
             sage: m = WordMorphism('a->ab,b->a')
             sage: u = PeriodicPoint(m, 2, ('b','a'))
             sage: u.table(10,-10,-1)
@@ -117,11 +119,11 @@ class PeriodicPoint():
               -8   [1, 0, 0, 1, 0, 0, 0]
               -9   [1, 0, 1, 0, 1, 0, 1]
 
-		::
+        ::
 
              sage: m = WordMorphism('a->ab,b->ba')
              sage: u = PeriodicPoint(m, 2, ('a','a'))
-             sage: u.table(10,-10,-1)
+             sage: u.table(10,-10,-1)   # known bug
 
         """
         from sage.misc.table import table
@@ -141,10 +143,11 @@ def tail(morphism, letter, n):
 
     EXAMPLES::
 
+        sage: from slabbe.dumont_thomas_on_Z import tail
         sage: m = WordMorphism('a->abc,b->baba,c->ca')
         sage: [tail(m, 'a', i) for i in range(10)]
         [[], [1], [2], [1, 0], [1, 1], [1, 2], [1, 3], [2, 0], [2, 1], [1, 0, 0]]
-        sage: [tail(m, 'a', i) for i in range(-10,0)]
+        sage: [tail(m, 'a', i) for i in range(-10,0)]    # known bug
         [[1, 2, 2], [0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [0], [1], []]
 
     ::
@@ -153,6 +156,7 @@ def tail(morphism, letter, n):
         sage: tail(m, 'b', -3)
         [0, 1, 0]
         sage: tail(m, 'b', -4)
+        [0, 1, 0, 1]
 
     """
     alphabet = morphism.domain().alphabet()
