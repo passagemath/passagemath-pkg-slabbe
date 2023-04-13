@@ -1418,7 +1418,6 @@ class Substitution2d(object):
             return G
 
 
-    prolongable_origins = deprecated_function_alias(123456, prolongable_seeds_graph)
     def prolongable_seeds_list(self):
         r"""
         Return the list of seed which are prolongable for some power of
