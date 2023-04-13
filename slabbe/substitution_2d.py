@@ -1450,23 +1450,41 @@ class Substitution2d(object):
             ....:  18: [[14, 2], [8, 0]]}
             sage: from slabbe import Substitution2d
             sage: omega = Substitution2d(d)
-            sage: omega.prolongable_seeds_list()
-            [[
-             [ 9 14]  [17 13]
-             [ 1  6], [16 15]
-             ],
-             [
-             [ 9 14]  [17 13]
-             [ 8 16], [ 6  5]
-             ],
-             [
-             [10 12]  [16 15]
-             [ 9 14], [ 3  7]
-             ],
-             [
-             [10 14]  [16 13]
-             [11 17], [ 2  4]
-             ]]
+
+        Here there are many seeds::
+
+            sage: seeds = flatten(omega.prolongable_seeds_list())
+            sage: len(seeds)
+            256
+
+        If all seeds belong to the language of the substitution (computed
+        from the letters), then there exists a unique subshift which is
+        self-similar with respect to the substitution. In this example,
+        it is not true::
+
+            sage: seeds_as_table = [[list(col[::-1]) for col in m.columns()] for m in seeds]
+            sage: F = omega.list_2x2_factors()
+            sage: all(seed in F for seed in seeds_as_table)
+            False
+
+        Indeed, only 8 of the 256 seeds belong to the language of the
+        substitution::
+
+            sage: [seed for seed in seeds_as_table if seed in F]
+            [[[1, 9], [6, 14]],
+             [[16, 17], [15, 13]],
+             [[8, 9], [16, 14]],
+             [[6, 17], [5, 13]],
+             [[9, 10], [14, 12]],
+             [[3, 16], [7, 15]],
+             [[11, 10], [17, 14]],
+             [[2, 16], [4, 13]]]
+
+        This means that all the other 248 seeds give rise to configurations
+        which are fixed by the substitution but are not uniformly
+        recurrent. In particular, if a subshift is self-similar with
+        respect to that substitution, we can not conclude that it is
+        minimal.
 
         """
         G = self.prolongable_seeds_graph()
