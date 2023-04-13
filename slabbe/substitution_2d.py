@@ -1533,12 +1533,11 @@ class Substitution2d(object):
             Looped digraph on 51 vertices
 
         """
-        alphabet = self.domain_alphabet()
         # compute the letters appearing at the left/right of images
         from collections import defaultdict
         data_end = defaultdict(list)
         data_start = defaultdict(list)
-        for a in alphabet:
+        for a in self.domain_alphabet():
             image = self([[a]])
             right_column = image[-1]
             length = len(right_column)
@@ -1565,6 +1564,88 @@ class Substitution2d(object):
         from sage.sets.recursively_enumerated_set import RecursivelyEnumeratedSet
         R = RecursivelyEnumeratedSet(possible_dominoes, children)
         G = R.to_digraph(multiedges=False)
+
+        if clean_sources:
+            from slabbe.graph import clean_sources_and_sinks
+            return clean_sources_and_sinks(G)
+        else:
+            return G
+
+    def periodic_vertical_domino_seeds_graph(self, clean_sources=False):
+        r"""
+        Return the directed graph of vertical dominoes where (u,v) is an edge if
+        the domino v appears in the image of the domino u under self on the separation
+        between the image of the two letters of the domino.
+
+        INPUT:
+
+        - ``clean_sources`` -- bool (default:``False``)
+
+        OUTPUT:
+
+            graph
+
+        EXAMPLES::
+
+            sage: from slabbe import Substitution2d
+            sage: d = {0: [[17]],
+            ....:  1: [[16]],
+            ....:  2: [[15], [11]],
+            ....:  3: [[13], [9]],
+            ....:  4: [[17], [8]],
+            ....:  5: [[16], [8]],
+            ....:  6: [[15], [8]],
+            ....:  7: [[14], [8]],
+            ....:  8: [[14, 6]],
+            ....:  9: [[17, 3]],
+            ....:  10: [[16, 3]],
+            ....:  11: [[14, 2]],
+            ....:  12: [[15, 7], [11, 1]],
+            ....:  13: [[14, 6], [11, 1]],
+            ....:  14: [[13, 7], [9, 1]],
+            ....:  15: [[12, 6], [9, 1]],
+            ....:  16: [[18, 5], [10, 1]],
+            ....:  17: [[13, 4], [9, 1]],
+            ....:  18: [[14, 2], [8, 0]]}
+            sage: omega = Substitution2d(d)
+            sage: omega.periodic_vertical_domino_seeds_graph()
+            Looped digraph on 93 vertices
+            sage: omega.periodic_vertical_domino_seeds_graph(clean_sources=True)
+            Looped digraph on 56 vertices
+
+        """
+        # compute the letters appearing at the top/bottom of images
+        from collections import defaultdict
+        data_end = defaultdict(list)
+        data_start = defaultdict(list)
+        for a in self.domain_alphabet():
+            image = self([[a]])
+            top_row = [col[-1] for col in image]
+            length = len(top_row)
+            for j,b in enumerate(top_row):
+                data_end[(j,length)].append(b)
+
+            bottom_row = [col[0] for col in image]
+            for j,b in enumerate(bottom_row):
+                data_start[(j,length)].append(b)
+
+        possible_dominoes = set()
+        for j_length in data_end:
+            A = data_end[j_length]
+            B = data_start[j_length]
+            possible_dominoes.update(itertools.product(A,B))
+
+        def children(t):
+            a,b = t
+            A = self([[a]])
+            B = self([[b]])
+            A_top_row = [col[-1] for col in A]
+            B_bottom_row = [col[0] for col in B]
+            return list(zip(A_top_row, B_bottom_row))
+        from sage.sets.recursively_enumerated_set import RecursivelyEnumeratedSet
+        R = RecursivelyEnumeratedSet(possible_dominoes, children)
+        G = R.to_digraph(multiedges=False)
+
         if clean_sources:
             from slabbe.graph import clean_sources_and_sinks
             return clean_sources_and_sinks(G)
@@ -1575,6 +1656,11 @@ class Substitution2d(object):
         r"""
         Return whether there is a unique self-similar subshift associated
         to this substitution.
+
+        INPUT:
+
+        - ``verbose`` -- bool (default:``False``), if ``True`` prints
+          information why there is no unique self-similar subshift
 
         OUTPUT:
 
@@ -1607,6 +1693,8 @@ class Substitution2d(object):
             False
 
         """
+        result = True
+
         # for unicity to hold, all prolongable seeds need to be
         # in the language of the substitution
         from sage.misc.flatten import flatten
@@ -1614,7 +1702,12 @@ class Substitution2d(object):
         seeds_as_table = [[list(col[::-1]) for col in m.columns()] for m in seeds]
         F = self.list_2x2_factors()
         if not all(seed in F for seed in seeds_as_table):
-            return False
+            if verbose:
+                print(("2x2 seeds preserved by the substitution which are not in the language "
+                    "of the substitution:"), [seed for seed in seeds_as_table if seed not in F])
+                result = False
+            else:
+                return False
 
         # for unicity to hold, all horizontal dominos seeds need to be
         # in the language of the substitution
@@ -1623,13 +1716,30 @@ class Substitution2d(object):
         dominoes_h = set(self.list_dominoes(direction='horizontal'))
         if not seeds_h <= dominoes_h:
             if verbose:
-                print(("Horizontal dominoes seeds which are "
+                print(("Horizontal domino seeds preserved by the substitution which are "
                     "not in the language of the substitution:"), seeds_h - dominoes_h)
-            return False
+                result = False
+            else:
+                return False
 
         # for unicity to hold, all vertical dominos seeds need to be
         # in the language of the substitution
-        raise NotImplementedError
+        G_v = self.periodic_vertical_domino_seeds_graph(clean_sources=True)
+        seeds_v = set([v for cycle in G_v.all_simple_cycles() for v in cycle[:-1]])
+        dominoes_v = set(self.list_dominoes(direction='vertical'))
+        if not seeds_v <= dominoes_v:
+            if verbose:
+                print(("Vertical domino seeds preserved by the substitution which are "
+                    "not in the language of the substitution:"), seeds_v - dominoes_v)
+                result = False
+            else:
+                return False
+
+        if verbose and not result:
+            return result
+
+        raise NotImplementedError("if the above did not returned False,"
+                " then a Lemma is needed to show that the result is True")
 
     _matrix_ = incidence_matrix
     def relabel_domain(self, other):
