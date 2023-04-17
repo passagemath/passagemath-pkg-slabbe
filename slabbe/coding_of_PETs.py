@@ -152,13 +152,16 @@ class PETsCoding(object):
             table.append(column)
         return table
 
-    def cylinder(self, pattern):
+    def cylinder(self, pattern, include_empty_interior_atom=False):
         r"""
         Return the coding region of the pattern.
 
         INPUT:
 
         - ``pattern`` -- list of lists or dict of positions to code
+        - ``include_empty_interior_atom`` -- boolean (default:``False``),
+          whether to include in the partition the atom that are not full
+          dimensional (that is, points, lines, etc.)
 
         OUTPUT:
 
@@ -217,7 +220,8 @@ class PETsCoding(object):
             for j,a in enumerate(column):
                 translated_back = Re1_inv(self._partition[a], niterations=i)
                 translated_back = Re2_inv(translated_back, niterations=j)
-                region = region.refinement(translated_back)
+                region = region.refinement(translated_back,
+                    include_empty_interior_atom=include_empty_interior_atom)
 
         return region
 
