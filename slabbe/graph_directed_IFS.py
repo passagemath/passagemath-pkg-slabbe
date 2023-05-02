@@ -215,7 +215,8 @@ class GraphDirectedIteratedFunctionSystem(object):
         return cls.from_inflation_rule(module, root, d)
 
     @classmethod
-    def from_two_dimensional_substitution(cls, s):
+    def from_two_dimensional_substitution(cls, s, inflation=None,
+            stone_inflation_shapes=None):
         r"""
         Return the GIFS defined by a 2-dimensional primitive
         substitution
@@ -226,6 +227,11 @@ class GraphDirectedIteratedFunctionSystem(object):
         INPUT:
 
         - ``s`` -- Substitution2d, primitive substitution
+        - ``inflation`` -- None or (Algebraic) number
+        - ``stone_inflation_shapes`` -- None or dict, from letters to tuple of
+          rectangular dimension of the tilebox associated to each letter.
+          If ``None``, it is computed automaticaly from left eigenvectors of
+          horizontal and vertical substitution.
 
         EXAMPLES::
 
@@ -266,41 +272,59 @@ class GraphDirectedIteratedFunctionSystem(object):
                   [a 0]     [a]
             x |-> [0 a] x + [a]
 
+        We can provide the rectangular shapes associated to each letter
+        (useful when they are not properly defined automatically)::
+
+            sage: z = polygen(QQ, 'z')
+            sage: K.<phi> = NumberField(z**2-z-1, 'phi', embedding=RR(1.6))
+            sage: shapes = {0:(1,1), 1:(phi,1), 2:(1,phi), 3:(phi,phi)}
+            sage: GIFS.from_two_dimensional_substitution(s, inflation=phi, stone_inflation_shapes=shapes)
+            GIFS defined by 9 maps on Vector space of dimension 2 over
+            Number Field in phi with defining polynomial z^2 - z - 1 with
+            phi = 1.618033988749895?
+
         """
         from sage.matrix.constructor import matrix
         from sage.groups.affine_gps.affine_group import AffineGroup
         from sage.rings.qqbar import number_field_elements_from_algebraics, AA
 
-        rootX, rootY, shapes = s.stone_inflation_shapes()
-        KX = rootX.parent()
-        KY = rootY.parent()
-        numbers = [AA(rootX), AA(rootY)]
-        KXY, (rootX_, rootY_), homo = number_field_elements_from_algebraics(numbers, minimal=True, embedded=True)
-        inflation_matrix = matrix.diagonal(KXY, [rootX, rootY])
-        F = AffineGroup(2, KXY)
+        if inflation is None or stone_inflation_shapes is None:
+            rootX, rootY, stone_inflation_shapes = s.stone_inflation_shapes()
+            KX = rootX.parent()
+            KY = rootY.parent()
+            numbers = [AA(rootX), AA(rootY)]
+            K, (rootX_, rootY_), homo = number_field_elements_from_algebraics(numbers, 
+                                                       minimal=True, embedded=True)
+            inflationX = rootX
+            inflationY = rootY
+        else:
+            K = inflation.parent()
+            inflationX = inflation
+            inflationY = inflation
+
+        inflation_matrix = matrix.diagonal(K, [inflationX, inflationY])
+        F = AffineGroup(2, K)
         vector_space = F.vector_space()
 
-        alphabet = s.domain_alphabet()
-
         edges = []
-        for a in alphabet:
+        for a in s.domain_alphabet():
             s_a = s([[a]])
 
             # compute the X positions of marker points
             lower_word = [col[0] for col in s_a]
             X_pos = []
-            pos = KXY.zero()
+            pos = K.zero()
             for b in lower_word:
                 X_pos.append(pos)
-                pos += shapes[b][0]
+                pos += stone_inflation_shapes[b][0]
 
             # compute the Y positions of marker points
             left_word = s_a[0]
             Y_pos = []
-            pos = KXY.zero()
+            pos = K.zero()
             for b in left_word:
                 Y_pos.append(pos)
-                pos += shapes[b][1]
+                pos += stone_inflation_shapes[b][1]
 
             # compute the translations
             for i,col in enumerate(s_a):
