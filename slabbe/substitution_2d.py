@@ -1211,6 +1211,110 @@ class Substitution2d(object):
         #return [create_table(f) for f in R]
         return list(R)
 
+    def horizontal_structure_substitution(self):
+        r"""
+        Return the horizontal substitution obtained after quotient 
+        by the equivalence relation defined by letters appearing in the
+        same column.
+
+        INPUT:
+
+        - ``self`` -- expansive and primitive 2d substitution
+
+        OUTPUT:
+
+        - substitution `B\to B^*`
+        - dictionary `A\to B` 
+
+        EXAMPLES::
+
+            sage: from slabbe import Substitution2d
+            sage: A = [[3]]
+            sage: B = [[3],[2]]
+            sage: C = [[3,1]]
+            sage: D = [[3,1],[2,0]]
+            sage: d = {0:A, 1:B, 2:C, 3:D}
+            sage: s = Substitution2d(d)
+            sage: s.horizontal_structure_substitution()
+            (WordMorphism: 2->3, 3->32, {0: 2, 1: 3, 2: 2, 3: 3})
+
+        """
+        if not self.codomain_alphabet() <= self.domain_alphabet():
+            raise ValueError("codomain alphabet (='{}') is not a subset of the"
+                    " domain alphabet (={})".format(self.codomain_alphabet(),
+                                              self.domain_alphabet()))
+        alphabet = self.domain_alphabet()
+
+        from sage.sets.disjoint_set import DisjointSet
+        from sage.combinat.words.morphism import WordMorphism
+        from sage.combinat.words.words import Words
+
+        dominoesV = self.list_dominoes(direction='vertical')
+        partition = DisjointSet(alphabet)
+        for a,b in dominoesV:
+            partition.union(a,b)
+        pHd = partition.element_to_root_dict()
+        pH = Substitution2d.from_permutation(pHd)
+        repH = sorted(partition.root_to_elements_dict().keys())
+        qH = Substitution2d.from_permutation({r:r for r in repH})
+        sH = pH * self * qH
+        sH = {k:[col[0] for col in v] for k,v in sH._d.items()}
+        sH = WordMorphism(sH, codomain=Words(sorted(sH)))
+
+        return sH,pHd
+
+    def vertical_structure_substitution(self):
+        r"""
+        Return the vertical substitution obtained after quotient 
+        by the equivalence relation defined by letters appearing in the
+        same row.
+
+        INPUT:
+
+        - ``self`` -- expansive and primitive 2d substitution
+
+        OUTPUT:
+
+        - substitution `B\to B^*`
+        - dictionary `A\to B` 
+
+        EXAMPLES::
+
+            sage: from slabbe import Substitution2d
+            sage: A = [[3]]
+            sage: B = [[3],[2]]
+            sage: C = [[3,1]]
+            sage: D = [[3,1],[2,0]]
+            sage: d = {0:A, 1:B, 2:C, 3:D}
+            sage: s = Substitution2d(d)
+            sage: s.vertical_structure_substitution()
+            (WordMorphism: 1->3, 3->31, {0: 1, 1: 1, 2: 3, 3: 3})
+
+        """
+        if not self.codomain_alphabet() <= self.domain_alphabet():
+            raise ValueError("codomain alphabet (='{}') is not a subset of the"
+                    " domain alphabet (={})".format(self.codomain_alphabet(),
+                                              self.domain_alphabet()))
+        alphabet = self.domain_alphabet()
+
+        from sage.sets.disjoint_set import DisjointSet
+        from sage.combinat.words.morphism import WordMorphism
+        from sage.combinat.words.words import Words
+
+        dominoesH = self.list_dominoes(direction='horizontal')
+        partition = DisjointSet(alphabet)
+        for a,b in dominoesH:
+            partition.union(a,b)
+        pVd = partition.element_to_root_dict()
+        pV = Substitution2d.from_permutation(pVd)
+        repV = sorted(partition.root_to_elements_dict().keys())
+        qV = Substitution2d.from_permutation({r:r for r in repV})
+        sV = pV * self * qV
+        sV = {k:v[0] for k,v in sV._d.items()}
+        sV = WordMorphism(sV, codomain=Words(sorted(sV)))
+
+        return sV,pVd
+
     def stone_inflation_shapes(self):
         r"""
         Return a dictionary of letters of the domain alphabet associated to
@@ -1255,40 +1359,17 @@ class Substitution2d(object):
                                               self.domain_alphabet()))
         alphabet = self.domain_alphabet()
 
-        from sage.sets.disjoint_set import DisjointSet
-        from sage.combinat.words.morphism import WordMorphism
         from slabbe.matrices import perron_left_eigenvector_in_number_field
-        from sage.combinat.words.words import Words
 
-        dominoesH = self.list_dominoes(direction='horizontal')
-        partitionH = DisjointSet(alphabet)
-        for a,b in dominoesH:
-            partitionH.union(a,b)
-        pHd = partitionH.element_to_root_dict()
-        pH = Substitution2d.from_permutation(pHd)
-        repH = sorted(partitionH.root_to_elements_dict().keys())
-        qH = Substitution2d.from_permutation({r:r for r in repH})
-        sH = pH * self * qH
-        sH = {k:v[0] for k,v in sH._d.items()}
-        sH = WordMorphism(sH, codomain=Words(sorted(sH))).incidence_matrix()
-        rootY, heights = perron_left_eigenvector_in_number_field(sH, 'rootY')
-        heigths_dict = dict(zip(repH, heights))
-        heigths_dict = {k:heigths_dict[v] for k,v in pHd.items()}
+        sV,pVd = self.vertical_structure_substitution()
+        rootY, heights = perron_left_eigenvector_in_number_field(sV.incidence_matrix(), 'rootY')
+        heigths_dict = dict(zip(sV.codomain().alphabet(), heights))
+        heigths_dict = {k:heigths_dict[v] for k,v in pVd.items()}
 
-        dominoesV = self.list_dominoes(direction='vertical')
-        partitionV = DisjointSet(alphabet)
-        for a,b in dominoesV:
-            partitionV.union(a,b)
-        pVd = partitionV.element_to_root_dict()
-        pV = Substitution2d.from_permutation(pVd)
-        repV = sorted(partitionV.root_to_elements_dict().keys())
-        qV = Substitution2d.from_permutation({r:r for r in repV})
-        sV = pV * self * qV
-        sV = {k:[col[0] for col in v] for k,v in sV._d.items()}
-        sV = WordMorphism(sV, codomain=Words(sorted(sV))).incidence_matrix()
-        rootX, widths = perron_left_eigenvector_in_number_field(sV, 'rootX')
-        widths_dict = dict(zip(repV, widths))
-        widths_dict = {k:widths_dict[v] for k,v in pVd.items()}
+        sH,pHd = self.horizontal_structure_substitution()
+        rootX, widths = perron_left_eigenvector_in_number_field(sH.incidence_matrix(), 'rootX')
+        widths_dict = dict(zip(sH.codomain().alphabet(), widths))
+        widths_dict = {k:widths_dict[v] for k,v in pHd.items()}
 
         return rootX, rootY, {a:(widths_dict[a], heigths_dict[a]) for a in alphabet}
 
