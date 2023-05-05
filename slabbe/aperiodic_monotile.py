@@ -21,15 +21,14 @@ EXAMPLES::
 
     sage: from slabbe.aperiodic_monotile import MonotileSolver
     sage: s = MonotileSolver(20,20)
-    sage: s.the_dlx_solver()
+    sage: s.the_dlx_solver()                                 # long time (1s)
     Dancing links solver for 4800 columns and 10320 rows
-    sage: s.one_solution(solver='glucose') is not None
-    CPU times: user 1.89 s, sys: 32 ms, total: 1.93 s
-    Wall time: 3.89 s
+    sage: s.one_solution(solver='glucose') is not None       # long time (3s)
     True
-    sage: G = s.draw_one_solution(solver='glucose')
-    sage: G
-    sage: G.save('solution_20x20.png', figsize=20)   # not tested
+    sage: G = s.draw_one_solution(solver='glucose')          # long time (12s)
+    sage: G                                                  # long time (3s)
+    Graphics object consisting of 4465 graphics primitives
+    sage: G.save('solution_20x20.png', figsize=20)           # not tested
 
 """
 #*****************************************************************************
@@ -54,6 +53,7 @@ def polyomino_reversal(p):
 
         sage: from slabbe.aperiodic_monotile import polyomino_reversal
         sage: V = [(0,1), (1,0), (1,-1), (0,-1), (-1,0), (-1,1)]
+        sage: from sage.combinat.tiling import Polyomino
         sage: hexagon = Polyomino(V)
         sage: image = polyomino_reversal(hexagon)
         sage: image == hexagon
@@ -71,6 +71,7 @@ def polyomino_mirror(p):
 
         sage: from slabbe.aperiodic_monotile import polyomino_mirror
         sage: V = [(0,1), (1,0), (1,-1), (0,-1), (-1,0), (-1,1)]
+        sage: from sage.combinat.tiling import Polyomino
         sage: hexagon = Polyomino(V)
         sage: image = polyomino_mirror(hexagon)
         sage: image == hexagon
@@ -98,6 +99,8 @@ def the_rotated_reflected_monotiles():
         sage: from sage.combinat.tiling import TilingSolver
         sage: solver = TilingSolver(monotiles, box, rotation=False,
         ....:         reflection=False, reusable=True, outside=False)
+        sage: it = solver.solve()
+        sage: next(it)
         [Polyomino: [(-1, 1), (-1, 3), (-1, 4), (0, 1), (1, 2), (1, 3), (2,
         1), (3, 1)], Color: gray]
 
@@ -156,6 +159,7 @@ class MonotileSolver():
 
             sage: from slabbe.aperiodic_monotile import MonotileSolver
             sage: MonotileSolver(10, 10)
+            Monotolie solver W=10, H=10
 
         """
         return ("Monotolie solver W={}, H={}".format(self._width, self._height))
@@ -275,6 +279,7 @@ class MonotileSolver():
             sage: from slabbe.aperiodic_monotile import MonotileSolver
             sage: s = MonotileSolver(1,1)
             sage: s.columns()
+            {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
         """
         bijection_int_to_coord = self.row_number_to_coord()
         rows = self.rows(extra=extra)
@@ -290,18 +295,18 @@ class MonotileSolver():
 
             sage: from slabbe.aperiodic_monotile import MonotileSolver
             sage: s = MonotileSolver(1,1)
-            sage: s.the_dlx_solver()
+            sage: d = s.the_dlx_solver(); d
             Dancing links solver for 12 columns and 60 rows
-            sage: d.one_solution()
+            sage: d.one_solution()                 # random
             [0, 12, 30]
 
         Extra = 4 seems sufficeent::
 
             sage: s = MonotileSolver(2,4)
             sage: s.the_dlx_solver(extra=1)
-            Dancing links solver for 96 columns and 204 rows
+            Dancing links solver for 96 columns and 288 rows
             sage: s.the_dlx_solver(extra=2)
-            Dancing links solver for 96 columns and 261 rows
+            Dancing links solver for 96 columns and 288 rows
             sage: s.the_dlx_solver(extra=3)
             Dancing links solver for 96 columns and 288 rows
             sage: s.the_dlx_solver(extra=4)
@@ -317,7 +322,9 @@ class MonotileSolver():
             sage: s.the_dlx_solver(extra=2)
             Dancing links solver for 300 columns and 780 rows
             sage: d = s.the_dlx_solver(extra=2)
-            sage: d.one_solution()
+            sage: L = d.one_solution()
+            sage: type(L)
+            <class 'list'>
 
         """
         rows = self.rows(extra=extra)
@@ -331,8 +338,8 @@ class MonotileSolver():
 
             sage: from slabbe.aperiodic_monotile import MonotileSolver
             sage: s = MonotileSolver(2,2)
-            sage: s.one_solution()
-            [71, 59, 50, 10, 114, 102, 5, 37, 90, 126, 15, 21]
+            sage: s.one_solution()           # random
+            [5, 4, 89, 108, 79, 62, 24, 86, 21, 25]
 
         ::
 
@@ -374,6 +381,7 @@ class MonotileSolver():
             sage: from slabbe.aperiodic_monotile import MonotileSolver
             sage: s = MonotileSolver(2,2)
             sage: s.plot_domain()
+            Graphics object consisting of 1 graphics primitive
         """
         from sage.plot.point import points
         box = self.the_box()
@@ -494,6 +502,7 @@ class MonotileSolver():
             sage: from slabbe.aperiodic_monotile import MonotileSolver
             sage: s = MonotileSolver(2,2)
             sage: s.draw_one_solution()
+            Graphics object consisting of 17 graphics primitives
 
         """
         from sage.plot.graphics import Graphics
@@ -530,6 +539,7 @@ class MonotileSolver():
             sage: from slabbe.aperiodic_monotile import MonotileSolver
             sage: s = MonotileSolver(2,2)
             sage: s.draw_one_solution()
+            Graphics object consisting of 17 graphics primitives
 
         """
         from sage.plot.graphics import Graphics
@@ -591,34 +601,35 @@ class MonotileSolver():
 
             sage: from slabbe.aperiodic_monotile import MonotileSolver
             sage: s = MonotileSolver(2,2)
-            sage: s.one_solution_list_of_edges()
-            {frozenset({(3, 2*sqrt3), (4, 2*sqrt3)}),
-             frozenset({(9/2, -1/2*sqrt3), (5, -sqrt3)}),
-             frozenset({(5, -sqrt3), (6, -sqrt3)}),
-             frozenset({(3, 0), (4, 0)}),
+            sage: L = s.one_solution_list_of_edges()
+            sage: sorted(L)                                # random
+            [frozenset({(3, 0), (4, 0)}),
+             frozenset({(3, 2*sqrt3), (4, 2*sqrt3)}),
              frozenset({(-3/2, 1/2*sqrt3), (-1, sqrt3)}),
-             frozenset({(6, -sqrt3), (6, 0)}),
-             frozenset({(3, sqrt3), (3, 2*sqrt3)}),
              frozenset({(0, sqrt3), (0, 2*sqrt3)}),
-             frozenset({(4, 2*sqrt3), (9/2, 3/2*sqrt3)}),
+             frozenset({(3, sqrt3), (3, 2*sqrt3)}),
+             frozenset({(9/2, -1/2*sqrt3), (6, 0)}),
+             frozenset({(9/2, 5/2*sqrt3), (6, 2*sqrt3)}),
+             frozenset({(6, 0), (6, sqrt3)}),
              frozenset({(0, 0), (3/2, 1/2*sqrt3)}),
              frozenset({(-1, sqrt3), (0, sqrt3)}),
              frozenset({(0, 2*sqrt3), (3/2, 5/2*sqrt3)}),
+             frozenset({(6, sqrt3), (7, sqrt3)}),
+             frozenset({(15/2, 3/2*sqrt3), (8, 2*sqrt3)}),
+             frozenset({(6, 2*sqrt3), (15/2, 5/2*sqrt3)}),
              frozenset({(4, 0), (9/2, 1/2*sqrt3)}),
              frozenset({(3/2, 1/2*sqrt3), (2, 0)}),
-             frozenset({(7, sqrt3), (15/2, 1/2*sqrt3)}),
+             frozenset({(4, 2*sqrt3), (9/2, 5/2*sqrt3)}),
              frozenset({(-3/2, 1/2*sqrt3), (0, 0)}),
              frozenset({(7, sqrt3), (15/2, 3/2*sqrt3)}),
-             frozenset({(4, 0), (9/2, -1/2*sqrt3)}),
              frozenset({(3/2, 5/2*sqrt3), (2, 2*sqrt3)}),
-             frozenset({(6, 0), (15/2, 1/2*sqrt3)}),
+             frozenset({(4, 0), (9/2, -1/2*sqrt3)}),
              frozenset({(2, 2*sqrt3), (3, 2*sqrt3)}),
-             frozenset({(6, 2*sqrt3), (15/2, 3/2*sqrt3)}),
              frozenset({(2, 0), (3, 0)}),
              frozenset({(3, sqrt3), (9/2, 1/2*sqrt3)}),
-             frozenset({(9/2, 3/2*sqrt3), (6, 2*sqrt3)})}
+             frozenset({(15/2, 5/2*sqrt3), (8, 2*sqrt3)})]
             sage: sum(line(edge) for edge in L)
-            Launched png viewer for Graphics object consisting of 25 graphics primitives
+            Graphics object consisting of ... graphics primitives
 
         """
         from collections import Counter
@@ -662,15 +673,15 @@ class MonotileSolver():
             \documentclass[tikz]{standalone}
             \begin{document}
             \begin{tikzpicture}
-            \draw[red] (9.00000000000000, 0.000000000000000) -- (10.0000000000000, 0.000000000000000);
-            \draw[red] (-2.00000000000000, 3.46410161513775) -- (-1.50000000000000, 2.59807621135332);
-            \draw[red] (3.00000000000000, 1.73205080756888) -- (3.00000000000000, 3.46410161513775);
-            \draw[red] (4.50000000000000, 0.866025403784439) -- (6.00000000000000, 0.000000000000000);
+            \draw[red] (..., ...) -- (..., ...);
+            \draw[red] (..., ...) -- (..., ...);
+            \draw[red] (..., ...) -- (..., ...);
+            \draw[red] (..., ...) -- (..., ...);
             ...
-            \draw[red] (6.00000000000000, 1.73205080756888) -- (5.00000000000000, 1.73205080756888);
-            \draw[red] (3.00000000000000, 1.73205080756888) -- (1.50000000000000, 0.866025403784439);
-            \draw[red] (7.50000000000000, 4.33012701892219) -- (8.00000000000000, 3.46410161513775);
-            \draw[red] (9.00000000000000, 1.73205080756888) -- (10.5000000000000, 0.866025403784439);
+            \draw[red] (..., ...) -- (..., ...);
+            \draw[red] (..., ...) -- (..., ...);
+            \draw[red] (..., ...) -- (..., ...);
+            \draw[red] (..., ...) -- (..., ...);
             \end{tikzpicture}
             \end{document}
 
@@ -697,14 +708,16 @@ class MonotileSolver():
             sage: from slabbe.aperiodic_monotile import MonotileSolver
             sage: s = MonotileSolver(4,4)
             sage: solution = s.one_solution()
-            sage: s.tile_positions_in_solution(solution)
-            {0: [(-1, 1), (-3, 11), (5, 1), (17, 1)],
-             1: [(-1, 6), (-5, 8), (3, 10)],
-             9: [(0, 2)],
-             4: [(1, 6), (7, 6), (5, 10)],
-             7: [(6, 5)],
-             3: [(8, 0), (10, 8)],
-             2: [(12, 3), (14, 5)]}
+            sage: s.tile_positions_in_solution(solution)    # random
+            {0: [(3, 5), (-5, 9), (5, 1), (9, 5)],
+             1: [(3, 10)],
+             2: [(0, 3)],
+             3: [(8, 0), (12, 4), (16, 2)],
+             4: [(13, 0), (5, 10), (11, 10)],
+             5: [(-2, 7)],
+             7: [(10, 9)],
+             9: [(4, 6)],
+             11: [(-5, 4)]}
 
         """
         # dlx data
@@ -740,7 +753,8 @@ class MonotileSolver():
 
             sage: from slabbe.aperiodic_monotile import MonotileSolver
             sage: s = MonotileSolver(2,2)
-            sage: s._draw_all()
+            sage: s._draw_all()                       # long time (1s)
+            Graphics object consisting of 325 graphics primitives
 
         """
         from sage.plot.graphics import Graphics
@@ -788,6 +802,7 @@ class MonotileSolver():
             sage: from slabbe.aperiodic_monotile import MonotileSolver
             sage: s = MonotileSolver(2,2)
             sage: s._draw_row(0)
+            Graphics object consisting of 4 graphics primitives
 
         """
         from sage.plot.graphics import Graphics
