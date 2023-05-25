@@ -21,14 +21,14 @@ EXAMPLES::
 
     sage: from slabbe.aperiodic_monotile import MonotileSolver
     sage: s = MonotileSolver(20,20)
-    sage: s.the_dlx_solver()                                 # long time (1s)
+    sage: s.the_dlx_solver()                               # long time (1s)
     Dancing links solver for 4800 columns and 10320 rows
-    sage: s.one_solution(solver='glucose') is not None       # long time (3s)
+    sage: s.one_solution(solver='glucose') is not None     # long time (3s)  # optional glucose
     True
-    sage: G = s.draw_one_solution(solver='glucose')          # long time (12s)
-    sage: G                                                  # long time (3s)
+    sage: G = s.draw_one_solution(solver='glucose')        # long time (12s) # optional glucose
+    sage: G                                                # long time (3s)  # optional glucose
     Graphics object consisting of 4465 graphics primitives
-    sage: G.save('solution_20x20.png', figsize=20)           # not tested
+    sage: G.save('solution_20x20.png', figsize=20)         # not tested
 
 """
 #*****************************************************************************
@@ -344,7 +344,7 @@ class MonotileSolver():
         ::
 
             sage: s = MonotileSolver(8,8)
-            sage: s.one_solution(solver='glucose') is not None
+            sage: s.one_solution(solver='glucose') is not None   # optional glucose
             True
 
         """
