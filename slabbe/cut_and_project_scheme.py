@@ -11,6 +11,7 @@ Cut and project schemes and model sets
 #
 #                  http://www.gnu.org/licenses/
 #*****************************************************************************
+from sage.misc.cachefunc import cached_method
 from sage.structure.sage_object import SageObject
 
 class CutAndProjectScheme(SageObject):
