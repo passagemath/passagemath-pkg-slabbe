@@ -169,6 +169,14 @@ __ https://trac.sagemath.org/
 Release history
 ---------------
 
+*Version 0.7.1 (June 30, 2023)*
+  New module on cut and project scheme (still preliminary).
+  New module to draw tilings with the Smith's aperiodic monotile (see this `blog post`__).
+  Few other improvements.
+  All tests passed on version 10.0 of SageMath.
+
+__ http://www.slabbe.org/blogue/2023/05/decoupe-laser-du-chapeau-tuile-aperiodique-decouverte-recemment/
+
 *Version 0.7 (December 8, 2022)*
   New module on d-dimensional Sturmian configurations, to draw figures from `arXiv:2204.06413`__.
   New module on Hypercubic billiard words (written with Mélodie Andrieu).
