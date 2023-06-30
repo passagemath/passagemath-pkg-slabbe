@@ -43,7 +43,6 @@ Combinatorics
    graph
    partial_injection
    magic_hexagon
-   wang_tiles
 
 Combinatorics on words
 ----------------------
@@ -73,8 +72,18 @@ Digital Geometry
    discrete_plane
    billiard
    christoffel_graph
-   double_square_tile
    polyhedron_partition
+
+Tilings
+-------
+
+.. toctree::
+   :maxdepth: 1
+
+   double_square_tile
+   aperiodic_monotile
+   cut_and_project_scheme
+   wang_tiles
 
 Vizualization
 -------------
