@@ -3,6 +3,11 @@
 TODO
 ====
 
+Update the package using setuptools and pyproject.toml
+------------------------------------------------------
+
+https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
+
 Use gitlab
 ----------
 
