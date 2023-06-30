@@ -87,7 +87,7 @@ from sage.misc.temporary_file import tmp_filename
 from sage.structure.sage_object import SageObject
 
 from sage.misc.decorators import rename_keyword
-from sage.misc.superseded import experimental
+#from sage.misc.superseded import experimental
 
 class Standalone(SageObject):
     @rename_keyword(standalone_options="standalone_config")
@@ -688,7 +688,7 @@ class TikzPicture(Standalone):
                            usetikzlibrary=['shapes'])
 
     @classmethod
-    @experimental(trac_number=20343)
+    #@experimental(trac_number=20343)
     def from_graph(cls, graph, merge_multiedges=True,
             merge_label_function=tuple, **kwds):
         r"""
@@ -829,7 +829,7 @@ class TikzPicture(Standalone):
                 usepackage=usepackage)
 
     @classmethod
-    @experimental(trac_number=20343)
+    #@experimental(trac_number=20343)
     def from_graph_with_pos(cls, graph, scale=1, merge_multiedges=True,
             merge_label_function=tuple):
         r"""
