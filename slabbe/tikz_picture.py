@@ -781,7 +781,7 @@ class TikzPicture(Standalone):
             sage: G = DiGraph()
             sage: G.add_edges((i, f(i), f) for i in (1, 2, 1/2, 1/4))
             sage: G.add_edges((i, g(i), g) for i in (1, 2, 1/2, 1/4))
-            sage: t = TikzPicture.from_graph(G)
+            sage: t = TikzPicture.from_graph(G)                           # optional -- dot2tex
             sage: _ = tikz.pdf()      # not tested
             sage: def edge_options(data):
             ....:     u, v, label = data
@@ -792,7 +792,7 @@ class TikzPicture(Standalone):
             ....:     if (u,v) == (1,  1/2): options["edge_string"] = "->"
             ....:     if (u,v) == (1/2,  1): options["backward"]    = True
             ....:     return options
-            sage: t = TikzPicture.from_graph(G, edge_options=edge_options)
+            sage: t = TikzPicture.from_graph(G, edge_options=edge_options)  # optional -- dot2tex
             sage: _ = tikz.pdf()      # not tested
 
         .. TODO:: improve the previous example

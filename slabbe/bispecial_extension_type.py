@@ -1121,7 +1121,7 @@ class ExtensionType(object):
 
             sage: G = E1.graph_under_sadic([132]*2+[123]*6, S)
             sage: from slabbe import TikzPicture
-            sage: _ = TikzPicture.from_graph(G).pdf(view=False) # (9s)
+            sage: _ = TikzPicture.from_graph(G).pdf(view=False) # (9s)  # optional -- dot2tex
             doctest:...: FutureWarning: This class/method/function is marked as experimental.
             It, its functionality or its interface might change without a formal deprecation.
             See http...20343 for details.
