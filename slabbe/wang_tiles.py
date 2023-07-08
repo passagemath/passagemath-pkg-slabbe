@@ -92,7 +92,7 @@ from sage.misc.decorators import rename_keyword
 from sage.misc.superseded import deprecated_function_alias
 
 
-def tile_to_tikz(tile, position, color=None, id=None, id_color='',
+def tile_to_tikz(tile, position, color=None, fill_background=None, id=None, id_color='',
         id_format='{}', sizex=1, sizey=1, rotate=None, label=True,
         label_shift=.2, label_color='black', right_edges=True,
         top_edges=True, left_edges=True, bottom_edges=True, draw_H=None,
@@ -106,6 +106,8 @@ def tile_to_tikz(tile, position, color=None, id=None, id_color='',
     - ``color`` -- dict or tuple or string (default: ``None``), color of the whole
       tile, or color of each 4 edges (east, north, west, south), or dict of
       edge id to colors
+    - ``fill_background`` -- string (default: ``None``), valid tikz string
+      describing the color background of the tile
     - ``id`` -- id (default: ``None``) of the tile to be printed in the center
     - ``id_color`` -- string (default: ``''``) 
     - ``id_format`` -- string (default: ``r'{}'``) to be called with
@@ -201,6 +203,7 @@ def tile_to_tikz(tile, position, color=None, id=None, id_color='',
          '\\node[rotate=90,black] at (10.2, 100.5) {30};',
          '\\node[rotate=0,black] at (10.5, 100.2) {40};']
     """
+    # Set the rotation parameter
     if rotate is None:
         rotate = []
         for i,a in enumerate(tile):
@@ -208,14 +211,24 @@ def tile_to_tikz(tile, position, color=None, id=None, id_color='',
                 rotate.append(90)
             else:
                 rotate.append(0)
+
+    # Get the parameters
     sx = sizex      # because it is shorter to write below
     sy = sizey      # because it is shorter to write below
     t = label_shift # because it is shorter to write below
     x,y = position
+
+    # Initialize the output
     lines = []
     #lines.append(r'\begin{tikzpicture}')
     lines.append('% tile at position (x,y)={}'.format((x,y)))
-    if color:
+
+    # Fill background color (simple and stupid)
+    if fill_background:
+        lines.append(fill_background)
+
+    # Fill background color (or the old complicated and less versatile way)
+    elif color:
         if isinstance(color, dict):
             color = tuple(color[a] for a in tile)
         if isinstance(color, tuple):
@@ -227,19 +240,23 @@ def tile_to_tikz(tile, position, color=None, id=None, id_color='',
             lines.append(triangle.format(col2, (x,y),c,(x,y+sy)))
             lines.append(triangle.format(col3, (x,y),c,(x+sx,y)))
         elif draw_H is None and draw_V is None:
-            square = r'\fill[{}] {} -- {} -- {} -- {} -- cycle;'
-            lines.append(square.format(color, (x,y), (x+sx,y), (x+sx,y+sy), (x,y+sy)))
+            square = r'\fill[{}] {} -- ++ {} -- ++ {} -- ++ {} -- cycle;'
+            lines.append(square.format(color, (x,y), (sx,0), (0,sy), (-sx,0)))
         else:
             # hacky way to fix issue with JR
             half_square = r'\fill[{}] {} {} {};'
-            lines.append(half_square.format(color, (x,y), draw_H[tile[3]][14:-1], draw_V[tile[0]][14:-1]))
-            lines.append(half_square.format(color, (x,y), draw_V[tile[2]][14:-1], draw_H[tile[1]][14:-1]))
+            lines.append(half_square.format(color, (x,y), draw_H[tile[3]][14:-1], 
+                                                          draw_V[tile[0]][14:-1]))
+            lines.append(half_square.format(color, (x,y), draw_V[tile[2]][14:-1], 
+                                                          draw_H[tile[1]][14:-1]))
 
+    # Draw the tile id at the center
     if id is not None:
         c = (x+.5*sx,y+.5*sy)
         id = id_format.format(id)
         lines.append(r'\node[{}] at {} {{{}}};'.format(id_color, c, id))
 
+    # Set default straight lines for draw_H and draw_V
     if draw_H is None:
         draw_H = {tile[1]:r'\draw {{}} -- ++ ({},0);'.format(sx),
                   tile[3]:r'\draw {{}} -- ++ ({},0);'.format(sx)}
@@ -247,6 +264,7 @@ def tile_to_tikz(tile, position, color=None, id=None, id_color='',
         draw_V = {tile[0]:r'\draw {{}} -- ++ (0,{});'.format(sy),
                   tile[2]:r'\draw {{}} -- ++ (0,{});'.format(sy)}
 
+    # Draw the boundary edges defined by draw_H and draw_V
     if right_edges:
         lines.append(draw_V[tile[0]].format((x+sx,y)))
     if top_edges:
@@ -256,6 +274,7 @@ def tile_to_tikz(tile, position, color=None, id=None, id_color='',
     if bottom_edges:
         lines.append(draw_H[tile[3]].format((x,y)))
 
+    # Draw the edge labels
     node_str = r'\node[rotate={},{}] at {} {{{}}};'
     if isinstance(label, bool):
         if label:
@@ -4562,11 +4581,11 @@ class WangTiling(object):
         return L
 
     @rename_keyword(fontsize='font')
-    def tikz(self, color=None, color_by_tile_id=None, font=r'\normalsize',
-            rotate=None, id=True, id_color='', id_format='{}', label=True,
-            label_shift=.2, label_color='black', scale=1, size=1,
-            edges=True, draw_H=None, draw_V=None, extra_before='',
-            extra_after=''):
+    def tikz(self, color=None, color_by_tile_id=None, fill_background_fn=None,
+            font=r'\normalsize', rotate=None, id=True, id_color='',
+            id_format='{}', label=True, label_shift=.2,
+            label_color='black', scale=1, size=1, edges=True, draw_H=None,
+            draw_V=None, extra_before='', extra_after=''):
         r"""
         Return a tikzpicture showing one solution.
 
@@ -4575,6 +4594,8 @@ class WangTiling(object):
         - ``color`` -- None or dict from edge values -> tikz color
         - ``color_by_tile_id`` -- None or dict from tile id -> color, if
           not ``None``, the result will ignore the ``color`` argument
+        - ``fill_background_fn`` -- function (default: ``None``), such that
+          ``fill_background_fn(i, position, tile)`` returns a tikz string
         - ``font`` -- string (default: ``r'\normalsize'``
         - ``rotate`` -- list or ``None`` (default:``None``) list of four angles
           in degrees like ``(0,0,0,0)``, the rotation angle to apply to each
@@ -4732,7 +4753,12 @@ class WangTiling(object):
                     this_color = tuple(color[a] for a in tile)
                 else:
                     this_color = None
+                if fill_background_fn:
+                    fill_background = fill_background_fn(i, position, tile)
+                else:
+                    fill_background = None
                 more_lines = tile_to_tikz(tile, position, color=this_color,
+                        fill_background=fill_background,
                         id=this_id, id_color=id_color, id_format=id_format,
                         sizex=size, sizey=size, rotate=rotate, label=label,
                         label_shift=label_shift, label_color=label_color,

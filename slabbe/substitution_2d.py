@@ -806,6 +806,8 @@ class Substitution2d(object):
     def wang_tikz(self, domain_tiles, codomain_tiles, 
             domain_color=None, codomain_color=None, 
             domain_color_by_id=None, codomain_color_by_id=None,
+            domain_fill_background_fn=None,
+            codomain_fill_background_fn=None,
             size=1, scale=1, font=r'\normalsize',
             rotate=None, label_shift=.2, id=True, edges=True, 
             ncolumns=4, direction='right', extra_space=1):
@@ -821,6 +823,10 @@ class Substitution2d(object):
         - ``codomain_color`` -- dict (default: ``None``) from tile values -> tikz colors
         - ``domain_color_by_id`` -- dict (default: ``None``) from tile values -> tikz colors
         - ``codomain_color_by_id`` -- dict (default: ``None``) from tile values -> tikz colors
+        - ``domain_fill_background_fn`` -- function (default: ``None``), such that
+          ``domain_fill_background_fn(i, position, tile)`` returns a tikz string
+        - ``codomain_fill_background_fn`` -- function (default: ``None``), such that
+          ``codomain_fill_background_fn(i, position, tile)`` returns a tikz string
         - ``size`` -- number (default: ``1``), size of the tile
         - ``scale`` -- number (default: ``1``), scale of tikzpicture
         - ``font`` -- string (default: ``r'\normalsize'``
@@ -924,8 +930,14 @@ class Substitution2d(object):
                 color = tuple(domain_color[x] for x in desubstituted_tile)
             else:
                 color = None
+            if domain_fill_background_fn:
+                fill_background = domain_fill_background_fn(a, (0,0),
+                        desubstituted_tile)
+            else:
+                fill_background = None
             new_lines = tile_to_tikz(desubstituted_tile, (0,0),
-                    color=color, id=this_id, sizex=size, sizey=size,
+                    color=color, fill_background=fill_background, 
+                    id=this_id, sizex=size, sizey=size,
                     rotate=rotate, label_shift=label_shift,
                     right_edges=edges, top_edges=edges, left_edges=edges,
                     bottom_edges=edges)
@@ -937,7 +949,8 @@ class Substitution2d(object):
             image_a = self._d[a]
             tiling = WangTiling(image_a, codomain_tiles, codomain_color)
             tiling_tikz = tiling.tikz(color=codomain_color,
-                    color_by_tile_id=codomain_color_by_id, font=font,
+                    color_by_tile_id=codomain_color_by_id, 
+                    fill_background_fn=codomain_fill_background_fn, font=font,
                     rotate=rotate, label_shift=label_shift, scale=scale,
                     edges=edges, id=id, size=size)
 
