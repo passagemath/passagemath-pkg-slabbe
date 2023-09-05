@@ -1832,7 +1832,7 @@ class DiscreteBox(DiscreteSubset):
         def predicate(p):
             return all(xmin <= x <= xmax for (x,(xmin,xmax)) in zip(p,self._intervals))
         dim = len(self._intervals)
-        root = tuple(round((xmax+xmin)/2) for (xmin,xmax) in self._intervals)
+        root = tuple(round((xmax+xmin)/2.0) for (xmin,xmax) in self._intervals)
         DiscreteSubset.__init__(self, dimension=dim,
                 predicate=predicate, roots=[root])
 
