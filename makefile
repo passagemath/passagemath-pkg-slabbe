@@ -1,4 +1,4 @@
-all: install ptest
+all: install ptestlong
 
 install:
 	sage -pip install --upgrade --no-index -v .
