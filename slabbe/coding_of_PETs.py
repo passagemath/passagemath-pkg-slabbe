@@ -438,7 +438,7 @@ class PETsCoding(object):
         def dominoes_to_wang_color(dominoes):
             edges = [((a,'left'),(b,'right')) for (a,b) in dominoes]
             G = DiGraph(edges, format='list_of_edges')
-            C = G.connected_components()
+            C = G.connected_components(sort=True)
             color_left = {}
             color_right = {}
             for i,c in enumerate(C):

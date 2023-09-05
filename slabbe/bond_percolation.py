@@ -463,7 +463,7 @@ class BondPercolationSample(SageObject):
         if pt is None:
             pt = self.zero()
         if pt in G:
-            return G.connected_component_containing_vertex(pt)
+            return G.connected_component_containing_vertex(pt, sort=True)
         else:
             return []
 
