@@ -73,7 +73,7 @@ cdef class WordDatatype_Kolakoski(object):
 
         .. NOTE::
 
-            Assuming ``sizeof(unsigned long)`` is `8`, i.e. 64 bit,
+            Assuming ``sizeof(unsigned long long)`` is `8`, i.e. 64 bit,
             when the variable ``i`` is equal to ``365583569408`` then ``f``
             is equal to ``2^64 - 1`` so that the line ``g = f + 1`` in the
             loop will bust the capacity.  Hence ``__getitem__`` returns bad
@@ -117,7 +117,7 @@ cdef class WordDatatype_Kolakoski(object):
             ...
             NotImplementedError: when n is larger then 365583569409
         """
-        cdef unsigned long e = 0, f = 0, g, m, i
+        cdef unsigned long long e = 0, f = 0, g, m, i
         if isinstance(n, slice):
             key = n
             from sage.rings.all import Infinity
@@ -168,7 +168,7 @@ cdef class WordDatatype_Kolakoski(object):
         .. NOTE::
 
             This iterator is defined not further than `365583569409` terms
-            if ``sizeof(unsigned long) == 8`` and less in fact (around
+            if ``sizeof(unsigned long long) == 8`` and less in fact (around
             `10^11`).
 
         TODO: Define this iterator further then the limit.
@@ -184,7 +184,7 @@ cdef class WordDatatype_Kolakoski(object):
         """
         yield 1
         yield 2
-        cdef unsigned long e = 0, f = 0, g, m
+        cdef unsigned long long e = 0, f = 0, g, m
         while True:
             g = f + 1
             m = f ^ g
