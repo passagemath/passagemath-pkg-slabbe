@@ -99,8 +99,6 @@ class PolyhedronExchangeTransformation(object):
 
         - Do we want to merge atoms mapped by the same translation?
 
-        - Add a plotting function with separated domain/codomain
-
     REFERENCES:
 
     - Schwartz, Richard Evan. The Octagonal PETs. First Edition edition.
@@ -319,11 +317,6 @@ class PolyhedronExchangeTransformation(object):
     def plot(self):
         r"""
 
-        .. TODO::
-
-            return two copy side-to-side of the domain and codomain instead
-            of arrows.
-
         EXAMPLES::
 
             sage: from slabbe import PolyhedronPartition, PolyhedronExchangeTransformation
@@ -334,26 +327,29 @@ class PolyhedronExchangeTransformation(object):
             sage: d = {0:(1-h,0), 1:(-h,0)}
             sage: T = PolyhedronExchangeTransformation(P, d)
             sage: T.plot()
-            Graphics object consisting of 16 graphics primitives
+            Graphics Array of size 1 x 2
+
+        Title is still placed correctly if size of domain changes::
+
+            sage: (5*T).plot()
+            Graphics Array of size 1 x 2
+
         """
-        from random import random
-        from sage.plot.arrow import arrow
-        from sage.modules.free_module_element import vector
-        d = self.ambient_space().dimension()
+        from sage.plot.text import text
+        from sage.plot.plot import graphics_array
 
         # computing the range of the domain in each dimension
         V = self.domain().vertices()
-        MAX = map(max, *V)
-        MIN = map(min, *V)
-        H = [b-a for (a,b) in zip(MIN,MAX)]
+        MAX = list(map(max, *V))
+        MIN = list(map(min, *V))
 
-        G = self.partition().plot()
-        for key,p in self.partition():
-            t = self._translations[key]
-            small_noise_vector = vector([H[i]*.1*random() for i in range(d)])
-            center = p.center() + small_noise_vector
-            G += arrow(center, center+t, color='green')
-        return G
+        title_position = ((MIN[0]+MAX[0])/2., MAX[1]*1.08)
+
+        P = self.partition().plot()
+        Q = self.image_partition().plot()
+        tP = text(r"domain partition", title_position, fontsize=10)
+        tQ = text(r"image partition", title_position, fontsize=10)
+        return graphics_array([P + tP,  Q + tQ])
 
     def domain(self):
         r"""
