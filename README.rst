@@ -169,6 +169,10 @@ __ https://trac.sagemath.org/
 Release history
 ---------------
 
+*Version 0.7.2 (Sep 6, 2023)*
+  Fixing few doctests and failures with module Kolakoski related to Cython and
+  Python 3.11.
+
 *Version 0.7.1 (June 30, 2023)*
   New module on cut and project scheme (still preliminary).
   New module to draw tilings with the Smith's aperiodic monotile (see this `blog post`__).
