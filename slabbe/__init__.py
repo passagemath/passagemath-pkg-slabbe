@@ -59,12 +59,7 @@ from .cut_and_project_scheme import (CutAndProjectScheme,
                                      model_sets)
 
 # BUG (sometimes, cython code does not work properly)
-try:
-    from .kolakoski_word import KolakoskiWord
-except ImportError:
-    print("There was an error while importing KolakoskiWord cython module")
-    print("Maybe that's because the pwd contains the slabbe folder?")
-    print("We ignore the problem but this module won't work.")
+# from .kolakoski_word import KolakoskiWord
 
 # for doctext to work, we import convex_boundary
 # from .discrete_subset import convex_boundary
