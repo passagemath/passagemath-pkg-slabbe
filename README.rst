@@ -172,6 +172,8 @@ Release history
 *Version 0.7.2 (Sep 6, 2023)*
   Fixing few doctests and failures with module Kolakoski related to Cython and
   Python 3.11.
+  All tests passed on SageMath version 10.0.beta4 using Python 3.10.12.
+  All tests passed on SageMath version 10.2.beta1 using Python 3.11.1 (except two).
 
 *Version 0.7.1 (June 30, 2023)*
   New module on cut and project scheme (still preliminary).
