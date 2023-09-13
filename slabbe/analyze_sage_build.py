@@ -136,9 +136,10 @@ def sage_logs_datetime_list(consider='last', verbose=False):
     SAGE_LOGS_PKGS = os.path.join(SAGE_ROOT,'logs','pkgs')
     K = []
     pattern = 'real\t'
-    for file in os.listdir(SAGE_LOGS_PKGS):
-        path_to_file = os.path.join(SAGE_LOGS_PKGS, file)
-        K.append((path_to_file, pattern))
+    if os.path.exists(SAGE_LOGS_PKGS):
+        for file in os.listdir(SAGE_LOGS_PKGS):
+            path_to_file = os.path.join(SAGE_LOGS_PKGS, file)
+            K.append((path_to_file, pattern))
 
     path_to_file = os.path.join(SAGE_LOGS, 'dochtml.log')
     if os.path.exists(path_to_file):
