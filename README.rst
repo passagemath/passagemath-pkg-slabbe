@@ -169,9 +169,16 @@ __ https://trac.sagemath.org/
 Release history
 ---------------
 
+*Version 0.7.4 (Sep 13, 2023)*
+  No more c files in the distribution tar.gz file.
+  Fixing the latex string of 2-dimensional substitutions in the Jupyter notebook.
+  In preparation for a conference at CIRM, Marseille, Sep 11-15 2023.
+  All tests passed on SageMath version 10.0.beta4 using Python 3.10.12.
+  All tests passed on SageMath version 10.2.beta1 using Python 3.11.1 (except two).
+
 *Version 0.7.3 (Sep 7, 2023)*
-  Improving the way Polyhedron exchange transformations are plotted in preparation
-  for a conference at CIRM, Marseille, Sep 11-15 2023.
+  Improving the way Polyhedron exchange transformations are plotted 
+  in preparation for a conference at CIRM, Marseille, Sep 11-15 2023.
   All tests passed on SageMath version 10.0.beta4 using Python 3.10.12.
   All tests passed on SageMath version 10.2.beta1 using Python 3.11.1 (except two).
 
