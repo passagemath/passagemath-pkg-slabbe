@@ -221,7 +221,19 @@ class Substitution2d(object):
         from sage.calculus.var import var
         from slabbe.matrices import map_coefficients_to_variable_index
         lines = []
-        lines.append(r'{{\arraycolsep={}'.format(arraycolsep))
+
+        # Check if we are in the Jupyter notebook
+        from sage.repl.rich_output import get_display_manager
+        from sage.repl.rich_output.backend_ipython import BackendIPythonNotebook
+        display_manager = get_display_manager()
+        is_in_jupyter = isinstance(display_manager._backend, BackendIPythonNotebook)
+
+        # Do not set arraycolsep if in IPython notebook (Jupyter)
+        # because MathJax does not recognize that option
+        # see https://ask.sagemath.org/question/48614/latex-multicolumn-is-not-recognized/
+        if not is_in_jupyter:
+            lines.append(r'{{\arraycolsep={}'.format(arraycolsep))
+
         lines.append(r'\begin{{array}}{{{}}}'.format(align*ncolumns))
         for i,(key,table) in enumerate(self._d.items()):
             M = matrix.column([col[::-1] for col in table])
@@ -240,7 +252,10 @@ class Substitution2d(object):
             else:
                 lines.append(r',&')
         lines.append(r'\end{array}')
-        lines.append(r'}') # arraycolsep
+
+        if not is_in_jupyter:
+            lines.append(r'}') # end arraycolsep
+
         return LatexExpr('\n'.join(lines))
 
     @classmethod
