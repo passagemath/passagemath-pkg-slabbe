@@ -1,1 +1,4 @@
 include README.rst
+exclude slabbe/diophantine_approx_pyx.c
+exclude slabbe/kolakoski_word_pyx.c
+exclude slabbe/mult_cont_frac_pyx.c
