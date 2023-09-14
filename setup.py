@@ -49,6 +49,8 @@ setup(name='slabbe',
     url='http://gitlab.com/seblabbe/slabbe',
     license = "GPLv2+",
     packages=['slabbe'],
-    ext_modules=cythonize(ext_modules),
+
+    # temporarily desactivate cython modules
+    #ext_modules=cythonize(ext_modules),
 )
 
