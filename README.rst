@@ -169,6 +169,9 @@ __ https://trac.sagemath.org/
 Release history
 ---------------
 
+*Version 0.7.5 (Sep 15, 2023)*
+  Desactivate Cython modules
+
 *Version 0.7.4 (Sep 13, 2023)*
   No more c files in the distribution tar.gz file.
   Fixing the latex string of 2-dimensional substitutions in the Jupyter notebook.
