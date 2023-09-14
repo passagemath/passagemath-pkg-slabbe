@@ -17,6 +17,23 @@ ext_modules = [
             sources = [path.join('slabbe','diophantine_approx_pyx.pyx')],
             include_dirs=sage_include_directories())]
 
+# try to cythonize the cython modules, but avoid failing when it fails
+# Often sage on conda or sage on ArchLinux does not have a working cython
+# Users most probably just want to use the Python modules, so let's ignore
+# the cython modules within slabbe
+def try_cythonize_ext_module():
+    try:
+        return cythonize(ext_modules)
+    except:
+        print("Problem when calling cythonize(ext_modules) in slabbe package.")
+        print("Here is the traceback showing the problem:")
+        print("--- START OF TRACEBACK ---")
+        import traceback
+        traceback.print_exc()
+        print("--- END OF TRACEBACK ---")
+        print("The slabbe package will be installed without its cython modules")
+        return []
+
 # Get the long description from the README file
 here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
@@ -49,8 +66,6 @@ setup(name='slabbe',
     url='http://gitlab.com/seblabbe/slabbe',
     license = "GPLv2+",
     packages=['slabbe'],
-
-    # temporarily desactivate cython modules
-    #ext_modules=cythonize(ext_modules),
+    ext_modules = try_cythonize_ext_module()
 )
 
