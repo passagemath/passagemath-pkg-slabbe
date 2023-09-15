@@ -129,6 +129,13 @@ class PiecewiseAffineTransformation(object):
         sage: from slabbe import PiecewiseAffineTransformation
         sage: T = PiecewiseAffineTransformation(P, {0:f0, 1:f1})
 
+    TESTS:
+
+    Works with general indices::
+
+        sage: P = PolyhedronPartition({'a':p, 'b':q})
+        sage: T = PiecewiseAffineTransformation(P, {'a':f0, 'b':f1})
+
     """
     def __init__(self, partition, affine_maps, affine_group=None):
         r"""
@@ -148,7 +155,11 @@ class PiecewiseAffineTransformation(object):
 
         if affine_group is None:
             if affine_maps:
-                self._affine_group = affine_maps[0].parent()
+                if isinstance(affine_maps, list):
+                    some_map = affine_maps[0]
+                elif isinstance(affine_maps, dict):
+                    some_map = next(iter(affine_maps.values()))
+                self._affine_group = some_map.parent()
             else:
                 raise ValueError("can't guess the affine group from an"
                         " empty list of affine maps")
