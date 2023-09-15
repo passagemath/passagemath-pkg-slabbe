@@ -1004,8 +1004,10 @@ class PiecewiseAffineTransformation(object):
         self_inv = self.inverse()
         while len(Q) and Q.volume() > ignore_volume:
             if verbose:
-                print("len(Q)={}; Volume(Q)={}={}".format(len(Q),
-                    Q.volume().n(), Q.volume()))
+                print("Volume not yet returned={}={} ({} atoms)".format(
+                    Q.volume(),
+                    Q.volume().n(),
+                    len(Q)))
 
             Q = self_inv(Q)
             # Compute the refinement of P and Q (concatenate the labels)
