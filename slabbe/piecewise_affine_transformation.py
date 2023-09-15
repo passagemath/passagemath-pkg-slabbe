@@ -1004,7 +1004,7 @@ class PiecewiseAffineTransformation(object):
         self_inv = self.inverse()
         while len(Q) and Q.volume() > ignore_volume:
             if verbose:
-                print("Volume not yet returned={}={} ({} atoms)".format(
+                print("Volume not yet returned={}={} ({} atoms).".format(
                     Q.volume(),
                     Q.volume().n(),
                     len(Q)))
@@ -1019,6 +1019,13 @@ class PiecewiseAffineTransformation(object):
             # Continue with what is left (keep labels from Q only)
             Q,d = Q.refinement(other_half, certificate=True)
             Q = PolyhedronPartition([(d[i][0], q) for (i,q) in Q])
+
+        if verbose:
+            print("Volume not yet returned={}={} ({} atoms).".format(
+                Q.volume(),
+                Q.volume().n(),
+                len(Q)))
+            print("Under these conditions, we stop the while loop of the Rauzy induction.")
 
         # We sort the keys and relabel them with nonnegative integers
         from slabbe.finite_word import sort_word_by_length_lex_key
