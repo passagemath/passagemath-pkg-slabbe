@@ -1094,12 +1094,26 @@ class PolyhedronPartition(object):
              A vertex at (0, 1),
              A vertex at (1, 0),
              A vertex at (1, 1))
+
+        If the partition is not convex, it returns its convex hull::
+
+            sage: h = 1/3
+            sage: p = Polyhedron([(0,h),(0,1),(h,1)])
+            sage: r = Polyhedron([(h,1), (1,1), (1,h), (h,0)])
+            sage: s = Polyhedron([(h,0), (1,0), (1,h)])
+            sage: P = PolyhedronPartition({0:p, 2:r, 3:s})
+            sage: P.domain()
+            A 2-dimensional polyhedron in QQ^2 defined as the convex hull of 5 vertices
+            sage: P.domain().vertices()
+            (A vertex at (0, 1),
+             A vertex at (0, 1/3),
+             A vertex at (1, 0),
+             A vertex at (1/3, 0),
+             A vertex at (1, 1))
+
         """
-        union = self.merge_atoms({a:0 for a in self.alphabet()})
-        if not len(union) == 1:
-            raise NotImplementedError("non convex domain (={})".format(union))
-        [(key,polyhedron)] = union
-        return polyhedron
+        return Polyhedron(v for atom in self.atoms()
+                            for v in atom.vertices())
 
     def code(self, p):
         r"""
