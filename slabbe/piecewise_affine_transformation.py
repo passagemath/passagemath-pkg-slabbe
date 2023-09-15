@@ -816,7 +816,8 @@ class PiecewiseAffineTransformation(object):
         else:
             raise TypeError('call undefined on input p(={})'.format(p))
 
-    def induced_partition(self, ieq, partition=None, substitution_type='dict'):
+    def induced_partition(self, ieq, partition=None,
+            substitution_type='dict', ignore_volume=0, verbose=False):
         r"""
         Returns the partition of the induced transformation on the domain.
 
@@ -829,6 +830,11 @@ class PiecewiseAffineTransformation(object):
         - ``substitution_type`` -- string (default:``'dict'``), if
           ``'column'`` or ``'row'``, it returns a substitution2d, otherwise
           it returns a dict.
+        - ``ignore_volume`` -- real (optional:``0``), stop the while loop if
+          the volume of what's not yet returned is less than the given
+          threshold
+        - ``verbose`` -- bool (optional:``False``), print verbose
+          information
 
         OUTPUT:
 
@@ -996,7 +1002,11 @@ class PiecewiseAffineTransformation(object):
         Q = PolyhedronPartition([(tuple(), W)])
         S = []
         self_inv = self.inverse()
-        while len(Q):
+        while len(Q) and Q.volume() > ignore_volume:
+            if verbose:
+                print("len(Q)={}; Volume(Q)={}={}".format(len(Q),
+                    Q.volume().n(), Q.volume()))
+
             Q = self_inv(Q)
             # Compute the refinement of P and Q (concatenate the labels)
             PQ,d = partition.refinement(Q, certificate=True)
@@ -1031,7 +1041,7 @@ class PiecewiseAffineTransformation(object):
 
         return induced_partition, sub
 
-    def induced_transformation(self, ieq):
+    def induced_transformation(self, ieq, ignore_volume=0, verbose=False):
         r"""
         Return the induced transformation on the domain.
 
@@ -1039,6 +1049,11 @@ class PiecewiseAffineTransformation(object):
 
         - ``ieq`` -- list, an inequality. An entry equal to "[-1,7,3,4]"
           represents the inequality 7x_1+3x_2+4x_3>= 1.
+        - ``ignore_volume`` -- real (optional:``0``), stop the while loop if
+          the volume of what's not yet returned is less than the given
+          threshold
+        - ``verbose`` -- bool (optional:``False``), print verbose
+          information
 
         OUTPUT:
 
@@ -1087,7 +1102,7 @@ class PiecewiseAffineTransformation(object):
 
         """
         from sage.misc.misc_c import prod
-        newP, sub = self.induced_partition(ieq)
+        newP, sub = self.induced_partition(ieq, ignore_volume=ignore_volume, verbose=verbose)
         d = self.affine_maps()
         newd = {a:prod(d[b] for b in reversed(sub[a])) for a in sub}
         return PiecewiseAffineTransformation(newP, newd), sub
