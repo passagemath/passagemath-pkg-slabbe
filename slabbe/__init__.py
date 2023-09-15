@@ -38,6 +38,7 @@ from .substitution_2d import Substitution2d
 from .wang_tiles import WangTiling, WangTileSolver, WangTileSet
 from .polyhedron_partition import PolyhedronPartition
 from .polyhedron_exchange_transformation import PolyhedronExchangeTransformation
+from .piecewise_affine_transformation import PiecewiseAffineTransformation
 from .coding_of_PETs import PETsCoding
 
 from .partial_injection import (number_of_partial_injection,
