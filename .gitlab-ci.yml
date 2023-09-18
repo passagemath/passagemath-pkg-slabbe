@@ -7,6 +7,8 @@ test:9.0:
 test:9.0: &test
   image: sagemath/sagemath-dev:9.0
   when: manual
+  artifacts:
+    expire_in: 1 month
   script:
     #- sudo apt update # broken on non LTS debian
     # https://github.com/moby/moby/issues/27988
