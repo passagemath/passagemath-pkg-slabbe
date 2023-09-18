@@ -6,8 +6,9 @@ before_script:
 test:9.0:
 test:9.0: &test
   image: sagemath/sagemath-dev:9.0
+  when: manual
   script:
-    - sudo apt update
+    #- sudo apt update # broken on non LTS debian
     # https://github.com/moby/moby/issues/27988
     - echo 'debconf debconf/frontend select Noninteractive' | sudo debconf-set-selections
     - sudo apt-get install -qy
