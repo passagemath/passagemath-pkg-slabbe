@@ -73,11 +73,6 @@ Inducing a piecewise affine transformation on a sub-domain::
     sage: sub
     {0: [0], 1: [1], 2: [1, 1], 3: [0, 1, 1], 4: [0, 1, 1, 1], 5: [0, 1, 1, 1, 1]}
 
-.. TODO::
-
-    This file was copied from Polyhedron exchange transformation. Next
-    step would be to factorize the code because many are just the same
-
 AUTHORS:
 
 - Sébastien Labbé, January 2019, added a class for polyhedron exchange transformations
