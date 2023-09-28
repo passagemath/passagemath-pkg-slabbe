@@ -254,6 +254,18 @@ class PiecewiseAffineTransformation(object):
             sage: T.partition()
             Polyhedron partition of 2 atoms with 2 letters
 
+        This code also handle PETs::
+
+            sage: from slabbe import PolyhedronExchangeTransformation
+            sage: h = 1/3
+            sage: p = Polyhedron([(0,0),(h,0),(h,1),(0,1)])
+            sage: q = Polyhedron([(1,0),(h,0),(h,1),(1,1)])
+            sage: P = PolyhedronPartition({0:p, 1:q})
+            sage: d = {0:(1-h,0), 1:(-h,0)}
+            sage: T = PolyhedronExchangeTransformation(P, d)
+            sage: T.partition()
+            Polyhedron partition of 2 atoms with 2 letters
+
         """
         return self._partition
 
@@ -295,6 +307,18 @@ class PiecewiseAffineTransformation(object):
             sage: f1 = F(M, (0, -1/3))
             sage: T = PiecewiseAffineTransformation(P, {0:f0, 1:f1})
             sage: T.ambient_space()
+            Vector space of dimension 2 over Rational Field
+
+        This code also handle PETs::
+
+            sage: from slabbe import PolyhedronExchangeTransformation
+            sage: h = 1/3
+            sage: p = Polyhedron([(0,0),(h,0),(h,1),(0,1)])
+            sage: q = Polyhedron([(1,0),(h,0),(h,1),(1,1)])
+            sage: P = PolyhedronPartition({0:p, 1:q})
+            sage: T = {0:(1-h,0), 1:(-h,0)}
+            sage: F = PolyhedronExchangeTransformation(P, T)
+            sage: F.ambient_space()
             Vector space of dimension 2 over Rational Field
 
         """
@@ -341,6 +365,31 @@ class PiecewiseAffineTransformation(object):
             sage: T.image_partition()
             Polyhedron partition of 2 atoms with 2 letters
 
+        It works also for PETs::
+
+            sage: from slabbe import PolyhedronPartition, PolyhedronExchangeTransformation
+            sage: h = 1/3
+            sage: p = Polyhedron([(0,0),(h,0),(h,1),(0,1)])
+            sage: q = Polyhedron([(1,0),(h,0),(h,1),(1,1)])
+            sage: P = PolyhedronPartition({0:p, 1:q})
+            sage: T = {0:(1-h,0), 1:(-h,0)}
+            sage: F = PolyhedronExchangeTransformation(P, T)
+            sage: F.image_partition()
+            Polyhedron partition of 2 atoms with 2 letters
+
+        ::
+
+            sage: h = 1/3
+            sage: p = Polyhedron([(0,h),(0,1),(h,1)])
+            sage: q = Polyhedron([(0,0), (0,h), (h,1), (h,0)])
+            sage: r = Polyhedron([(h,1), (1,1), (1,h), (h,0)])
+            sage: s = Polyhedron([(h,0), (1,0), (1,h)])
+            sage: P = PolyhedronPartition([(0,p), (0,q), (1,r), (1,s)])
+            sage: T = {0:(1-h,0), 1:(-h,0)}
+            sage: F = PolyhedronExchangeTransformation(P, T)
+            sage: F.image_partition()
+            Polyhedron partition of 4 atoms with 2 letters
+
         """
         return PolyhedronPartition([(a,self._affine_maps[a](p))
                                     for (a,p) in self._partition])
@@ -373,6 +422,23 @@ class PiecewiseAffineTransformation(object):
              A vertex at (0, 1),
              A vertex at (1, 0),
              A vertex at (1, 1))
+
+        This code also handle PETs::
+
+            sage: from slabbe import PolyhedronExchangeTransformation
+            sage: h = 1/3
+            sage: p = Polyhedron([(0,0),(h,0),(h,1),(0,1)])
+            sage: q = Polyhedron([(1,0),(h,0),(h,1),(1,1)])
+            sage: P = PolyhedronPartition({0:p, 1:q})
+            sage: T = {0:(1-h,0), 1:(-h,0)}
+            sage: F = PolyhedronExchangeTransformation(P, T)
+            sage: F.domain()
+            A 2-dimensional polyhedron in QQ^2 defined as the convex hull of 4 vertices
+            sage: F.domain().vertices()
+            (A vertex at (0, 0),
+             A vertex at (0, 1),
+             A vertex at (1, 0),
+             A vertex at (1, 1))
         """
         return self.partition().domain()
 
@@ -400,6 +466,18 @@ class PiecewiseAffineTransformation(object):
         Title is still placed correctly if size of domain changes::
 
             sage: (5*T).plot()
+            Graphics Array of size 1 x 2
+
+        This code also works for PETs::
+
+            sage: from slabbe import PolyhedronExchangeTransformation
+            sage: h = 1/3
+            sage: p = Polyhedron([(0,0),(h,0),(h,1),(0,1)])
+            sage: q = Polyhedron([(1,0),(h,0),(h,1),(1,1)])
+            sage: P = PolyhedronPartition({0:p, 1:q})
+            sage: d = {0:(1-h,0), 1:(-h,0)}
+            sage: T = PolyhedronExchangeTransformation(P, d)
+            sage: T.plot()
             Graphics Array of size 1 x 2
 
         """
@@ -739,16 +817,35 @@ class PiecewiseAffineTransformation(object):
             A 2-dimensional polyhedron in QQ^2 defined as the convex hull of 4 vertices
             sage: T(P, niterations=5)
             Polyhedron partition of 9 atoms with 2 letters
-
-        TESTS::
-
             sage: T((1/10, 1/10), niterations=0)
             (1/10, 1/10)
 
-        ::
+        This code also works for PETs::
+
+            sage: from slabbe import PolyhedronPartition, PolyhedronExchangeTransformation
+            sage: h = 1/3
+            sage: p = Polyhedron([(0,0),(h,0),(h,1),(0,1)])
+            sage: q = Polyhedron([(1,0),(h,0),(h,1),(1,1)])
+            sage: P = PolyhedronPartition({0:p, 1:q})
+            sage: T = {0:(1-h,0), 1:(-h,0)}
+            sage: F = PolyhedronExchangeTransformation(P, T)
+            sage: F((1/10, 1/10))
+            (23/30, 1/10)
+            sage: F(p)
+            A 2-dimensional polyhedron in QQ^2 defined as the convex hull of 4 vertices
+            sage: F(P)
+            Polyhedron partition of 2 atoms with 2 letters
+            sage: F((1/10, 1/10), niterations=5)
+            (13/30, 1/10)
+            sage: F(p, niterations=5)
+            A 2-dimensional polyhedron in QQ^2 defined as the convex hull of 4 vertices
+            sage: F(P, niterations=5)
+            Polyhedron partition of 3 atoms with 2 letters
+
+        TESTS::
+
 
             sage: from slabbe import PolyhedronPartition
-            sage: from slabbe import PolyhedronExchangeTransformation as PET
             sage: h = 1/3
             sage: p = Polyhedron([(0,0),(0,1),(h,1),(h,0)])
             sage: q = Polyhedron([(1,0), (1,1), (h,1), (h,0)])
@@ -764,6 +861,28 @@ class PiecewiseAffineTransformation(object):
             1
             sage: uuP = u(uP); uuP
             Polyhedron partition of 4 atoms with 2 letters
+            sage: uuP.volume()
+            1
+
+        This code also works for PETs::
+
+            sage: from slabbe import PolyhedronPartition
+            sage: from slabbe import PolyhedronExchangeTransformation as PET
+            sage: h = 1/3
+            sage: p = Polyhedron([(0,h),(0,1),(h,1)])
+            sage: q = Polyhedron([(0,0), (0,h), (h,1), (h,0)])
+            sage: r = Polyhedron([(h,1), (1,1), (1,h), (h,0)])
+            sage: s = Polyhedron([(h,0), (1,0), (1,h)])
+            sage: P = PolyhedronPartition({0:p, 1:q, 2:r, 3:s})
+            sage: base = identity_matrix(2)
+            sage: translation = vector((2/3, 0))
+            sage: u = PET.toral_translation(base, translation)
+            sage: uP = u(P); uP
+            Polyhedron partition of 4 atoms with 4 letters
+            sage: uP.volume()
+            1
+            sage: uuP = u(uP); uuP
+            Polyhedron partition of 6 atoms with 4 letters
             sage: uuP.volume()
             1
 
@@ -1182,6 +1301,59 @@ class PiecewiseAffineTransformation(object):
             sage: sum(C3)
             1
 
+        It also works for PETs::
+
+            sage: from slabbe import PolyhedronPartition
+            sage: h = 1/2
+            sage: p = Polyhedron([(0,h),(0,1),(h,1)])
+            sage: q = Polyhedron([(0,0), (0,h), (h,1), (1,1), (1,h), (h,0)])
+            sage: r = Polyhedron([(h,0), (1,0), (1,h)])
+            sage: P = PolyhedronPartition([p,q,r])
+
+        ::
+
+            sage: from slabbe import PolyhedronExchangeTransformation as PET
+            sage: base = identity_matrix(2)
+            sage: translation = vector((1/3, 0))
+            sage: u = PET.toral_translation(base, translation)
+            sage: c = u.cylinder([2,2], P); c
+            Polyhedron partition of 1 atoms with 1 letters
+            sage: c.alphabet()
+            {0}
+            sage: u.cylinder([1,1], P)
+            Polyhedron partition of 2 atoms with 2 letters
+            sage: u.cylinder([1], P)
+            Polyhedron partition of 1 atoms with 1 letters
+            sage: u.cylinder([], P).volume()
+            1
+            sage: C1 = [u.cylinder([a], P).volume() for a in range(3)]
+            sage: C1
+            [1/8, 3/4, 1/8]
+            sage: sum(C1)
+            1
+            sage: import itertools
+            sage: L2 = itertools.product(range(3),repeat=2)
+            sage: C2 = [u.cylinder([a,b], P).volume() for (a,b) in L2]
+            sage: C2
+            [1/72, 1/9, 0, 1/9, 19/36, 1/9, 0, 1/9, 1/72]
+            sage: sum(C2)
+            1
+            sage: L3 = itertools.product(range(3),repeat=3)
+            sage: C3 = [u.cylinder([a,b,c], P).volume() for (a,b,c) in L3]
+            sage: sum(C3)
+            1
+
+        TESTS::
+
+            sage: u.cylinder([0,0,0], P)
+            Polyhedron partition of 0 atoms with 0 letters
+            sage: u.cylinder([2,3], P)
+            Polyhedron partition of 0 atoms with 0 letters
+            sage: u.cylinder([2,1], P)
+            Polyhedron partition of 1 atoms with 1 letters
+            sage: u.cylinder([], P)
+            Polyhedron partition of 3 atoms with 3 letters
+
         """
         # Default partition
         if partition is None:
@@ -1231,6 +1403,21 @@ class PiecewiseAffineTransformation(object):
              Polyhedron partition of 9 atoms with 9 letters]
             sage: [T.cylinders(i).alphabet() for i in range(5)]
             [{()}, {0, 1}, {0, 1, 2, 3}, {0, 1, 2, 3, 4, 5}, {0, 1, 2, 3, 4, 5, 6, 7, 8}]
+
+        The code works also for PETs::
+
+            sage: from slabbe import PolyhedronExchangeTransformation as PET
+            sage: base = identity_matrix(2)
+            sage: translation = vector((1/3, 0))
+            sage: u = PET.toral_translation(base, translation)
+            sage: [u.cylinders(i) for i in range(5)]
+            [Polyhedron partition of 1 atoms with 1 letters,
+             Polyhedron partition of 2 atoms with 2 letters,
+             Polyhedron partition of 3 atoms with 3 letters,
+             Polyhedron partition of 3 atoms with 3 letters,
+             Polyhedron partition of 3 atoms with 3 letters]
+            sage: [u.cylinders(i).alphabet() for i in range(5)]
+            [{()}, {0, 1}, {0, 1, 2}, {0, 1, 2}, {0, 1, 2}]
 
         """
         # Default partition
