@@ -25,6 +25,7 @@ Dynamical systems
    markov_transformation
    matrices
    polyhedron_exchange_transformation
+   piecewise_affine_transformation
    substitution_2d
    coding_of_PETs
    graph_directed_IFS
