@@ -1813,8 +1813,14 @@ class Substitution2d(object):
         F = self.list_2x2_factors()
         if not all(seed in F for seed in seeds_as_table):
             if verbose:
-                print(("2x2 seeds preserved by the substitution, but which are not in the language "
-                    "of the substitution:"), [seed for seed in seeds_as_table if seed not in F])
+                seeds_in_language = [seed for seed in seeds_as_table if seed in F]
+                print("2x2 seeds preserved by the substitution, which are in the language "
+                    "of the substitution ({} of them): {}".format(len(seeds_in_language), 
+                        seeds_in_language))
+                seeds_not_in_language = [seed for seed in seeds_as_table if seed not in F]
+                print("2x2 seeds preserved by the substitution, but which are not in the language "
+                    "of the substitution ({} of them): {}".format(len(seeds_not_in_language), 
+                        seeds_not_in_language))
                 result = False
             else:
                 return False
@@ -1826,8 +1832,10 @@ class Substitution2d(object):
         dominoes_h = set(self.list_dominoes(direction='horizontal'))
         if not seeds_h <= dominoes_h:
             if verbose:
-                print(("Horizontal domino seeds preserved by the substitution, but which are "
-                    "not in the language of the substitution:"), seeds_h - dominoes_h)
+                seeds_h_minus_dominoes_h = seeds_h - dominoes_h
+                print("Horizontal domino seeds preserved by the substitution, but which are "
+                    "not in the language of the substitution ({} of "
+                    "them): {}".format(len(seeds_h_minus_dominoes_h), seeds_h_minus_dominoes_h))
                 result = False
             else:
                 return False
@@ -1839,8 +1847,10 @@ class Substitution2d(object):
         dominoes_v = set(self.list_dominoes(direction='vertical'))
         if not seeds_v <= dominoes_v:
             if verbose:
-                print(("Vertical domino seeds preserved by the substitution, but which are "
-                    "not in the language of the substitution:"), seeds_v - dominoes_v)
+                seeds_v_minus_dominoes_v = seeds_v - dominoes_v
+                print("Vertical domino seeds preserved by the substitution, but which are "
+                    "not in the language of the substitution ({} of "
+                    "them): {}".format(len(seeds_v_minus_dominoes_v), seeds_v_minus_dominoes_v))
                 result = False
             else:
                 return False
