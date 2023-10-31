@@ -825,7 +825,7 @@ class Substitution2d(object):
             codomain_fill_background_fn=None,
             size=1, scale=1, font=r'\normalsize',
             rotate=None, label_shift=.2, id=True, edges=True, 
-            ncolumns=4, direction='right', extra_space=1):
+            ncolumns=4, direction='right', subst_arrow_node='', extra_space=1):
         r"""
         Return the tikz code showing what the substitution A->B* does on
         Wang tiles.
@@ -855,6 +855,7 @@ class Substitution2d(object):
         - ``ncolumns`` -- integer (default: ``4``)
         - ``edges`` -- bool (default: ``True``) 
         - ``direction`` -- string (default: ``'right'``) or ``'down'``
+        - ``subst_arrow_node`` -- string (default: ``''``)
         - ``extra_space`` -- number (default: ``1``), space between the
           tile and its image
 
@@ -981,7 +982,7 @@ class Substitution2d(object):
             lines.append(r'\node (B) at ({},{}) {{{}}};'.format(xshift, yshift,
                                              tiling_tikz.tikz_picture_code()))
 
-            lines.append(r'\draw[-to,very thick] (A) edge (B);')
+            lines.append(r'\draw[-to,very thick] (A) edge {} (B);'.format(subst_arrow_node))
 
             lines.append(r'\end{tikzpicture}')
             lines.append(r'};')
