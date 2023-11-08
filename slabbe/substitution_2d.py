@@ -1212,6 +1212,50 @@ class Substitution2d(object):
             [(0, 2), (1, 3), (2, 0), (2, 2), (3, 1), (3, 3)]
 
         """
+        R = self.domino_language_rec_enum_set(direction)
+        #return [create_table(f) for f in R]
+        return list(R)
+
+    def domino_language_rec_enum_set(self, direction):
+        r"""
+        Return the recursively enumerated set of the 1x2 or 2x1 factors in
+        the language of the associated substitutive shift.
+
+        INPUT:
+
+        - ``self`` -- expansive and primitive 2d substitution
+        - ``direction`` -- string, ``'horizontal'`` or ``'vertical'``
+
+        OUTPUT:
+
+            recursively enumerated set
+
+        EXAMPLES::
+
+            sage: from slabbe import Substitution2d
+            sage: A = [[0,1],[0,1]]
+            sage: B = [[1,0],[1,1]]
+            sage: d = {0:A, 1:B}
+            sage: s = Substitution2d(d)
+            sage: s.domino_language_rec_enum_set(direction='horizontal')
+            A recursively enumerated set (breadth first search)
+            sage: s.domino_language_rec_enum_set(direction='vertical')
+            A recursively enumerated set (breadth first search)
+
+        ::
+
+            sage: A = [[3]]
+            sage: B = [[3],[2]]
+            sage: C = [[3,1]]
+            sage: D = [[3,1],[2,0]]
+            sage: d = {0:A, 1:B, 2:C, 3:D}
+            sage: s = Substitution2d(d)
+            sage: s.domino_language_rec_enum_set(direction='horizontal')
+            A recursively enumerated set (breadth first search)
+            sage: s.domino_language_rec_enum_set(direction='vertical')
+            A recursively enumerated set (breadth first search)
+
+        """
         if not self.codomain_alphabet() <= self.domain_alphabet():
             raise ValueError("codomain alphabet (='{}') is not a subset of the"
                     " domain alphabet (={})".format(self.codomain_alphabet(),
@@ -1236,9 +1280,7 @@ class Substitution2d(object):
             table = create_table(factor)
             image = self(table)
             return set_of_factors(image, shape)
-        R = RecursivelyEnumeratedSet(seeds, children)
-        #return [create_table(f) for f in R]
-        return list(R)
+        return RecursivelyEnumeratedSet(seeds, children)
 
     def horizontal_structure_substitution(self):
         r"""
