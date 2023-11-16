@@ -957,7 +957,7 @@ class Substitution2d(object):
                     rotate=rotate, label_shift=label_shift,
                     right_edges=edges, top_edges=edges, left_edges=edges,
                     bottom_edges=edges)
-            new_lines.insert(0, r'\begin{tikzpicture}')
+            new_lines.insert(0, r'\begin{{tikzpicture}}[scale={}]'.format(scale))
             new_lines.append(r'\end{tikzpicture}')
             new_lines = '\n'.join(new_lines)
             lines.append(r'\node (A) at (0,0) {{{}}};'.format(new_lines))
@@ -970,8 +970,8 @@ class Substitution2d(object):
                     rotate=rotate, label_shift=label_shift, scale=scale,
                     edges=edges, id=id, size=size)
 
-            size_image_x = len(image_a)
-            size_image_y = len(image_a[0])
+            size_image_x = len(image_a)*size
+            size_image_y = len(image_a[0])*size
 
             if direction == 'right':
                 xshift = extra_space + .5 * size_image_x

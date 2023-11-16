@@ -4753,11 +4753,12 @@ class WangTiling(object):
                     this_color = tuple(color[a] for a in tile)
                 else:
                     this_color = None
+                position_size = (j*size, k*size)
                 if fill_background_fn:
-                    fill_background = fill_background_fn(i, position, tile)
+                    fill_background = fill_background_fn(i, position_size, tile)
                 else:
                     fill_background = None
-                more_lines = tile_to_tikz(tile, position, color=this_color,
+                more_lines = tile_to_tikz(tile, position_size, color=this_color,
                         fill_background=fill_background,
                         id=this_id, id_color=id_color, id_format=id_format,
                         sizex=size, sizey=size, rotate=rotate, label=label,
