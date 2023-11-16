@@ -153,8 +153,8 @@ cdef class WordDatatype_Kolakoski(object):
                 for i from 0 <= i < n-1:
                     g = f + 1
                     m = f ^ g
-                    e ^= m / 2
-                    f = g + (e & m) / 2
+                    e ^= m // 2
+                    f = g + (e & m) // 2
             return int(2 - (e & 1))
 
     def __iter__(self):
@@ -188,8 +188,8 @@ cdef class WordDatatype_Kolakoski(object):
         while True:
             g = f + 1
             m = f ^ g
-            e ^= m / 2
-            f = g + (e & m) / 2
+            e ^= m // 2
+            f = g + (e & m) // 2
             yield int(2 - (e & 1))
 
     def __reduce__(self):
