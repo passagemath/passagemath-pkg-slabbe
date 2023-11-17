@@ -854,7 +854,8 @@ class Substitution2d(object):
         - ``id`` -- boolean (default: ``True``), presence of the tile id
         - ``ncolumns`` -- integer (default: ``4``)
         - ``edges`` -- bool (default: ``True``) 
-        - ``direction`` -- string (default: ``'right'``) or ``'down'``
+        - ``direction`` -- string (default: ``'right'``) or ``'down'`` or
+          ``'left'`` or ``'up'``
         - ``subst_arrow_node`` -- string (default: ``''``)
         - ``extra_space`` -- number (default: ``1``), space between the
           tile and its image
@@ -893,11 +894,13 @@ class Substitution2d(object):
             sage: tikz = sM.wang_tikz(domain_tiles, codomain_tiles)
             sage: _ = tikz.pdf(view=False)      # long time
 
-        Down direction::
+        Down or left direction::
 
-            sage: tikz = s.wang_tikz(domain_tiles, codomain_tiles,
-            ....:                      direction='down')
+            sage: tikz = s.wang_tikz(domain_tiles, codomain_tiles, direction='down')
             sage: _ = tikz.pdf(view=False)      # long time
+            sage: tikz = s.wang_tikz(domain_tiles, codomain_tiles, direction='left')
+            sage: _ = tikz.pdf(view=False)      # long time
+
         """
         from slabbe.wang_tiles import tile_to_tikz, WangTileSet, WangTiling
         if isinstance(codomain_tiles, WangTileSet):
@@ -919,10 +922,6 @@ class Substitution2d(object):
                 raise ValueError("domain_alphabet={}, but tiles are"
                         " {}".format(self.domain_alphabet(),
                         domain_tiles))
-
-        if direction not in ['right', 'down']:
-            raise ValueError("direction(={}) must be 'right' or"
-                    " 'down'".format(direction))
 
         lines = []
         lines.append(r'\begin{tikzpicture}')
@@ -976,9 +975,19 @@ class Substitution2d(object):
             if direction == 'right':
                 xshift = extra_space + .5 * size_image_x
                 yshift = 0
+            elif direction == 'left':
+                xshift = -extra_space - .5 * size_image_x
+                yshift = 0
             elif direction == 'down':
                 xshift = 0
                 yshift = -extra_space - .5 * size_image_y
+            elif direction == 'up':
+                xshift = 0
+                yshift = extra_space + .5 * size_image_y
+            else:
+                raise ValueError("direction(={}) must be 'right' or"
+                        " 'down' or 'left' or 'up'".format(direction))
+
             lines.append(r'\node (B) at ({},{}) {{{}}};'.format(xshift, yshift,
                                              tiling_tikz.tikz_picture_code()))
 
