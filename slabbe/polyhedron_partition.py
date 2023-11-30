@@ -135,7 +135,19 @@ def center_insphere_polytope(polytope, solver=None):
         sage: center_insphere_polytope(P)                        # abs tol 1e-6
         ([0.47506218943955486, 0.47506218943955486], 0.47506218943955486)
 
+    TESTS::
+
+        sage: P = Polyhedron([(0,0),(1,1)])
+        sage: center_insphere_polytope(P)
+        ([0.0, 0.5], 0.5)
+        sage: P = Polyhedron([(0,0)])
+        sage: center_insphere_polytope(P)
+        ([0, 0], 0)
+
     """
+    if polytope.n_vertices() == 1:
+        return (list(polytope.center()), 0)
+
     from math import sqrt
     from sage.numerical.mip import MixedIntegerLinearProgram
     p = MixedIntegerLinearProgram(solver=solver)
