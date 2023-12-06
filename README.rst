@@ -169,6 +169,14 @@ __ https://trac.sagemath.org/
 Release history
 ---------------
 
+*Version 0.7.6 (Dec 6, 2023)*
+  New module to deal with piecewise affine transformations, the module
+  on polyhedron exchange transformations is now based on it.
+  Few improvements and bug fixes on drawing substitution and Wang tilings.
+  Many doctests are currently failing with SageMath version 10.2 because Cython
+  modules in the slabbe packages are broken by a recent update of Cython in
+  SageMath. These are not fixed in this release.
+
 *Version 0.7.5 (Sep 15, 2023)*
   Desactivate Cython modules
 
