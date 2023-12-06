@@ -49,7 +49,7 @@ The result is cached so the same answer is returned again::
 The cluster containing the point zero is returned as an iterator::
 
     sage: S.cluster()
-    <generator object at ...>
+    <...enerator object at ...>
 
 It may be finite of infinite. If you believe it is finite, you may compute
 its cardinality. If the cluster is infinite, it will not halt::
