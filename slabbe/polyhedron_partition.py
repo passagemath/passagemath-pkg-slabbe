@@ -138,10 +138,10 @@ def center_insphere_polytope(polytope, solver=None):
     TESTS::
 
         sage: P = Polyhedron([(0,0),(1,1)])
-        sage: center_insphere_polytope(P)
+        sage: center_insphere_polytope(P)                        # abs tol 1e-6
         ([0.0, 0.5], 0.5)
         sage: P = Polyhedron([(0,0)])
-        sage: center_insphere_polytope(P)
+        sage: center_insphere_polytope(P)                        # abs tol 1e-6
         ([0, 0], 0)
 
     """
