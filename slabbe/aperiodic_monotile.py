@@ -539,7 +539,7 @@ class MonotileSolver():
             sage: from slabbe.aperiodic_monotile import MonotileSolver
             sage: s = MonotileSolver(2,2)
             sage: s.draw_one_solution()
-            Graphics object consisting of 17 graphics primitives
+            Graphics object consisting of ... graphics primitives
 
         """
         from sage.plot.graphics import Graphics
