@@ -60,6 +60,7 @@ def RankingScale_CQU4_2011():
           104        0              1              0           0
     """
     from sage.rings.integer_ring import ZZ
+    from sage.rings.real_double import RDF
     serieA = [0] + discrete_curve(50, 1000, K=1, R=sqrt(2), base=e) #Movember, Bye Bye, Cdf, MA
     la_flotte = [0] + discrete_curve(32, 800, K=1, R=sqrt(2), base=e)  # la flotte
     serieB = [0] + discrete_curve(24, 400, K=1, R=sqrt(2), base=e) # october fest, funenuf, la viree
@@ -69,7 +70,7 @@ def RankingScale_CQU4_2011():
     pivot_y = serieA[pivot_x]
     slope = (1-pivot_y) / (nb_ma-pivot_x)
     L = [pivot_y + slope * (p-pivot_x) for p in range(pivot_x, nb_ma+1)]
-    L = [ZZ(round(_)) for _ in L]
+    L = [ZZ(RDF(_).round()) for _ in L]
     mars_attaque = serieA[:pivot_x] + L
 
     scales = serieA, mars_attaque, la_flotte, serieB
@@ -431,11 +432,11 @@ def discrete_curve(nb_equipes, max_points=100, K=1, R=2, base=2, verbose=False):
         sage: B = discrete_curve(32+2, 70)  # la flotte
         sage: C = discrete_curve(16+2, 40) # october fest, funenuf, la viree
     """
-    from sage.misc.functional import round
     from sage.rings.integer_ring import ZZ
+    from sage.rings.real_double import RDF
     from sage.combinat.words.word import Word
     fn_normalise = curve(nb_equipes, max_points, K=K, R=R, base=base)
-    L = [ZZ(round(fn_normalise(p=i))) for i in range(1,nb_equipes+1)]
+    L = [ZZ(RDF(fn_normalise(p=i)).round()) for i in range(1,nb_equipes+1)]
     if verbose: 
         print("First difference sequence is")
         print(list(Word(L).reversal().finite_differences()))
@@ -444,11 +445,11 @@ def discrete_curve(nb_equipes, max_points=100, K=1, R=2, base=2, verbose=False):
 def discrete_curve_2(nb_equipes, max_points=100):
     r"""
     """
-    from sage.misc.functional import round
     from sage.functions.log import log
     from sage.rings.integer_ring import ZZ
+    from sage.rings.real_double import RDF
     f = lambda p:(max_points-1)*(1-log(p)/log(nb_equipes))+1
-    L = [ZZ(round(f(p=i))) for i in range(1,nb_equipes+1)]
+    L = [ZZ(RDF(f(p=i)).round()) for i in range(1,nb_equipes+1)]
     return L
 
 ######################
