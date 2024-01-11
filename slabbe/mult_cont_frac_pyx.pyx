@@ -169,7 +169,7 @@ cdef extern from "stdlib.h":
     void qsort(void *base, int nmemb, int size,
                 int(*compar)(const_void *, const_void *)) nogil
 
-cdef int cmp_double(const_void * pa, const_void * pb):
+cdef int cmp_double(const_void * pa, const_void * pb) noexcept:
     r"""
     cmp of doubles
     """
@@ -183,7 +183,7 @@ cdef int cmp_double(const_void * pa, const_void * pb):
         return 0
 
 cdef double* _KEY
-cdef int cmp_int_KEY(const_void * pa, const_void * pb):
+cdef int cmp_int_KEY(const_void * pa, const_void * pb) noexcept:
     r"""
     cmp of integers according to their values in global array _KEY 
     """
@@ -1574,7 +1574,7 @@ cdef class MCFAlgorithm(object):
         # initialization of the counter
         # change this to something else
         # see https://groups.google.com/forum/?fromgroups=#!topic/sage-devel/NCBmj2KjwEM
-        cpdef int C[NDIVS][NDIVS]
+        cdef int C[NDIVS][NDIVS]
         for k from 0 <= k <= ndivs:
             for j from 0 <= j <= ndivs:
                 C[j][j] = 0
