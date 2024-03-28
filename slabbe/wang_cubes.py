@@ -371,11 +371,14 @@ class WangCubeSet(object):
             (True, [1, 1, 1])
 
         """
+        from sage.combinat.integer_lists.invlex import IntegerListsLex
         it = itertools.count(3) if stop is None else range(3, stop)
         for n in it:
             if verbose:
                 print('Trying n=x+y+z={}'.format(n))
             for X_Y_Z in IntegerListsLex(n=n, length=3, min_part=1):
+                if verbose:
+                    print('Trying to tile (cyclically) a box of size (x,y,z)={}'.format(X_Y_Z))
                 sat_solver = self.sat_solver(box=X_Y_Z, cyclic=True)
                 solution = sat_solver()
                 if solution:
@@ -399,7 +402,7 @@ class WangCubeSet(object):
         for n in it:
             X_Y_Z = (n,n,n)
             if verbose:
-                print('Trying to tile a box of sizes (x,y,z)={}'.format(X_Y_Z))
+                print('Trying to tile a box of size (x,y,z)={}'.format(X_Y_Z))
             sat_solver = self.sat_solver(box=X_Y_Z, cyclic=False)
             solution = sat_solver()
             if not solution:
