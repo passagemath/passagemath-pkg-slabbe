@@ -360,7 +360,7 @@ class WangCubeSet(object):
                 configuration[(j,k,l)] = i
             return configuration
 
-    def is_periodic(self, stop=None, certificate=False):
+    def is_periodic(self, stop=None, certificate=False, verbose=False):
         r"""
         EXAMPLES::
 
@@ -371,8 +371,10 @@ class WangCubeSet(object):
             (True, [1, 1, 1])
 
         """
-        it = itertools.count() if stop is None else range(stop)
+        it = itertools.count(3) if stop is None else range(3, stop)
         for n in it:
+            if verbose:
+                print('Trying n=x+y+z={}'.format(n))
             for X_Y_Z in IntegerListsLex(n=n, length=3, min_part=1):
                 sat_solver = self.sat_solver(box=X_Y_Z, cyclic=True)
                 solution = sat_solver()
@@ -382,7 +384,7 @@ class WangCubeSet(object):
                     else:
                         return True
 
-    def is_finite(self, stop=None, certificate=False):
+    def is_finite(self, stop=None, certificate=False, verbose= False):
         r"""
         EXAMPLES::
 
@@ -396,6 +398,8 @@ class WangCubeSet(object):
         it = itertools.count(1) if stop is None else range(1, stop)
         for n in it:
             X_Y_Z = (n,n,n)
+            if verbose:
+                print('Trying to tile a box of sizes (x,y,z)={}'.format(X_Y_Z))
             sat_solver = self.sat_solver(box=X_Y_Z, cyclic=False)
             solution = sat_solver()
             if not solution:
