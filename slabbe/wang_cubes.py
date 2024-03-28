@@ -187,6 +187,10 @@ class WangCubeSet(object):
           preassigned to some positions (on the border or inside)
         - ``preassigned_cubes`` -- None or dict of cubes preassigned to
           some positions
+        - ``solver`` -- string or None (default: ``None``), 
+          ``'dancing_links'`` or the name of a MILP solver in Sage like
+          ``'GLPK'``, ``'Coin'``, ``'cplex'`` or ``'Gurobi'`` or the name
+          of a SAT solver in SageMath
 
         EXAMPLES::
 
@@ -297,7 +301,8 @@ class WangCubeSet(object):
           constraints on opposite boundary must match
         - ``solver`` -- string or None (default: ``None``), 
           ``'dancing_links'`` or the name of a MILP solver in Sage like
-          ``'GLPK'``, ``'Coin'``, ``'cplex'`` or ``'Gurobi'``.
+          ``'GLPK'``, ``'Coin'``, ``'cplex'`` or ``'Gurobi'`` or the name
+          of a SAT solver in SageMath
         - ``solver_parameters`` -- dict (default: ``{}``), parameters given
           to the MILP solver using method ``solver_parameter``. For a list
           of available parameters for example for the Gurobi backend, see
@@ -360,8 +365,19 @@ class WangCubeSet(object):
                 configuration[(j,k,l)] = i
             return configuration
 
-    def is_periodic(self, stop=None, certificate=False, verbose=False):
+    def is_periodic(self, stop=None, solver=None, certificate=False, verbose=False):
         r"""
+
+        INPUT:
+
+        - ``stop`` -- integer
+        - ``solver`` -- string or None (default: ``None``), 
+          ``'dancing_links'`` or the name of a MILP solver in Sage like
+          ``'GLPK'``, ``'Coin'``, ``'cplex'`` or ``'Gurobi'`` or the name
+          of a SAT solver in SageMath
+        - ``certificate`` -- bool (default:``False``)
+        - ``verbose`` -- bool (default:``False``)
+
         EXAMPLES::
 
             sage: from slabbe import WangCubeSet
@@ -379,7 +395,7 @@ class WangCubeSet(object):
             for X_Y_Z in IntegerListsLex(n=n, length=3, min_part=1):
                 if verbose:
                     print('Trying to tile (cyclically) a box of size (x,y,z)={}'.format(X_Y_Z))
-                sat_solver = self.sat_solver(box=X_Y_Z, cyclic=True)
+                sat_solver = self.sat_solver(box=X_Y_Z, cyclic=True, solver=solver)
                 solution = sat_solver()
                 if solution:
                     if certificate:
@@ -387,8 +403,19 @@ class WangCubeSet(object):
                     else:
                         return True
 
-    def is_finite(self, stop=None, certificate=False, verbose= False):
+    def is_finite(self, stop=None, solver=None, certificate=False, verbose=False):
         r"""
+
+        INPUT:
+
+        - ``stop`` -- integer
+        - ``solver`` -- string or None (default: ``None``), 
+          ``'dancing_links'`` or the name of a MILP solver in Sage like
+          ``'GLPK'``, ``'Coin'``, ``'cplex'`` or ``'Gurobi'`` or the name
+          of a SAT solver in SageMath
+        - ``certificate`` -- bool (default:``False``)
+        - ``verbose`` -- bool (default:``False``)
+
         EXAMPLES::
 
             sage: from slabbe import WangCubeSet
@@ -403,7 +430,7 @@ class WangCubeSet(object):
             X_Y_Z = (n,n,n)
             if verbose:
                 print('Trying to tile a box of size (x,y,z)={}'.format(X_Y_Z))
-            sat_solver = self.sat_solver(box=X_Y_Z, cyclic=False)
+            sat_solver = self.sat_solver(box=X_Y_Z, cyclic=False, solver=solver)
             solution = sat_solver()
             if not solution:
                 if certificate:
