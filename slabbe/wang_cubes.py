@@ -122,6 +122,21 @@ class WangCubeSet(object):
         """
         return self._cubes.keys()
 
+    def cubes(self):
+        r"""
+
+        EXAMPLES::
+
+            sage: from slabbe import WangCubeSet
+            sage: cubes = [(0,0,0,0,0,0), (1,1,1,1,1,1), (2,2,2,2,2,2)]
+            sage: T = WangCubeSet(cubes)
+            sage: T.cubes()
+            {0: (0, 0, 0, 0, 0, 0),
+             1: (1, 1, 1, 1, 1, 1),
+             2: (2, 2, 2, 2, 2, 2)}
+        """
+        return self._cubes
+
     def sat_variable_to_cube_position_bijection(self, box):
         r"""
         Return the dictionary giving the correspondence between variables
@@ -444,4 +459,58 @@ class WangCubeSet(object):
         3d rectangular box admit to tiling.
         """
         raise NotImplementedError
+
+def KariCulik21cubes():
+    r"""
+    EXAMPLES::
+
+        sage: W21 = KariCulik21cubes()
+        sage: W21
+        Set of Wang cubes of cardinality 21
+
+    No short periodic configuration is found::
+
+        sage: W21.is_periodic(9, certificate=True, solver='kissat')   # not tested # long (11 s)
+
+    Problem, it can't not find a tiling of a 2x2x2 box (???)::
+
+        sage: W21.is_finite(9, certificate=True, verbose=True, solver='kissat')
+        Trying to tile a box of size (x,y,z)=(1, 1, 1)
+        Trying to tile a box of size (x,y,z)=(2, 2, 2)
+        (True, (2, 2, 2))
+
+    ::
+
+        sage: W21.solve_tiling_a_box((2,2,2), solver='kissat')
+        Traceback (most recent call last):
+        ...
+        ValueError: no solution found using SAT solver (=kissat)
+
+    Is there a problem in the interpretation of the definition of the set `W_21`?
+
+    REFERENCES:
+
+        Culik, Karel, II, et Jarkko Kari. « An aperiodic set of Wang cubes ».
+        In STACS 96 (Grenoble, 1996), 1046:137‑46. Lecture Notes in Comput.
+        Sci. Springer, Berlin, 1996.
+        https://mathscinet.ams.org/mathscinet-getitem?mr=1462092.
+    """
+    divide_by_2 = [("0/2","0'","0/2",0), ("0/2",2,"0/2",1), ("1/2",1,"0/2",0), ("1/2",1,"0/2","0'"), ("1/2","0'","1/2",0), ("1/2",2,"1/2",1), ("0/2",1,"1/2",1)]
+    times_3 = [(-1,1,-2,2), (0,1,-2,1), (0,1,-1,2), (-2,0,-1,1), (-2,0,0,2), (-1,0,0,1)]
+    Culik_T13 = divide_by_2 + times_3
+    to_remove = [("0/2",2,"0/2",1), ("1/2",1,"0/2",0), ("1/2",2,"1/2",1), ("0/2",1,"1/2",1)]
+    T_9 = [t for t in Culik_T13 if t not in to_remove]
+    assert len(T_9) == 9, "len(T9)(={}) should be 9".format(len(T_9))
+
+    A = [((s,1),a,b,(t,1), (1,1), (1,1)) for (t,a,s,b) in T_9]
+    B = [((s,x),2,1,(s,y), (1,x), (1,(x+y)%2)) for s in ["0/2","1/2"]
+                                               for x in [0,1]
+                                               for y in [0,1]]
+    C = [(("1/2",1),1,1,("0/2",0), (0,1), (0,1)),
+         (("1/2",1),1,1,("0/2",1), (0,1), (0,1)),
+         (("0/2",1),1,1,("1/2",0), (0,1), (0,1)),
+         (("0/2",1),1,1,("1/2",1), (0,1), (0,1))]
+    W_21 = A + B + C
+    return WangCubeSet(W_21)
+
 
