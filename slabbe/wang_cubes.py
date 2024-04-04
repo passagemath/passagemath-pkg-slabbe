@@ -461,7 +461,6 @@ class WangCubeSet(object):
         raise NotImplementedError
 
 def KariCulik21cubes(version='what_seems_to_work'):
-
     r"""
     INPUT:
 
