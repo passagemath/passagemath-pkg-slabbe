@@ -504,7 +504,8 @@ def KariCulik21cubes(version='what_seems_to_work'):
 
     **What it should be**
 
-    Kari believes the typo should be fixed by replacing it by 0'. But this
+    Kari (personnal communication, April 2nd, 2024, at CIRM, Marseille)
+    believes the typo should be fixed by replacing it by 0'. But this
     does not seem to work, because the 21 cubes that we get do not tile a
     6x6x6 block::
     
