@@ -460,8 +460,17 @@ class WangCubeSet(object):
         """
         raise NotImplementedError
 
-def KariCulik21cubes():
+def KariCulik21cubes(version='what_seems_to_work'):
+
     r"""
+    INPUT:
+
+    - ``version`` -- string (optional). Valid options are:
+
+      - ``'what_the_paper_say'``
+      - ``'what_it_should_be'``
+      - ``'what_seems_to_work'`` (default)
+
     EXAMPLES::
 
         sage: W21 = KariCulik21cubes()
@@ -509,6 +518,39 @@ def KariCulik21cubes():
         Trying to tile a box of size (x,y,z)=(12, 12, 12)
         Trying to tile a box of size (x,y,z)=(13, 13, 13)
 
+    The paper has a typo. There is an issue with the tiles in the set C
+    because it admits a periodic configuration (a simple domino of tiles of
+    indices 18 and 20)::
+
+        sage: W21.is_periodic(5, certificate=True, solver='kissat')
+        (True, [1, 2, 1])
+        sage: W21.solve_tiling_a_box((1,2,1), cyclic=True, solver='kissat')
+        {(0, 0, 0): 18, (0, 1, 0): 20}
+        sage: W21[18]
+        (1, ('0/2', 1), (0, 1), 1, ('1/2', 1), (0, 1))
+        sage: W21[20]
+        (1, ('1/2', 1), (0, 1), 1, ('0/2', 1), (0, 1))
+
+    The typo can be found by comparing the set of tiles in the set C with
+    the 4 tiles removed from the set T_{13} to define T_9. We observe that
+    in one of the tile, the bottom edge labeled 1 needs to be replaced by 0
+    (or 0'?). There is an ambiguity here on how to fix the typo, because
+    the typo precisely involves the two tiles that are equal except the
+    bottom edge labeled 0 or 0' (this is the great contribution made by
+    Culik (adding the 0' on some horizontal edges) for creating the 13
+    tiles from the 12 naturally obtained from the multiplication by 1/2 and
+    by 3). Kari says the typo should be fixed by replacing it by 0'. 
+    But this does not seem to work, because the 21 cubes that we get do not
+    tile a 6x6x6 block::
+    
+        sage: W21 = KariCulik21cubes(version='what_it_should_be')
+        sage: W21.is_finite(10, certificate=True, solver='kissat')
+        (True, (6, 6, 6))
+        sage: W21.solve_tiling_a_box((6,6,6), solver='kissat')
+        Traceback (most recent call last):
+        ...
+        ValueError: no solution found using SAT solver (=kissat)
+
     REFERENCES:
 
         Culik, Karel, II, et Jarkko Kari. « An aperiodic set of Wang cubes ».
@@ -527,16 +569,23 @@ def KariCulik21cubes():
     B = [((s,x),2,1,(s,y), (1,x), (1,(x+y)%2)) for s in ["0/2","1/2"]
                                                for x in [0,1]
                                                for y in [0,1]]
-    C = [(("1/2",1),1,1,("0/2",0), (0,1), (0,1)),
-         (("1/2",1),1,1,("0/2",1), (0,1), (0,1)),
-        #(("0/2",1),1,1,("1/2",0), (0,1), (0,1)),  # this is what the paper say
-        #(("0/2",1),1,1,("1/2",1), (0,1), (0,1))]  # this is what the paper say
-         (("0/2",1),1,0,("1/2",0), (0,1), (0,1)),  # this is what it should be
-         (("0/2",1),1,0,("1/2",1), (0,1), (0,1))]  # this is what it should be
+    C = [(("1/2",1),1,1,("0/2",x), (0,1), (0,1)) for x in [0,1]]
+
+    if version == 'what_the_paper_say':
+        C += [(("0/2",1),1,1,("1/2",x), (0,1), (0,1)) for x in [0,1]]  
+    elif version == 'what_it_should_be':
+        # what it should be
+        # (Kari, personnal communication, April 2nd, 2024, at CIRM)
+        C += [(("0/2",1),1,"0'",("1/2",x), (0,1), (0,1)) for x in [0,1]]
+    elif version == 'what_seems_to_work':
+        C += [(("0/2",1),1,0,("1/2",x), (0,1), (0,1)) for x in [0,1]]
+    else:
+        raise ValueError('invalid version (={})'.format(version))
+
     W_21 = A + B + C
 
-    # NOTE: Kari, Culik claim they use (left, right, front, back, top, bottom)
-    # but they rather use (left, front, back, right, top, bottom)
+    # NOTE: Kari, Culik say they use (left, right, front, back, top, bottom)
+    # but they really use (left, front, back, right, top, bottom)
 
     W_21_reordered = [(front, right, top, back, left, bottom)
                       for (left, front, back, right, top, bottom) in W_21]
