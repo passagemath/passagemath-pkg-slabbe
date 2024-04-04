@@ -473,7 +473,55 @@ def KariCulik21cubes(version='what_seems_to_work'):
     EXAMPLES::
 
         sage: from slabbe.wang_cubes import KariCulik21cubes
-        sage: W21 = KariCulik21cubes()
+
+    **What the paper say**
+
+    The paper has a typo. There is an issue with the tiles in the set C
+    because it admits a periodic configuration (a simple domino of tiles of
+    indices 18 and 20)::
+
+        sage: W21 = KariCulik21cubes(version='what_the_paper_say')
+        sage: W21
+        Set of Wang cubes of cardinality 21
+        sage: W21.is_periodic(5, certificate=True, solver='kissat') # optional: kissat
+        (True, [1, 2, 1])
+        sage: W21.solve_tiling_a_box((1,2,1), cyclic=True, solver='kissat') # optional: kissat
+        {(0, 0, 0): 18, (0, 1, 0): 20}
+        sage: W21[18]
+        (1, ('0/2', 1), (0, 1), 1, ('1/2', 1), (0, 1))
+        sage: W21[20]
+        (1, ('1/2', 1), (0, 1), 1, ('0/2', 1), (0, 1))
+
+    The typo can be found by comparing the set of tiles in the set C with
+    the 4 tiles removed from the set T_{13} to define T_9. We observe that
+    in one of the tile, the bottom edge labeled 1 needs to be replaced by 0
+    (or 0'?). There is an ambiguity here on how to fix the typo, because
+    the typo precisely involves the two tiles that are equal except the
+    bottom edge labeled 0 or 0' (this is the great contribution made by
+    Culik (adding the 0' on some horizontal edges) for creating the 13
+    tiles from the 12 naturally obtained from the multiplication by 1/2 and
+    by 3). 
+
+    **What it should be**
+
+    Kari believes the typo should be fixed by replacing it by 0'. But this
+    does not seem to work, because the 21 cubes that we get do not tile a
+    6x6x6 block::
+    
+        sage: W21 = KariCulik21cubes(version='what_it_should_be')
+        sage: W21.is_finite(10, certificate=True, solver='kissat') # optional: kissat # long time (2s)
+        (True, (6, 6, 6))
+        sage: W21.solve_tiling_a_box((6,6,6), solver='kissat') # optional: kissat
+        Traceback (most recent call last):
+        ...
+        ValueError: no solution found using SAT solver (=kissat)
+
+    **What seems to work**
+
+    What seems to work is to replace the 1 by a 0::
+
+        sage: W21 = KariCulik21cubes(version='what_seems_to_work')
+        sage: W21 = KariCulik21cubes()                             # its the default
         sage: W21
         Set of Wang cubes of cardinality 21
 
@@ -494,13 +542,6 @@ def KariCulik21cubes(version='what_seems_to_work'):
         Trying to tile (cyclically) a box of size (x,y,z)=[1, 2, 2]
         Trying to tile (cyclically) a box of size (x,y,z)=[1, 1, 3]
 
-    For example, it admits no cyclic solution of a 2x2x2 block::
-
-        sage: W21.solve_tiling_a_box((2,2,2), solver='kissat', cyclic=True) # optional: kissat
-        Traceback (most recent call last):
-        ...
-        ValueError: no solution found using SAT solver (=kissat)
-
     We check that it can tile larger and larger boxes::
 
         sage: W21.is_finite(7, certificate=True, verbose=True, solver='kissat') # optional: kissat # long time (2s) 
@@ -510,40 +551,6 @@ def KariCulik21cubes(version='what_seems_to_work'):
         Trying to tile a box of size (x,y,z)=(4, 4, 4)
         Trying to tile a box of size (x,y,z)=(5, 5, 5)
         Trying to tile a box of size (x,y,z)=(6, 6, 6)
-
-    The paper has a typo. There is an issue with the tiles in the set C
-    because it admits a periodic configuration (a simple domino of tiles of
-    indices 18 and 20)::
-
-        sage: W21 = KariCulik21cubes(version='what_the_paper_say')
-        sage: W21.is_periodic(5, certificate=True, solver='kissat') # optional: kissat
-        (True, [1, 2, 1])
-        sage: W21.solve_tiling_a_box((1,2,1), cyclic=True, solver='kissat') # optional: kissat
-        {(0, 0, 0): 18, (0, 1, 0): 20}
-        sage: W21[18]
-        (1, ('0/2', 1), (0, 1), 1, ('1/2', 1), (0, 1))
-        sage: W21[20]
-        (1, ('1/2', 1), (0, 1), 1, ('0/2', 1), (0, 1))
-
-    The typo can be found by comparing the set of tiles in the set C with
-    the 4 tiles removed from the set T_{13} to define T_9. We observe that
-    in one of the tile, the bottom edge labeled 1 needs to be replaced by 0
-    (or 0'?). There is an ambiguity here on how to fix the typo, because
-    the typo precisely involves the two tiles that are equal except the
-    bottom edge labeled 0 or 0' (this is the great contribution made by
-    Culik (adding the 0' on some horizontal edges) for creating the 13
-    tiles from the 12 naturally obtained from the multiplication by 1/2 and
-    by 3). Kari says the typo should be fixed by replacing it by 0'. 
-    But this does not seem to work, because the 21 cubes that we get do not
-    tile a 6x6x6 block::
-    
-        sage: W21 = KariCulik21cubes(version='what_it_should_be')
-        sage: W21.is_finite(10, certificate=True, solver='kissat') # optional: kissat # long time (2s)
-        (True, (6, 6, 6))
-        sage: W21.solve_tiling_a_box((6,6,6), solver='kissat') # optional: kissat
-        Traceback (most recent call last):
-        ...
-        ValueError: no solution found using SAT solver (=kissat)
 
     REFERENCES:
 
