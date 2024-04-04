@@ -511,6 +511,13 @@ def KariCulik21cubes():
          (("0/2",1),1,1,("1/2",0), (0,1), (0,1)),
          (("0/2",1),1,1,("1/2",1), (0,1), (0,1))]
     W_21 = A + B + C
-    return WangCubeSet(W_21)
+
+    # NOTE: Kari, Culik claim they use (left, right, front, back, top, bottom)
+    # but they rather use (left, front, back, right, top, bottom)
+
+    W_21_reordered = [(front, right, top, back, left, bottom)
+                      for (left, front, back, right, top, bottom) in W_21]
+
+    return WangCubeSet(W_21_reordered)
 
 
