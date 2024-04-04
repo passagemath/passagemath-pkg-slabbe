@@ -473,13 +473,14 @@ def KariCulik21cubes(version='what_seems_to_work'):
 
     EXAMPLES::
 
+        sage: from slabbe.wang_cubes import KariCulik21cubes
         sage: W21 = KariCulik21cubes()
         sage: W21
         Set of Wang cubes of cardinality 21
 
     No short periodic configuration is found::
 
-        sage: W21.is_periodic(6, certificate=True, solver='kissat', verbose=True) # not tested # long
+        sage: W21.is_periodic(6, certificate=True, solver='kissat', verbose=True) # optional: kissat # long time (2s)
         Trying n=x+y+z=3
         Trying to tile (cyclically) a box of size (x,y,z)=[1, 1, 1]
         Trying n=x+y+z=4
@@ -496,35 +497,29 @@ def KariCulik21cubes(version='what_seems_to_work'):
 
     For example, it admits no cyclic solution of a 2x2x2 block::
 
-        sage: W21.solve_tiling_a_box((2,2,2), solver='kissat', cyclic=True)
+        sage: W21.solve_tiling_a_box((2,2,2), solver='kissat', cyclic=True) # optional: kissat
         Traceback (most recent call last):
         ...
         ValueError: no solution found using SAT solver (=kissat)
 
     We check that it can tile larger and larger boxes::
 
-        sage: W21.is_finite(14, certificate=True, verbose=True, solver='kissat')  # not tested # long (11 s)
+        sage: W21.is_finite(7, certificate=True, verbose=True, solver='kissat') # optional: kissat # long time (2s) 
         Trying to tile a box of size (x,y,z)=(1, 1, 1)
         Trying to tile a box of size (x,y,z)=(2, 2, 2)
         Trying to tile a box of size (x,y,z)=(3, 3, 3)
         Trying to tile a box of size (x,y,z)=(4, 4, 4)
         Trying to tile a box of size (x,y,z)=(5, 5, 5)
         Trying to tile a box of size (x,y,z)=(6, 6, 6)
-        Trying to tile a box of size (x,y,z)=(7, 7, 7)
-        Trying to tile a box of size (x,y,z)=(8, 8, 8)
-        Trying to tile a box of size (x,y,z)=(9, 9, 9)
-        Trying to tile a box of size (x,y,z)=(10, 10, 10)
-        Trying to tile a box of size (x,y,z)=(11, 11, 11)
-        Trying to tile a box of size (x,y,z)=(12, 12, 12)
-        Trying to tile a box of size (x,y,z)=(13, 13, 13)
 
     The paper has a typo. There is an issue with the tiles in the set C
     because it admits a periodic configuration (a simple domino of tiles of
     indices 18 and 20)::
 
-        sage: W21.is_periodic(5, certificate=True, solver='kissat')
+        sage: W21 = KariCulik21cubes(version='what_the_paper_say')
+        sage: W21.is_periodic(5, certificate=True, solver='kissat') # optional: kissat
         (True, [1, 2, 1])
-        sage: W21.solve_tiling_a_box((1,2,1), cyclic=True, solver='kissat')
+        sage: W21.solve_tiling_a_box((1,2,1), cyclic=True, solver='kissat') # optional: kissat
         {(0, 0, 0): 18, (0, 1, 0): 20}
         sage: W21[18]
         (1, ('0/2', 1), (0, 1), 1, ('1/2', 1), (0, 1))
@@ -544,9 +539,9 @@ def KariCulik21cubes(version='what_seems_to_work'):
     tile a 6x6x6 block::
     
         sage: W21 = KariCulik21cubes(version='what_it_should_be')
-        sage: W21.is_finite(10, certificate=True, solver='kissat')
+        sage: W21.is_finite(10, certificate=True, solver='kissat') # optional: kissat # long time (2s)
         (True, (6, 6, 6))
-        sage: W21.solve_tiling_a_box((6,6,6), solver='kissat')
+        sage: W21.solve_tiling_a_box((6,6,6), solver='kissat') # optional: kissat
         Traceback (most recent call last):
         ...
         ValueError: no solution found using SAT solver (=kissat)
