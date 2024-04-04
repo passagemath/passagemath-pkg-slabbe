@@ -470,23 +470,44 @@ def KariCulik21cubes():
 
     No short periodic configuration is found::
 
-        sage: W21.is_periodic(9, certificate=True, solver='kissat')   # not tested # long (11 s)
+        sage: W21.is_periodic(6, certificate=True, solver='kissat', verbose=True) # not tested # long
+        Trying n=x+y+z=3
+        Trying to tile (cyclically) a box of size (x,y,z)=[1, 1, 1]
+        Trying n=x+y+z=4
+        Trying to tile (cyclically) a box of size (x,y,z)=[2, 1, 1]
+        Trying to tile (cyclically) a box of size (x,y,z)=[1, 2, 1]
+        Trying to tile (cyclically) a box of size (x,y,z)=[1, 1, 2]
+        Trying n=x+y+z=5
+        Trying to tile (cyclically) a box of size (x,y,z)=[3, 1, 1]
+        Trying to tile (cyclically) a box of size (x,y,z)=[2, 2, 1]
+        Trying to tile (cyclically) a box of size (x,y,z)=[2, 1, 2]
+        Trying to tile (cyclically) a box of size (x,y,z)=[1, 3, 1]
+        Trying to tile (cyclically) a box of size (x,y,z)=[1, 2, 2]
+        Trying to tile (cyclically) a box of size (x,y,z)=[1, 1, 3]
 
-    Problem, it can't not find a tiling of a 2x2x2 box (???)::
+    For example, it admits no cyclic solution of a 2x2x2 block::
 
-        sage: W21.is_finite(9, certificate=True, verbose=True, solver='kissat')
-        Trying to tile a box of size (x,y,z)=(1, 1, 1)
-        Trying to tile a box of size (x,y,z)=(2, 2, 2)
-        (True, (2, 2, 2))
-
-    ::
-
-        sage: W21.solve_tiling_a_box((2,2,2), solver='kissat')
+        sage: W21.solve_tiling_a_box((2,2,2), solver='kissat', cyclic=True)
         Traceback (most recent call last):
         ...
         ValueError: no solution found using SAT solver (=kissat)
 
-    Is there a problem in the interpretation of the definition of the set `W_21`?
+    We check that it can tile larger and larger boxes::
+
+        sage: W21.is_finite(14, certificate=True, verbose=True, solver='kissat')  # not tested # long (11 s)
+        Trying to tile a box of size (x,y,z)=(1, 1, 1)
+        Trying to tile a box of size (x,y,z)=(2, 2, 2)
+        Trying to tile a box of size (x,y,z)=(3, 3, 3)
+        Trying to tile a box of size (x,y,z)=(4, 4, 4)
+        Trying to tile a box of size (x,y,z)=(5, 5, 5)
+        Trying to tile a box of size (x,y,z)=(6, 6, 6)
+        Trying to tile a box of size (x,y,z)=(7, 7, 7)
+        Trying to tile a box of size (x,y,z)=(8, 8, 8)
+        Trying to tile a box of size (x,y,z)=(9, 9, 9)
+        Trying to tile a box of size (x,y,z)=(10, 10, 10)
+        Trying to tile a box of size (x,y,z)=(11, 11, 11)
+        Trying to tile a box of size (x,y,z)=(12, 12, 12)
+        Trying to tile a box of size (x,y,z)=(13, 13, 13)
 
     REFERENCES:
 
