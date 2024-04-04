@@ -508,8 +508,10 @@ def KariCulik21cubes():
                                                for y in [0,1]]
     C = [(("1/2",1),1,1,("0/2",0), (0,1), (0,1)),
          (("1/2",1),1,1,("0/2",1), (0,1), (0,1)),
-         (("0/2",1),1,1,("1/2",0), (0,1), (0,1)),
-         (("0/2",1),1,1,("1/2",1), (0,1), (0,1))]
+        #(("0/2",1),1,1,("1/2",0), (0,1), (0,1)),  # this is what the paper say
+        #(("0/2",1),1,1,("1/2",1), (0,1), (0,1))]  # this is what the paper say
+         (("0/2",1),1,0,("1/2",0), (0,1), (0,1)),  # this is what it should be
+         (("0/2",1),1,0,("1/2",1), (0,1), (0,1))]  # this is what it should be
     W_21 = A + B + C
 
     # NOTE: Kari, Culik claim they use (left, right, front, back, top, bottom)
