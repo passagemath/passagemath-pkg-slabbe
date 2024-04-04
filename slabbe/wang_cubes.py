@@ -585,7 +585,7 @@ def KariCulik21cubes(version='what_seems_to_work'):
 
     W_21 = A + B + C
 
-    # NOTE: Kari, Culik say they use (left, right, front, back, top, bottom)
+    # NOTE: the first pages of the paper say they use (left, right, front, back, top, bottom)
     # but they really use (left, front, back, right, top, bottom)
 
     W_21_reordered = [(front, right, top, back, left, bottom)
