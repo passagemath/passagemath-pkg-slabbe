@@ -553,6 +553,41 @@ def KariCulik21cubes(version='what_seems_to_work'):
         Trying to tile a box of size (x,y,z)=(5, 5, 5)
         Trying to tile a box of size (x,y,z)=(6, 6, 6)
 
+    Tested up to 26x26x26::
+
+        sage: from slabbe.wang_cubes import KariCulik21cubes
+        sage: W21 = KariCulik21cubes(version='what_seems_to_work')
+        sage: W21.is_finite(30, certificate=True, solver='kissat', verbose=True) # not tested
+        Trying to tile a box of size (x,y,z)=(1, 1, 1)
+        Trying to tile a box of size (x,y,z)=(2, 2, 2)
+        Trying to tile a box of size (x,y,z)=(3, 3, 3)
+        Trying to tile a box of size (x,y,z)=(4, 4, 4)
+        Trying to tile a box of size (x,y,z)=(5, 5, 5)
+        Trying to tile a box of size (x,y,z)=(6, 6, 6)
+        Trying to tile a box of size (x,y,z)=(7, 7, 7)
+        Trying to tile a box of size (x,y,z)=(8, 8, 8)
+        Trying to tile a box of size (x,y,z)=(9, 9, 9)
+        Trying to tile a box of size (x,y,z)=(10, 10, 10)
+        Trying to tile a box of size (x,y,z)=(11, 11, 11)
+        Trying to tile a box of size (x,y,z)=(12, 12, 12)
+        Trying to tile a box of size (x,y,z)=(13, 13, 13)
+        Trying to tile a box of size (x,y,z)=(14, 14, 14)
+        Trying to tile a box of size (x,y,z)=(15, 15, 15)
+        Trying to tile a box of size (x,y,z)=(16, 16, 16)
+        Trying to tile a box of size (x,y,z)=(17, 17, 17)
+        Trying to tile a box of size (x,y,z)=(18, 18, 18)
+        Trying to tile a box of size (x,y,z)=(19, 19, 19)
+        Trying to tile a box of size (x,y,z)=(20, 20, 20)
+        Trying to tile a box of size (x,y,z)=(21, 21, 21)
+        Trying to tile a box of size (x,y,z)=(22, 22, 22)
+        Trying to tile a box of size (x,y,z)=(23, 23, 23)
+        Trying to tile a box of size (x,y,z)=(24, 24, 24)
+        Trying to tile a box of size (x,y,z)=(25, 25, 25)
+        Trying to tile a box of size (x,y,z)=(26, 26, 26)
+        Traceback (most recent call last):
+        ...
+        KeyboardInterrupt:
+
     REFERENCES:
 
         Culik, Karel, II, et Jarkko Kari. « An aperiodic set of Wang cubes ».
