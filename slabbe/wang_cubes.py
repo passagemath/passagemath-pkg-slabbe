@@ -409,14 +409,20 @@ class WangCubeSet(object):
                 print('Trying n=x+y+z={}'.format(n))
             for X_Y_Z in IntegerListsLex(n=n, length=3, min_part=1):
                 if verbose:
-                    print('Trying to tile (cyclically) a box of size (x,y,z)={}'.format(X_Y_Z))
+                    print('Trying to tile (cyclically) a box of size (x,y,z)={}: '.format(X_Y_Z), end='')
                 sat_solver = self.sat_solver(box=X_Y_Z, cyclic=True, solver=solver)
                 solution = sat_solver()
                 if solution:
+                    if verbose:
+                        print('solution found!')
                     if certificate:
                         return True, X_Y_Z
                     else:
                         return True
+                else:
+                    if verbose:
+                        print('no solution')
+
 
     def is_finite(self, stop=None, solver=None, certificate=False, verbose=False):
         r"""
@@ -444,10 +450,15 @@ class WangCubeSet(object):
         for n in it:
             X_Y_Z = (n,n,n)
             if verbose:
-                print('Trying to tile a box of size (x,y,z)={}'.format(X_Y_Z))
+                print('Trying to tile a box of size (x,y,z)={}: '.format(X_Y_Z), end='')
             sat_solver = self.sat_solver(box=X_Y_Z, cyclic=False, solver=solver)
             solution = sat_solver()
-            if not solution:
+            if solution:
+                if verbose:
+                    print('solution found')
+            else:
+                if verbose:
+                    print('no solution found!')
                 if certificate:
                     return True, X_Y_Z
                 else:
@@ -629,4 +640,32 @@ def KariCulik21cubes(version='what_seems_to_work'):
 
     return WangCubeSet(W_21_reordered)
 
+
+class WangCubeSets(object):
+    r"""
+    Construct a set of Wang cubes.
+
+    INPUT:
+
+    - ``n`` -- integer, number of cubes
+
+    EXAMPLES::
+
+        sage: from slabbe.wang_cubes import WangCubeSets
+        sage: S = WangCubeSets(3)
+
+    """
+    def __init__(self, n):
+        r"""
+        EXAMPLES::
+
+            sage: from slabbe.wang_cubes import WangCubeSets
+            sage: S = WangCubeSets(3)
+        """
+        self._n = n
+
+    def __iter__(self):
+        r"""
+        """
+        pass
 
