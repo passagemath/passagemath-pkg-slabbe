@@ -424,6 +424,60 @@ class WangCubeSet(object):
                         print('no solution')
 
 
+    def is_periodic_parallel(self, stop=None, solver=None,
+            certificate=False, verbose=False, ncpus=8):
+        r"""
+
+        INPUT:
+
+        - ``stop`` -- integer
+        - ``solver`` -- string or None (default: ``None``), 
+          ``'dancing_links'`` or the name of a MILP solver in Sage like
+          ``'GLPK'``, ``'Coin'``, ``'cplex'`` or ``'Gurobi'`` or the name
+          of a SAT solver in SageMath
+        - ``certificate`` -- bool (default:``False``)
+        - ``verbose`` -- bool (default:``False``)
+        - ``ncpus`` -- integer (default:``8``)
+
+        EXAMPLES::
+
+            sage: from slabbe import WangCubeSet
+            sage: cubes = [(0,0,0,0,0,0), (1,1,1,1,1,1), (2,2,2,2,2,2)]
+            sage: T = WangCubeSet(cubes)
+            sage: T.is_periodic_parallel(5, certificate=True)
+            (True, [1, 1, 1])
+
+        """
+        from sage.combinat.integer_lists.invlex import IntegerListsLex
+        from sage.parallel.decorate import parallel
+
+        @parallel(ncpus=ncpus)
+        def find_cyclic_tiling(box):
+            sat_solver = self.sat_solver(box=box, cyclic=True, solver=solver)
+            return sat_solver()
+
+        it = itertools.count(3) if stop is None else range(3, stop)
+
+        boxes = (box for n in it
+                     for box in IntegerListsLex(n=n, length=3, min_part=1))
+
+        for (args,kwds),result in find_cyclic_tiling(boxes):
+            (arg,) = args
+            if verbose:
+                print('Trying to tile (cyclically) a box of size (x,y,z)={}: '.format(arg), end='')
+
+            if result:
+                if verbose:
+                    print('solution found!')
+                if certificate:
+                    return True, arg
+                else:
+                    return True
+            else:
+                if verbose:
+                    print('no solution')
+
+
     def is_finite(self, stop=None, solver=None, certificate=False, verbose=False):
         r"""
 
@@ -464,12 +518,54 @@ class WangCubeSet(object):
                 else:
                     return True
 
-    def is_aperiodic(self, verbose=True):
+    def is_aperiodic_candidate(self, stop=None, verbose=False, solver=None, certificate=True):
         r"""
         Return False if a periodic configuration is found or if some finite
-        3d rectangular box admit to tiling.
+        3d rectangular box admit no tiling.
+
+        INPUT:
+
+        - ``stop`` -- integer
+        - ``solver`` -- string or None (default: ``None``), 
+          ``'dancing_links'`` or the name of a MILP solver in Sage like
+          ``'GLPK'``, ``'Coin'``, ``'cplex'`` or ``'Gurobi'`` or the name
+          of a SAT solver in SageMath
+        - ``certificate`` -- bool (default:``False``)
+        - ``verbose`` -- bool (default:``False``)
+
+        EXAMPLES::
+
+            sage: from slabbe import WangCubeSet
+            sage: cubes = [(0,0,1,0,1,0), (1,1,3,1,2,1), (2,0,2,0,2,2)]
+            sage: T = WangCubeSet(cubes)
+            sage: T.is_aperiodic_candidate(5, certificate=True)
+            (False, ('is_finite', True, (2, 2, 2)))
+
+        ::
+
+            sage: cubes = [(0,0,0,0,0,0), (1,1,1,1,1,1), (2,2,2,2,2,2)]
+            sage: T = WangCubeSet(cubes)
+            sage: T.is_aperiodic_candidate(5, certificate=True)
+            (False, ('is_periodic', True, [1, 1, 1]))
+
         """
-        raise NotImplementedError
+        from sage.parallel.decorate import parallel
+
+        @parallel(ncpus=2)
+        def call_method(method):
+            F = getattr(self, method) 
+            return F(stop=stop,verbose=verbose,solver=solver,certificate=certificate)
+
+        methods = ['is_periodic', 'is_finite']
+        #methods = ['is_periodic_parallel', 'is_finite']
+        for ((args,kwds),result) in call_method(methods):
+            if result:
+                if certificate:
+                    return False, args + result
+                else:
+                    return False
+
+        return True
 
 def KariCulik21cubes(version='what_seems_to_work'):
     r"""
