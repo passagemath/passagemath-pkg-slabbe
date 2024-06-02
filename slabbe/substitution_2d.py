@@ -2111,6 +2111,38 @@ class Substitution2d(object):
             new_subs[letter] = new_image
         return Substitution2d(new_subs)
 
+    def to_automaton_graph(self):
+        r"""
+        Return the automaton associated to the substitution.
+
+        OUTPUT
+
+            DiGraph
+
+        EXAMPLES::
+
+            sage: from slabbe import Substitution2d
+            sage: A = [[2,3],[4,5]]
+            sage: B = [[6,7]]
+            sage: d = {0:A, 1:B}
+            sage: s = Substitution2d(d)
+            sage: G = s.to_automaton_graph()
+            sage: G.edges()
+            [(0, 2, (0, 0)),
+             (0, 3, (0, 1)),
+             (0, 4, (1, 0)),
+             (0, 5, (1, 1)),
+             (1, 6, (0, 0)),
+             (1, 7, (0, 1))]
+
+        """
+        from sage.graphs.digraph import DiGraph
+        edges = [(a,b,(i,j)) for a,table in self._d.items()
+                     for i,col in enumerate(table)
+                     for j,b in enumerate(col)
+                ]
+        return DiGraph(edges, format='list_of_edges')
+
 def set_of_factors(table, shape, avoid_border=0):
     r"""
     Return the set of factors of given shape in the table.
