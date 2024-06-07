@@ -4773,3 +4773,86 @@ class WangTiling(object):
         from slabbe import TikzPicture
         return TikzPicture('\n'.join(lines))
 
+class WangTilesGenerator:
+    r"""
+    Generator of well-known sets of Wang tiles.
+    """
+    def JeandelRao(self):
+        r"""
+        EXAMPLES::
+
+            sage: from slabbe import wang_tiles
+            sage: wang_tiles.JeandelRao()
+            Wang tile set of cardinality 11
+
+        REFERENCES:
+
+        .. [JR21] Emmanuel Jeandel and Micha{\"e}l Rao. An aperiodic set of 11
+           Wang tiles. Adv. Comb., 2021:37, 2021. Id/No 1.
+        """
+        tiles = [(2,4,2,1), (2,2,2,0), (1,1,3,1), (1,2,3,2), (3,1,3,3),
+                 (0,1,3,1), (0,0,0,1), (3,1,0,2), (0,2,1,2), (1,2,1,4),
+                 (3,3,1,2)]
+        return WangTileSet(tiles)
+
+    def Kari(self):
+        r"""
+        EXAMPLES::
+
+            sage: from slabbe import wang_tiles
+            sage: wang_tiles.Kari()
+            Wang tile set of cardinality 14
+
+        REFERENCE:
+
+        .. [K96] Jarkko Kari. A small aperiodic set of Wang tiles.
+           Discrete Math., 160(1-3):259--264, 1996.
+        """
+        times_2third = [("0/3",2,-1/3,1), (1/3,2,"0/3",1), (2/3,2,1/3,1),
+                        (-1/3,2,1/3,2), ("0/3",2,2/3,2)]
+
+        times_2third.extend([(-1/3,1,"0/3",1), ("0/3",1,1/3,1),
+            (1/3,1,2/3,1), (1/3,1,-1/3,0), (2/3,1,"0/3",0)])
+
+        times_2 = [(-1,1,-1,2), (0,1,-1,1), (-1,0,0,1), (0,1,0,2)]
+        return WangTileSet(times_2third + times_2)
+
+    def Culik(self):
+        r"""
+        EXAMPLES::
+
+            sage: from slabbe import wang_tiles
+            sage: wang_tiles.Culik()
+            Wang tile set of cardinality 13
+
+        REFERENCE:
+
+        .. [C96] Karel Culik, II. An aperiodic set of 13 Wang tiles.
+           Discrete Math., 160(1-3):245--251, 1996.
+        """
+        divide_by_2 = [("0/2","0'","0/2",0), ("0/2",2,"0/2",1),
+                (1/2,1,"0/2",0), (1/2,1,"0/2","0'"), (1/2,"0'",1/2,0),
+                (1/2,2,1/2,1), ("0/2",1,1/2,1)]
+        times_3 = [(-1,1,-2,2), (0,1,-2,1), (0,1,-1,2), (-2,0,-1,1),
+                (-2,0,0,2), (-1,0,0,1)]
+        return WangTileSet(divide_by_2 + times_3)
+
+    def Ammann(self):
+        r"""
+        EXAMPLES::
+
+            sage: from slabbe import wang_tiles
+            sage: wang_tiles.Ammann()
+            Wang tile set of cardinality 16
+
+        REFERENCE:
+
+        .. [GS87] Branko Gr\"unbaum and G.~C. Shephard.  Tilings and
+           patterns. W. H. Freeman and Company, New York, 1987.
+        """
+        return WangTileSet([(1,1,2,2), (3,3,4,4), (4,4,5,5), (6,6,3,3),
+            (4,3,4,5), (6,3,4,3), (3,4,5,4), (3,6,3,4), (5,2,3,1),
+            (4,2,6,1), (5,1,4,1), (3,2,6,2), (2,4,1,6), (2,5,1,3),
+            (2,3,2,6), (1,5,1,4)])
+
+wang_tiles = WangTilesGenerator()
