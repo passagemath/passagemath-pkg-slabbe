@@ -4855,4 +4855,199 @@ class WangTilesGenerator:
             (4,2,6,1), (5,1,4,1), (3,2,6,2), (2,4,1,6), (2,5,1,3),
             (2,3,2,6), (1,5,1,4)])
 
+    def _MetallicMean_tiles_data(self, k, output_type='tuple', extended=False):
+        r"""
+        Return the set of `(k+3)^2` metallic mean Wang tiles
+
+        INPUT:
+
+        - ``k`` -- integer
+        - ``output_type`` -- string (default:``'tuple'``), ``'tuple'`` or ``'str'``
+        - ``extended`` -- bool (default:``False``), whether to include the
+          extended set of metallic mean Wang tiles
+
+        EXAMPLES::
+
+            sage: from slabbe import wang_tiles
+            sage: wang_tiles._MetallicMean_tiles_data(0)
+            [(0, (0, 2), ((1, 1, 1), (0, 1, 1), (1, 1, 1), (0, 0, 0)), 'green', 'V'),
+             (1, (1, 2), ((0, 1, 1), (0, 0, 1), (0, 1, 0), (0, 1, 1)), 'red', None),
+             (2, (2, 2), ((0, 1, 1), (0, 1, 1), (0, 1, 1), (0, 1, 1)), 'red', None),
+             (3, (0, 1), ((0, 0, 1), (0, 0, 0), (0, 0, 0), (0, 1, 0)), 'red', None),
+             (4, (1, 1), ((0, 0, 1), (0, 0, 1), (0, 1, 0), (0, 1, 0)), 'red', None),
+             (5, (2, 1), ((0, 0, 1), (0, 1, 1), (0, 1, 1), (0, 1, 0)), 'red', None),
+             (6, (0, 0), ((0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0)), 'red', None),
+             (7, (1, 0), ((0, 0, 0), (0, 0, 1), (0, 1, 0), (0, 0, 0)), 'red', None),
+             (8, (2, 0), ((0, 1, 1), (1, 1, 1), (0, 0, 0), (1, 1, 1)), 'green', 'H')]
+            sage: wang_tiles._MetallicMean_tiles_data(0, output_type='str')
+            [(0, (0, 2), ('111', '011', '111', '000'), 'green', 'V'),
+             (1, (1, 2), ('011', '001', '010', '011'), 'red', None),
+             (2, (2, 2), ('011', '011', '011', '011'), 'red', None),
+             (3, (0, 1), ('001', '000', '000', '010'), 'red', None),
+             (4, (1, 1), ('001', '001', '010', '010'), 'red', None),
+             (5, (2, 1), ('001', '011', '011', '010'), 'red', None),
+             (6, (0, 0), ('000', '000', '000', '000'), 'red', None),
+             (7, (1, 0), ('000', '001', '010', '000'), 'red', None),
+             (8, (2, 0), ('011', '111', '000', '111'), 'green', 'H')]
+            sage: wang_tiles._MetallicMean_tiles_data(0, output_type='str', extended=True)
+            [(0, (1, 3), ('111', '001', '110', '000'), 'blue', 'V'),
+             (1, (-1, 2), ('011', '000', '000', '011'), 'red', None),
+             (2, (0, 2), ('111', '011', '111', '000'), 'green', 'V'),
+             (3, (1, 2), ('011', '001', '010', '011'), 'red', None),
+             (4, (2, 2), ('011', '011', '011', '011'), 'red', None),
+             (5, (0, 1), ('001', '000', '000', '010'), 'red', None),
+             (6, (1, 1), ('001', '001', '010', '010'), 'red', None),
+             (7, (2, 1), ('001', '011', '011', '010'), 'red', None),
+             (8, (3, 1), ('001', '111', '000', '110'), 'blue', 'H'),
+             (9, (0, 0), ('000', '000', '000', '000'), 'red', None),
+             (10, (1, 0), ('000', '001', '010', '000'), 'red', None),
+             (11, (2, 0), ('011', '111', '000', '111'), 'green', 'H'),
+             (12, (2, -1), ('000', '011', '011', '000'), 'red', None)]
+
+        """
+        def white_tile(m, n):
+            assert 1 <= m <= k
+            assert 1 <= n <= k
+            return ((1,1,m+1), (1,1,n+1), (1,1,m), (1,1,n)), 'white'
+
+        def yellow_tile(m):
+            assert 1 <= m <= k
+            return ((1,1,2), (0,1,m+1), (1,1,k+1), (0,1,m)), 'yellow'
+
+        def green_tile(m):
+            assert 0 <= m <= k
+            return ((1,1,1), (0,1,m+1), (1,1,k+1), (0,0,m)), 'green'
+
+        def blue_tile(m):
+            assert 0 <= m <= k-1
+            return ((1,1,1), (0,0,m+1), (1,1,k), (0,0,m)), 'blue'
+
+        def yellow_tileR(m):
+            assert 1 <= m <= k
+            return ((0,1,m+1), (1,1,2), (0,1,m), (1,1,k+1)), 'yellow'
+
+        def green_tileR(m):
+            assert 0 <= m <= k
+            return ((0,1,m+1), (1,1,1), (0,0,m), (1,1,k+1)), 'green'
+
+        def blue_tileR(m):
+            assert 0 <= m <= k-1
+            return ((0,0,m+1), (1,1,1), (0,0,m), (1,1,k)), 'blue'
+
+        def junction_tile(x, y):
+            assert 0 <= x <= 2
+            assert 0 <= y <= 2
+            assert -1 <= x-y <= 1
+            if x == 0:
+                left = (0,0,k)
+                top = (0,0,0)
+            elif x == 1:
+                left = (0,1,k)
+                top = (0,0,1)
+            elif x == 2:
+                left = (0,1,k+1)
+                top = (0,1,1)
+            if y == 0:
+                bottom = (0,0,k)
+                right = (0,0,0)
+            elif y == 1:
+                bottom = (0,1,k)
+                right = (0,0,1)
+            elif y == 2:
+                bottom = (0,1,k+1)
+                right = (0,1,1)
+            return (right, top, left, bottom), 'red'
+
+        d = {}
+        d.update({(x+3,y+3):white_tile(x+1,y+1) for x in range(k)
+                                                for y in range(k)})
+        d.update({(2,y+3):yellow_tile(y+1) for y in range(k)})
+        d.update({(1,y+3):blue_tile(y) for y in range(k)})
+        d.update({(0,y+2):green_tile(y) for y in range(k+1)})
+        d.update({(x+3,2):yellow_tileR(x+1) for x in range(k)})
+        d.update({(x+3,1):blue_tileR(x) for x in range(k)})
+        d.update({(x+2,0):green_tileR(x) for x in range(k+1)})
+        # junction tiles
+        relative_positions = [(0,0), (1,0), (0,1), (1,1), (2,1), (1,2), (2,2)]
+        d.update({(x,y):junction_tile(x,y) for (x,y) in relative_positions})
+
+        if extended:
+            # antigreen tiles
+            d.update({(i+2,-1):(((0,0,i+1),(1,1,2),(0,1,i),(1,1,k)),'antigreen')
+                                        for i in range(1,k+1)})
+            d.update({(-1,i+2):(((1,1,2),(0,0,i+1),(1,1,k),(0,1,i)),'antigreen')
+                                        for i in range(1,k+1)})
+            # additional junction tiles
+            d.update({(-1,2):(((0,1,1),(0,0,0),(0,0,k),(0,1,k+1)), 'red'), 
+                    (2,-1):(((0,0,0),(0,1,1),(0,1,k+1),(0,0,k)), 'red')})
+            # additional blue sup tiles
+            d.update({(k+3,1):(((0,0,k+1),(1,1,1),(0,0,k),(1,1,k)), 'blue'), 
+                      (1,k+3):(((1,1,1),(0,0,k+1),(1,1,k),(0,0,k)), 'blue')})
+
+        sorted_keys = sorted(d.keys(), key=lambda c:(-c[1],c[0]))
+        tiles = []
+        for (i,xy) in enumerate(sorted_keys):
+            tile,color = d[xy]
+
+            # stripe orientation
+            right,top,_,_ = tile
+            if right[0] == 1 and top[0] == 1:
+                stripe = None
+            elif right[0] == 0 and top[0] == 1:
+                stripe = 'H'
+            elif right[0] == 1 and top[0] == 0:
+                stripe = 'V'
+            elif right[0] == 0 and top[0] == 0:
+                stripe = None
+            else:
+                raise ValueError('error with tile(={})'.format(tile))
+
+            # output type
+            if output_type == 'tuple':
+                pass
+            elif output_type == 'str':
+                tile = tuple(''.join(str(a) for a in v) for v in tile) 
+            else:
+                raise ValueError(f'output_type(={output_type}) unknown')
+            tiles.append((i,xy,tile,color,stripe))
+
+        return tiles
+
+    def MetallicMean(self, k, output_type='tuple', extended=False):
+        r"""
+        Return the set of `(k+3)^2` metallic mean Wang tiles
+
+        INPUT:
+
+        - ``k`` -- integer
+        - ``output_type`` -- string (default:``'tuple'``), ``'tuple'`` or ``'str'``
+        - ``extended`` -- bool (default:``False``), whether to include the
+          extended set of metallic mean Wang tiles
+
+        EXAMPLES::
+
+            sage: from slabbe import wang_tiles
+            sage: wang_tiles.MetallicMean(1, output_type='str')
+            Wang tile set of cardinality 16
+            sage: wang_tiles.MetallicMean(2, output_type='str')
+            Wang tile set of cardinality 25
+            sage: wang_tiles.MetallicMean(3, output_type='str')
+            Wang tile set of cardinality 36
+            sage: wang_tiles.MetallicMean(3)
+            Wang tile set of cardinality 36
+            sage: wang_tiles.MetallicMean(3, extended=True)
+            Wang tile set of cardinality 46
+
+        Works with input 0, but the 9 tiles admit periodic configurations::
+
+            sage: wang_tiles.MetallicMean(0)
+            Wang tile set of cardinality 9
+
+        """
+        tiles_data = self._MetallicMean_tiles_data(k,
+                output_type=output_type, extended=extended)
+        tiles = [tile for (i,xy,tile,color,stripe) in tiles_data]
+        return WangTileSet(tiles)
+
 wang_tiles = WangTilesGenerator()
+
