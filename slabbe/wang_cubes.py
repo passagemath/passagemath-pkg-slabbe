@@ -902,6 +902,8 @@ class WangCubeSets(object):
         Idea: use `integer_lists_mod_perm_group` in the Vincent package
         `adm_cycles` which is better than the one in Sage.
 
+        See: https://gitlab.com/modulispaces/admcycles/-/blob/master/admcycles/integer_list.py?ref_type=heads
+
         ::
 
             sage: I = IntegerVectorsModPermutationGroup(PermutationGroup([[(1,2,3)]]), sum=6)
