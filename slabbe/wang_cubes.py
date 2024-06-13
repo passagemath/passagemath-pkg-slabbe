@@ -562,7 +562,7 @@ class WangCubeSet(object):
         for ((args,kwds),result) in call_method(methods):
             if result:
                 if certificate:
-                    return False, args + result
+                    return False, args, result
                 else:
                     return False
 
@@ -763,8 +763,72 @@ class WangCubeSets(object):
 
     def __iter__(self):
         r"""
+        Generates all sets of Wang cubes whose directed multigraph with loops
+        in each direction has no sink and nor source.
+
+        EXAMPLES::
+
+            sage: S = WangCubeSets(1)
+            sage: L = list(S)
+            sage: len(L)
+            1
+
+        ::
+
+
+            sage: S = WangCubeSets(2)
+            sage: L = list(S)
+            sage: len(L)
+            75
+
+        ::
+
+            sage: S = WangCubeSets(3)
+            sage: L = list(S)
+            sage: len(L)
+            10952
+
+        ::
+
+            sage: S = WangCubeSets(4)
+            sage: L = list(S)       # not tested # long (1min 43s)
+            sage: len(L)
+            6598341
+
+        All sets of 2 Wang cubes are periodic::
+
+            sage: from collections import Counter
+            sage: S = WangCubeSets(2)
+            sage: c = Counter(T.is_aperiodic_candidate(7, solver='kissat') for T in S)
+            sage: dict(c)
+            {(False, ('is_periodic',), (True, [1, 1, 1])): 18,
+             (False, ('is_periodic',), (True, [1, 1, 2])): 12,
+             (False, ('is_periodic',), (True, [1, 2, 1])): 12,
+             (False, ('is_periodic',), (True, [1, 2, 2])): 8,
+             (False, ('is_periodic',), (True, [2, 1, 1])): 9,
+             (False, ('is_periodic',), (True, [2, 1, 2])): 6,
+             (False, ('is_periodic',), (True, [2, 2, 1])): 6,
+             (False, ('is_periodic',), (True, [2, 2, 2])): 4}
+
         """
-        pass
+        from sage.combinat.permutation import Permutations
+        P = Permutations(list(range(self._n)))
+
+        L = self._graphs_with_n_edges()
+        for gx,gy,gz in itertools.product(L, repeat=3):
+            gx_edges = [(u,v) for (u,v,_) in gx.edges()]
+            gy_edges = [(u,v) for (u,v,_) in gy.edges()]
+            gz_edges = [(u,v) for (u,v,_) in gz.edges()]
+
+            P_gy_edges = set(tuple(gy_edges[p[i]] for i in range(self._n)) for p in P)
+            P_gz_edges = set(tuple(gz_edges[p[i]] for i in range(self._n)) for p in P)
+            #print(len(L), len(P_gy_edges), len(P_gz_edges))
+
+            for permuted_gy_edges,permuted_gz_edges in itertools.product(P_gy_edges, P_gz_edges):
+                cubes = [(a,c,e,b,d,f) for (a,b),(c,d),(e,f) 
+                                  in zip(gx_edges, permuted_gy_edges, permuted_gz_edges)]
+                T = WangCubeSet(cubes)
+                yield T
 
     @cached_method
     def _graphs_with_n_edges(self):
@@ -798,6 +862,11 @@ class WangCubeSets(object):
 
             sage: len(list(WangCubeSets(4)._graphs_with_n_edges())) # long (10s)
             29
+            sage: len(list(WangCubeSets(5)._graphs_with_n_edges())) # not tested (1h)
+            110
+
+        List [1,3,8,29,110] is almost related to https://oeis.org/A350907 ?
+        "Number of unlabeled initially connected digraphs with n arcs." 
 
         """
         from sage.graphs.digraph import DiGraph
