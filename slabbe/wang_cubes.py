@@ -921,5 +921,50 @@ class WangCubeSets(object):
             for g in digraphs(nvertices, size=self._n, copy=True):
                 yield g
 
+    def aperiodic_candidates(self, stop, verbose=False, solver='kissat',
+            certificate=False, initial_candidates=None, ncpus=8):
+        r"""
+        EXAMPLES::
 
+            sage: from slabbe.wang_cubes import WangCubeSets
+            sage: S = WangCubeSets(2)
+            sage: L = list(S.aperiodic_candidates(stop=4))   # long time (5s)
+            sage: len(L)                                     # long time (fast)
+            57
+
+        This proves that there are no aperiodic set of 2 Wang cubes::
+
+            sage: L = list(S.aperiodic_candidates(stop=7)) # not tested (18s)
+            sage: len(L)
+            0
+
+        Of the 10952 candidates of sets of 3 Wang cubes, their remains 5809
+        to check::
+
+            sage: %time L = list(S.aperiodic_candidates(stop=6, verbose=True)) # not tested 17 min
+            sage: len(L)
+            5809
+
+        """
+        from sage.parallel.decorate import parallel
+
+        @parallel(ncpus=ncpus)
+        def is_it_periodic(candidate):
+            return candidate.is_periodic(stop=stop,verbose=verbose,solver=solver,certificate=False)
+
+        if initial_candidates:
+            L = list(initial_candidates)
+        else:
+            L = list(self)
+            if verbose:
+                print('list of {} candidates created'.format(len(L)))
+
+        i = 0
+        for (args,kwds),result in is_it_periodic(L):
+            i += 1
+            if verbose:
+                print(i, args, result)
+            if not result:
+                (arg,) = args
+                yield arg
 
