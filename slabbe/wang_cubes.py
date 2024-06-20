@@ -433,7 +433,7 @@ class WangCubeSet(object):
                 if verbose:
                     print('trivial solution found!')
                 if certificate:
-                    return True, [1,1,1]
+                    return True, (1,1,1)
                 else:
                     return True
             else:
@@ -1031,7 +1031,7 @@ class WangCubeSets(object):
             if result is None:
                 N += 1
                 yield arg
-            elif result == 'NO DATA':
+            elif result[2] == 'NO DATA':
                 N += 1
                 yield arg
         if verbose:
