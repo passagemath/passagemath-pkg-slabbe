@@ -381,12 +381,37 @@ class WangCubeSet(object):
                 configuration[(j,k,l)] = i
             return configuration
 
-    def is_periodic(self, stop=None, solver=None, certificate=False, verbose=False):
+    def is_periodic_111(self):
+        r"""
+        Return True is some Wang cube tiles the space trivially.
+
+        EXAMPLES::
+
+            sage: from slabbe import WangCubeSet
+            sage: cubes = [(0,0,0,0,0,0), (1,1,1,1,0,1), (2,2,2,0,2,2)]
+            sage: T = WangCubeSet(cubes)
+            sage: T.is_periodic_111()
+            True
+
+        ::
+
+            sage: cubes = [(1,0,0,0,0,0), (1,1,1,1,0,1), (2,2,2,0,2,2)]
+            sage: T = WangCubeSet(cubes)
+            sage: T.is_periodic_111()
+            False
+
+        """
+        return any(all(cube[i]==cube[i+3] for i in range(3))
+                   for cube in self.cubes().values())
+
+    def is_periodic(self, stop=None, start=3, solver=None, certificate=False, verbose=False):
         r"""
 
         INPUT:
 
         - ``stop`` -- integer
+        - ``start`` -- integer (default:``3``), sum of the sizes of the
+          rectangular box
         - ``solver`` -- string or None (default: ``None``), 
           ``'dancing_links'`` or the name of a MILP solver in Sage like
           ``'GLPK'``, ``'Coin'``, ``'cplex'`` or ``'Gurobi'`` or the name
@@ -403,8 +428,19 @@ class WangCubeSet(object):
             (True, [1, 1, 1])
 
         """
+        if start == 3:
+            if self.is_periodic_111():
+                if verbose:
+                    print('trivial solution found!')
+                if certificate:
+                    return True, [1,1,1]
+                else:
+                    return True
+            else:
+                start = 4
+
         from sage.combinat.integer_lists.invlex import IntegerListsLex
-        it = itertools.count(3) if stop is None else range(3, stop)
+        it = itertools.count(start) if stop is None else range(start, stop)
         for n in it:
             if verbose:
                 print('Trying n=x+y+z={}'.format(n))
@@ -779,21 +815,21 @@ class WangCubeSets(object):
             sage: S = WangCubeSets(2)
             sage: L = list(S)
             sage: len(L)
-            75
+            33
 
         ::
 
             sage: S = WangCubeSets(3)
             sage: L = list(S)
             sage: len(L)
-            10952
+            3142
 
         ::
 
             sage: S = WangCubeSets(4)
             sage: L = list(S)       # not tested # long (1min 43s)
             sage: len(L)
-            6598341
+            1545093
 
         All sets of 2 Wang cubes are periodic::
 
@@ -801,13 +837,9 @@ class WangCubeSets(object):
             sage: S = WangCubeSets(2)
             sage: c = Counter(T.is_aperiodic_candidate(7, solver='kissat') for T in S)
             sage: dict(c)
-            {(False, ('is_periodic',), (True, [1, 1, 1])): 18,
-             (False, ('is_periodic',), (True, [1, 1, 2])): 12,
-             (False, ('is_periodic',), (True, [1, 2, 1])): 12,
+            {(False, ('is_periodic',), (True, [1, 1, 1])): 11,
+             (False, ('is_periodic',), (True, [1, 1, 2])): 10,
              (False, ('is_periodic',), (True, [1, 2, 2])): 8,
-             (False, ('is_periodic',), (True, [2, 1, 1])): 9,
-             (False, ('is_periodic',), (True, [2, 1, 2])): 6,
-             (False, ('is_periodic',), (True, [2, 2, 1])): 6,
              (False, ('is_periodic',), (True, [2, 2, 2])): 4}
 
         """
@@ -815,7 +847,7 @@ class WangCubeSets(object):
         P = Permutations(list(range(self._n)))
 
         L = self._graphs_with_n_edges()
-        for gx,gy,gz in itertools.product(L, repeat=3):
+        for gx,gy,gz in itertools.combinations_with_replacement(L, 3):
             gx_edges = [(u,v) for (u,v,_) in gx.edges()]
             gy_edges = [(u,v) for (u,v,_) in gy.edges()]
             gz_edges = [(u,v) for (u,v,_) in gz.edges()]
@@ -930,27 +962,55 @@ class WangCubeSets(object):
             sage: S = WangCubeSets(2)
             sage: L = list(S.aperiodic_candidates(stop=4))   # long time (5s)
             sage: len(L)                                     # long time (fast)
-            57
+            22
 
         This proves that there are no aperiodic set of 2 Wang cubes::
 
-            sage: L = list(S.aperiodic_candidates(stop=7)) # not tested (18s)
+            sage: L = list(S.aperiodic_candidates(stop=7)) # not tested (3s)
             sage: len(L)
             0
 
-        Of the 10952 candidates of sets of 3 Wang cubes, their remains 5809
+        Of the 3142 candidates of sets of 3 Wang cubes, their remains 1556
         to check::
 
-            sage: %time L = list(S.aperiodic_candidates(stop=6, verbose=True)) # not tested 17 min
+            sage: S = WangCubeSets(3)
+            sage: L = list(S.aperiodic_candidates(stop=6, verbose=True)) # not tested 4 min
             sage: len(L)
-            5809
+            1556
+            sage: c = Counter(T.is_aperiodic_candidate(7, solver='kissat') for T in S)
+            sage: %time L = list(S.aperiodic_candidates(stop=7, verbose=True)) # not tested 4 min
+            sage: len(L)
+            1509
+
+        ::
+
+            sage: %time L = list(S.aperiodic_candidates(stop=13, verbose=True)) # not tested (6min)
+            {(False, ('is_finite',), 'NO DATA'): 11,
+             (False, ('is_finite',), (True, (2, 2, 2))): 792,
+             (False, ('is_finite',), (True, (3, 3, 3))): 289,
+             (False, ('is_periodic',), 'NO DATA'): 33,
+             (False, ('is_periodic',), (True, [1, 1, 2])): 155,
+             (False, ('is_periodic',), (True, [1, 1, 3])): 145,
+             (False, ('is_periodic',), (True, [1, 2, 1])): 23,
+             (False, ('is_periodic',), (True, [1, 2, 2])): 127,
+             (False, ('is_periodic',), (True, [1, 3, 3])): 220,
+             (False, ('is_periodic',), (True, [2, 1, 1])): 16,
+             (False, ('is_periodic',), (True, [2, 1, 2])): 26,
+             (False, ('is_periodic',), (True, [2, 2, 1])): 4,
+             (False, ('is_periodic',), (True, [2, 2, 2])): 34,
+             (False, ('is_periodic',), (True, [3, 1, 3])): 34
+             (False, ('is_periodic',), (True, [3, 3, 1])): 23, 
+             (False, ('is_periodic',), (True, [3, 3, 3])): 136, 
+             (False, ('is_periodic',), (True, [1, 1, 1])): 1074} 
 
         """
         from sage.parallel.decorate import parallel
+        from collections import Counter
 
         @parallel(ncpus=ncpus)
-        def is_it_periodic(candidate):
-            return candidate.is_periodic(stop=stop,verbose=verbose,solver=solver,certificate=False)
+        def is_it_aperiodic(candidate):
+            return candidate.is_aperiodic_candidate(stop=stop,verbose=False,solver=solver,
+                                                    certificate=True)
 
         if initial_candidates:
             L = list(initial_candidates)
@@ -960,11 +1020,22 @@ class WangCubeSets(object):
                 print('list of {} candidates created'.format(len(L)))
 
         i = 0
-        for (args,kwds),result in is_it_periodic(L):
+        N = 0
+        c = Counter()
+        for (args,kwds),result in is_it_aperiodic(L):
             i += 1
+            (arg,) = args
+            c[result] += 1
             if verbose:
-                print(i, args, result)
-            if not result:
-                (arg,) = args
+                print(i, arg.cubes(), result, N)
+            if result is None:
+                N += 1
                 yield arg
+            elif result == 'NO DATA':
+                N += 1
+                yield arg
+        if verbose:
+            print(dict(c))
+
+
 
