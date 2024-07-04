@@ -328,14 +328,11 @@ class WangCubeSet(object):
             ....:   False, False, False, True, True, True, True, True, True, True,
             ....:   True, False, False, False, False, False, False, False, False)
             sage: T.sat_solution_to_tiling(box, solution)
-            {(0, 0, 0): 1,
-             (0, 0, 1): 1,
-             (0, 1, 0): 1,
-             (0, 1, 1): 1,
-             (1, 0, 0): 1,
-             (1, 0, 1): 1,
-             (1, 1, 0): 1,
-             (1, 1, 1): 1}
+            array([[[1, 1],
+                    [1, 1]],
+            <BLANKLINE>
+                   [[1, 1],
+                    [1, 1]]], dtype=int8)
 
         """
         (var_to_cube_pos,
@@ -345,7 +342,8 @@ class WangCubeSet(object):
         assert len(support) == box[0] * box[1] * box[2], ("len(support)={} "
                 "!= volume of the box".format(len(support)))
         X,Y,Z = box
-        configuration = {(j,k,l):None for (j,k,l) in itertools.product(range(X),range(Y),range(Z))}
+        #configuration = {(j,k,l):None for (j,k,l) in itertools.product(range(X),range(Y),range(Z))}
+        configuration = numpy.zeros(box, dtype=numpy.int8)
         for val in support:
             i,j,k,l = var_to_cube_pos[val]
             configuration[(j,k,l)] = i
@@ -385,23 +383,17 @@ class WangCubeSet(object):
             sage: T = WangCubeSet(cubes)
             sage: box = (2,2,2)
             sage: T.solve_tiling_a_box(box, solver='glucose')
-            {(0, 0, 0): 1,
-             (0, 0, 1): 1,
-             (0, 1, 0): 1,
-             (0, 1, 1): 1,
-             (1, 0, 0): 1,
-             (1, 0, 1): 1,
-             (1, 1, 0): 1,
-             (1, 1, 1): 1}
+            array([[[1, 1],
+                    [1, 1]],
+            <BLANKLINE>
+                   [[1, 1],
+                    [1, 1]]], dtype=int8)
             sage: T.solve_tiling_a_box(box, cyclic=True, solver='glucose')
-            {(0, 0, 0): 1,
-             (0, 0, 1): 1,
-             (0, 1, 0): 1,
-             (0, 1, 1): 1,
-             (1, 0, 0): 1,
-             (1, 0, 1): 1,
-             (1, 1, 0): 1,
-             (1, 1, 1): 1}
+            array([[[1, 1],
+                    [1, 1]],
+            <BLANKLINE>
+                   [[1, 1],
+                    [1, 1]]], dtype=int8)
 
         """
         if solver == 'dancing_links':
