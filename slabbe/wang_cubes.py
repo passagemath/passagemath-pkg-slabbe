@@ -137,6 +137,7 @@ class WangCubeSet(object):
         """
         return self._cubes
 
+    @cached_method
     def sat_variable_to_cube_position_bijection(self, box):
         r"""
         Return the dictionary giving the correspondence between variables
@@ -304,6 +305,52 @@ class WangCubeSet(object):
 
         return s
 
+    def sat_solution_to_tiling(self, box, solution):
+        r"""
+        Return a configuration of cubes from a SAT solution
+
+        INPUT:
+
+        - ``box`` -- tuple of 3 integers
+        - ``solution`` -- tuple of bools
+
+        OUTPUT:
+
+            dict
+
+        EXAMPLES::
+
+            sage: from slabbe import WangCubeSet
+            sage: cubes = [(0,0,0,0,0,0), (1,1,1,1,1,1), (2,2,2,2,2,2)]
+            sage: T = WangCubeSet(cubes)
+            sage: box = (2,2,2)
+            sage: solution = (None, False, False, False, False, False,
+            ....:   False, False, False, True, True, True, True, True, True, True,
+            ....:   True, False, False, False, False, False, False, False, False)
+            sage: T.sat_solution_to_tiling(box, solution)
+            {(0, 0, 0): 1,
+             (0, 0, 1): 1,
+             (0, 1, 0): 1,
+             (0, 1, 1): 1,
+             (1, 0, 0): 1,
+             (1, 0, 1): 1,
+             (1, 1, 0): 1,
+             (1, 1, 1): 1}
+
+        """
+        (var_to_cube_pos,
+         cube_pos_to_var) = self.sat_variable_to_cube_position_bijection(box)
+
+        support = [key for (key,val) in enumerate(solution) if val]
+        assert len(support) == box[0] * box[1] * box[2], ("len(support)={} "
+                "!= volume of the box".format(len(support)))
+        X,Y,Z = box
+        configuration = {(j,k,l):None for (j,k,l) in itertools.product(range(X),range(Y),range(Z))}
+        for val in support:
+            i,j,k,l = var_to_cube_pos[val]
+            configuration[(j,k,l)] = i
+        return configuration
+
     def solve_tiling_a_box(self, box, cyclic=False, solver=None,
             solver_parameters=None, ncpus=1):
         r"""
@@ -371,15 +418,7 @@ class WangCubeSet(object):
             del sat_solver
             if not solution:
                 raise ValueError('no solution found using SAT solver (={})'.format(solver))
-            support = [key for (key,val) in enumerate(solution) if val]
-            assert len(support) == box[0] * box[1] * box[2], ("len(support)={} "
-                    "!= volume of the box".format(len(support)))
-            X,Y,Z = box
-            configuration = {(j,k,l):None for (j,k,l) in itertools.product(range(X),range(Y),range(Z))}
-            for val in support:
-                i,j,k,l = var_to_cube_pos[val]
-                configuration[(j,k,l)] = i
-            return configuration
+            return self.sat_solution_to_tiling(box, solution)
 
     def is_periodic_111(self):
         r"""
