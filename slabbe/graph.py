@@ -700,6 +700,9 @@ def digraphs_with_n_edges(n_edges):
     Return the list of directed multigraphs with loops with n
     edges with no sink nor sources up to graph isomorphisms.
 
+    This is an initial naive straight-forward implementation.
+    Something more clever needs to be done to handle 6 edges or more.
+
     INPUT:
 
     - ``n_edges`` -- integer
@@ -725,6 +728,18 @@ def digraphs_with_n_edges(n_edges):
 
     ::
 
+        sage: [g.edges(labels=False) for g in digraphs_with_n_edges(3)]
+        [[(0, 0), (0, 0), (0, 0)],
+         [(0, 0), (0, 0), (1, 1)],
+         [(0, 0), (0, 1), (1, 0)],
+         [(0, 0), (0, 1), (1, 1)],
+         [(0, 0), (1, 1), (2, 2)],
+         [(0, 0), (1, 2), (2, 1)],
+         [(0, 1), (0, 1), (1, 0)],
+         [(0, 1), (1, 2), (2, 0)]]
+
+    ::
+
         sage: len(list(digraphs_with_n_edges(4))) # long time (10s)
         29
         sage: len(list(digraphs_with_n_edges(5))) # not tested (1h)
@@ -735,6 +750,25 @@ def digraphs_with_n_edges(n_edges):
         List [1,3,8,29,110] does not exist in OEIS but is almost related to
         https://oeis.org/A350907 "Number of unlabeled initially connected
         digraphs with n arcs."
+
+    .. TODO::
+
+        Do something more clever using nauty graph generator
+        ``for g in digraphs(nvertices, size=n, copy=True)`` and use
+        ``IntegerVectorsModPermutationGroup`` to generate admissible
+        multiplicities for edges and loops, using the automorphism group of
+        the graph::
+
+            sage: I = IntegerVectorsModPermutationGroup(PermutationGroup([[(1,2,3)]]), sum=6)
+            sage: I.cardinality()
+            10
+            sage: I.list()
+            [[6, 0, 0], [5, 1, 0], [5, 0, 1], [4, 2, 0], [4, 1, 1],
+             [4, 0, 2], [3, 3, 0], [3, 2, 1], [3, 1, 2], [2, 2, 2]]
+
+        Also one may use `integer_lists_mod_perm_group` in the Vincent package
+        `adm_cycles` which is better than the one in Sage. See:
+        https://gitlab.com/modulispaces/admcycles/-/blob/master/admcycles/integer_list.py?ref_type=heads
 
     """
     from sage.graphs.digraph import DiGraph
@@ -759,33 +793,4 @@ def digraphs_with_n_edges(n_edges):
         L.append(g)
 
     return L
-
-def _digraphs_with_n_edges_more_clever(self):
-    r"""
-    EXAMPLES::
-
-    - allows loops?
-    - allows multiedges?
-
-    Idea: use `integer_lists_mod_perm_group` in the Vincent package
-    `adm_cycles` which is better than the one in Sage.
-
-    See: https://gitlab.com/modulispaces/admcycles/-/blob/master/admcycles/integer_list.py?ref_type=heads
-
-    ::
-
-        sage: I = IntegerVectorsModPermutationGroup(PermutationGroup([[(1,2,3)]]), sum=6)
-        sage: I.cardinality()
-        10
-        sage: I.list()
-        [[6, 0, 0], [5, 1, 0], [5, 0, 1], [4, 2, 0], [4, 1, 1],
-            [4, 0, 2], [3, 3, 0], [3, 2, 1], [3, 1, 2], [2, 2, 2]]
-
-    """
-    from sage.graphs.digraph_generators import digraphs
-    #max_nvertices = 2 * self._n
-    max_nvertices = self._n
-    for nvertices in range(1, max_nvertices+1):
-        for g in digraphs(nvertices, size=self._n, copy=True):
-            yield g
 
