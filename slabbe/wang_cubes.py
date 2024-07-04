@@ -613,7 +613,10 @@ class WangCubeSet(object):
                 else:
                     return False
 
-        return True
+        if certificate:
+            return True, None, None
+        else:
+            return True
 
 def KariCulik21cubes(version='what_seems_to_work'):
     r"""
@@ -966,7 +969,7 @@ class WangCubeSets(object):
                 yield g
 
     def aperiodic_candidates(self, stop, verbose=False, solver='kissat',
-            certificate=False, initial_candidates=None, ncpus=8):
+            certificate=False, initial_candidates=None, ncpus=4):
         r"""
         EXAMPLES::
 
