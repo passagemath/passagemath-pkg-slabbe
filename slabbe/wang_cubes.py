@@ -16,7 +16,6 @@ other well-known problems like linear problem, exact cover problem and SAT.
 #                  http://www.gnu.org/licenses/
 #*****************************************************************************
 import itertools
-from sage.misc.cachefunc import cached_method
 
 class WangCubeSet(object):
     r"""
@@ -861,7 +860,9 @@ class WangCubeSets(object):
         from sage.combinat.permutation import Permutations
         P = Permutations(list(range(self._n)))
 
-        L = self._graphs_with_n_edges()
+        from slabbe.graph import digraphs_with_n_edges
+        L = digraphs_with_n_edges(self._n)
+
         for gx,gy,gz in itertools.combinations_with_replacement(L, 3):
             gx_edges = [(u,v) for (u,v,_) in gx.edges()]
             gy_edges = [(u,v) for (u,v,_) in gy.edges()]
@@ -876,97 +877,6 @@ class WangCubeSets(object):
                                   in zip(gx_edges, permuted_gy_edges, permuted_gz_edges)]
                 T = WangCubeSet(cubes)
                 yield T
-
-    @cached_method
-    def _graphs_with_n_edges(self):
-        r"""
-        Return the list of directed multigraphs graphs with loops with n
-        edges with no sink nor sources.
-
-        EXAMPLES::
-
-            sage: from slabbe.wang_cubes import WangCubeSets
-            sage: S = WangCubeSets(1)
-            sage: S._graphs_with_n_edges()
-            [Looped multi-digraph on 1 vertex]
-            sage: S = WangCubeSets(2)
-            sage: S._graphs_with_n_edges()
-            [Looped multi-digraph on 1 vertex,
-             Looped multi-digraph on 2 vertices,
-             Looped multi-digraph on 2 vertices]
-            sage: S = WangCubeSets(3)
-            sage: S._graphs_with_n_edges()
-            [Looped multi-digraph on 1 vertex,
-             Looped multi-digraph on 2 vertices,
-             Looped multi-digraph on 2 vertices,
-             Looped multi-digraph on 2 vertices,
-             Looped multi-digraph on 3 vertices,
-             Looped multi-digraph on 3 vertices,
-             Looped multi-digraph on 2 vertices,
-             Looped multi-digraph on 3 vertices]
-
-        ::
-
-            sage: len(list(WangCubeSets(4)._graphs_with_n_edges())) # long time (10s)
-            29
-            sage: len(list(WangCubeSets(5)._graphs_with_n_edges())) # not tested (1h)
-            110
-
-        List [1,3,8,29,110] is almost related to https://oeis.org/A350907 ?
-        "Number of unlabeled initially connected digraphs with n arcs." 
-
-        """
-        from sage.graphs.digraph import DiGraph
-
-        def has_sink(G):
-            return any(d== 0 for d in G.out_degree_iterator())
-        def has_source(G):
-            return any(d== 0 for d in G.in_degree_iterator())
-
-        L = []
-
-        nvertices = 2 * self._n
-        V = list(range(nvertices))
-        VV = list(itertools.product(V, repeat=2))
-        for edges in itertools.combinations_with_replacement(VV, self._n):
-            g = DiGraph(edges, format='list_of_edges', loops=True, multiedges=True)
-            if has_sink(g) or has_source(g):
-                continue
-            if any(g.is_isomorphic(h) for h in L):
-                continue
-
-            L.append(g)
-
-        return L
-
-    def _graphs_with_n_edges_more_clever(self):
-        r"""
-        EXAMPLES::
-
-        - allows loops?
-        - allows multiedges?
-
-        Idea: use `integer_lists_mod_perm_group` in the Vincent package
-        `adm_cycles` which is better than the one in Sage.
-
-        See: https://gitlab.com/modulispaces/admcycles/-/blob/master/admcycles/integer_list.py?ref_type=heads
-
-        ::
-
-            sage: I = IntegerVectorsModPermutationGroup(PermutationGroup([[(1,2,3)]]), sum=6)
-            sage: I.cardinality()
-            10
-            sage: I.list()
-            [[6, 0, 0], [5, 1, 0], [5, 0, 1], [4, 2, 0], [4, 1, 1],
-             [4, 0, 2], [3, 3, 0], [3, 2, 1], [3, 1, 2], [2, 2, 2]]
-
-        """
-        from sage.graphs.digraph_generators import digraphs
-        #max_nvertices = 2 * self._n
-        max_nvertices = self._n
-        for nvertices in range(1, max_nvertices+1):
-            for g in digraphs(nvertices, size=self._n, copy=True):
-                yield g
 
     def aperiodic_candidates(self, stop, verbose=False, solver='kissat',
             certificate=False, initial_candidates=None, ncpus=4):

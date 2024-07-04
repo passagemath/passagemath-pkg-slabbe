@@ -20,6 +20,7 @@ from collections import Counter, defaultdict
 import itertools
 from sage.graphs.digraph import DiGraph
 from sage.graphs.graph import Graph
+from sage.misc.cachefunc import cached_function
 
 def projection_graph(G, proj_fn, filename=None, verbose=False):
     r"""
@@ -692,4 +693,99 @@ def vertices_in_a_cycle(G, verbose=False):
         else:
             continue
     return V
+
+@cached_function
+def digraphs_with_n_edges(n_edges):
+    r"""
+    Return the list of directed multigraphs with loops with n
+    edges with no sink nor sources up to graph isomorphisms.
+
+    INPUT:
+
+    - ``n_edges`` -- integer
+
+    EXAMPLES::
+
+        sage: from slabbe.graph import digraphs_with_n_edges
+        sage: digraphs_with_n_edges(1)
+        [Looped multi-digraph on 1 vertex]
+        sage: digraphs_with_n_edges(2)
+        [Looped multi-digraph on 1 vertex,
+         Looped multi-digraph on 2 vertices,
+         Looped multi-digraph on 2 vertices]
+        sage: digraphs_with_n_edges(3)
+        [Looped multi-digraph on 1 vertex,
+         Looped multi-digraph on 2 vertices,
+         Looped multi-digraph on 2 vertices,
+         Looped multi-digraph on 2 vertices,
+         Looped multi-digraph on 3 vertices,
+         Looped multi-digraph on 3 vertices,
+         Looped multi-digraph on 2 vertices,
+         Looped multi-digraph on 3 vertices]
+
+    ::
+
+        sage: len(list(digraphs_with_n_edges(4))) # long time (10s)
+        29
+        sage: len(list(digraphs_with_n_edges(5))) # not tested (1h)
+        110
+
+    .. NOTE::
+
+        List [1,3,8,29,110] does not exist in OEIS but is almost related to
+        https://oeis.org/A350907 "Number of unlabeled initially connected
+        digraphs with n arcs."
+
+    """
+    from sage.graphs.digraph import DiGraph
+
+    def has_sink(G):
+        return any(d== 0 for d in G.out_degree_iterator())
+    def has_source(G):
+        return any(d== 0 for d in G.in_degree_iterator())
+
+    L = []
+
+    nvertices = 2 * n_edges
+    V = list(range(nvertices))
+    VV = list(itertools.product(V, repeat=2))
+    for edges in itertools.combinations_with_replacement(VV, n_edges):
+        g = DiGraph(edges, format='list_of_edges', loops=True, multiedges=True)
+        if has_sink(g) or has_source(g):
+            continue
+        if any(g.is_isomorphic(h) for h in L):
+            continue
+
+        L.append(g)
+
+    return L
+
+def _digraphs_with_n_edges_more_clever(self):
+    r"""
+    EXAMPLES::
+
+    - allows loops?
+    - allows multiedges?
+
+    Idea: use `integer_lists_mod_perm_group` in the Vincent package
+    `adm_cycles` which is better than the one in Sage.
+
+    See: https://gitlab.com/modulispaces/admcycles/-/blob/master/admcycles/integer_list.py?ref_type=heads
+
+    ::
+
+        sage: I = IntegerVectorsModPermutationGroup(PermutationGroup([[(1,2,3)]]), sum=6)
+        sage: I.cardinality()
+        10
+        sage: I.list()
+        [[6, 0, 0], [5, 1, 0], [5, 0, 1], [4, 2, 0], [4, 1, 1],
+            [4, 0, 2], [3, 3, 0], [3, 2, 1], [3, 1, 2], [2, 2, 2]]
+
+    """
+    from sage.graphs.digraph_generators import digraphs
+    #max_nvertices = 2 * self._n
+    max_nvertices = self._n
+    for nvertices in range(1, max_nvertices+1):
+        for g in digraphs(nvertices, size=self._n, copy=True):
+            yield g
 
