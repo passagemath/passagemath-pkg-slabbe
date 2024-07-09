@@ -211,7 +211,7 @@ class Language(object):
             sage: L = FactorialLanguage(alphabet, [w[:10000]])
             sage: L.bispecial_table(20)
               |w|   word                  m(w)   info   d^-(w)   d^+(w)
-            +-----+---------------------+------+------+--------+--------+
+            ├─────┼─────────────────────┼──────┼──────┼────────┼────────┤
               0                           0      ord.   2        2
               1     0                     0      ord.   2        2
               3     010                   0      ord.   2        2
@@ -225,7 +225,7 @@ class Language(object):
             sage: L = FactorialLanguage(alphabet, [w[:10000]])
             sage: L.bispecial_table(20)
               |w|   word               m(w)   info     d^-(w)   d^+(w)
-            +-----+------------------+------+--------+--------+--------+
+            ├─────┼──────────────────┼──────┼────────┼────────┼────────┤
               0                        1      strong   2        2
               1     0                  0      ord.     2        2
               1     1                  0      ord.     2        2

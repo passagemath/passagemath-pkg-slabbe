@@ -49,7 +49,7 @@ def projection_graph(G, proj_fn, filename=None, verbose=False):
 
         sage: projection_graph(g, lambda i:i%4, verbose=True)
           Number of vertices   Projected vertices
-        +--------------------+--------------------+
+        ├────────────────────┼────────────────────┤
           2                    3
           2                    2
           3                    1

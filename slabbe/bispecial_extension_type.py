@@ -1424,7 +1424,7 @@ class ExtensionType(object):
             sage: E1 = ExtensionTypeLong(data, (1,2,3))
             sage: E1.bispecial_factors_table_under_sadic([132]*2+[123]*6, S)
               |w|   w                      m(w)   d^-(w)   d2^-(w)   info
-            +-----+----------------------+------+--------+---------+---------+
+            ├─────┼──────────────────────┼──────┼────────┼─────────┼─────────┤
               0                            0      3        5         ord.
               1     2                      0      3        4         dendric
               2     22                     0      2        2         ord.
@@ -2839,7 +2839,7 @@ def table_bispecial(word, k, nleft=1, nright=1):
         sage: w = words.FibonacciWord()
         sage: table_bispecial(w[:10000], 6)
           |w|   word                  m(w)   info   d^-(w)   d^+(w)
-        +-----+---------------------+------+------+--------+--------+
+        ├─────┼─────────────────────┼──────┼──────┼────────┼────────┤
           0                           0      ord.   2        2
           1     0                     0      ord.   2        2
           3     010                   0      ord.   2        2
@@ -2852,7 +2852,7 @@ def table_bispecial(word, k, nleft=1, nright=1):
         sage: w = words.FibonacciWord()
         sage: table_bispecial(w[:10000], 6, nleft=2)
           |w|   word                  m(w)   info   d^-(w)   d_2^-(w)   d^+(w)
-        +-----+---------------------+------+------+--------+----------+--------+
+        ├─────┼─────────────────────┼──────┼──────┼────────┼──────────┼────────┤
           0                           0      ord.   2        3          2
           1     0                     0      ord.   2        2          2
           3     010                   0      ord.   2        2          2
@@ -2865,7 +2865,7 @@ def table_bispecial(word, k, nleft=1, nright=1):
         sage: w = words.ThueMorseWord()
         sage: table_bispecial(w[:10000], 11)
           |w|   word     m(w)   info     d^-(w)   d^+(w)
-        +-----+--------+------+--------+--------+--------+
+        ├─────┼────────┼──────┼────────┼────────┼────────┤
           0              1      strong   2        2
           1     0        0      ord.     2        2
           1     1        0      ord.     2        2

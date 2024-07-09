@@ -79,7 +79,7 @@ def ostrowski_integer(n, alpha):
         sage: rows = [[i]+ostrowski_integer(i, sqrt(2)-1)[0]+[0,0,0,0] for i in range(25)]
         sage: table(rows=rows,header_row='N c1 c2 c3 c4'.split())
           N    c1   c2   c3   c4
-        +----+----+----+----+----+
+        ├────┼────┼────┼────┼────┤
           0    0    0    0    0
           1    1    0    0    0
           2    0    1    0    0

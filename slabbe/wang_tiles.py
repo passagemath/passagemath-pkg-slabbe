@@ -456,7 +456,7 @@ class WangTileSet(object):
             sage: T = WangTileSet(tiles)
             sage: T.table()
               Id   Right   Top   Left   Bottom
-            +----+-------+-----+------+--------+
+            ├────┼───────┼─────┼──────┼────────┤
               0    0       0     0      2
               1    1       0     0      1
               2    2       1     0      0
