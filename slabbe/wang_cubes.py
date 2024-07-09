@@ -344,6 +344,7 @@ class WangCubeSet(object):
                 "!= volume of the box".format(len(support)))
         X,Y,Z = box
         #configuration = {(j,k,l):None for (j,k,l) in itertools.product(range(X),range(Y),range(Z))}
+        import numpy
         configuration = numpy.zeros(box, dtype=numpy.int8)
         for val in support:
             i,j,k,l = var_to_cube_pos[val]
