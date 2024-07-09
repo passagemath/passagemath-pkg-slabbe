@@ -676,7 +676,8 @@ def KariCulik21cubes(version='what_seems_to_work'):
         sage: W21.is_periodic(5, certificate=True, solver='kissat') # optional: kissat
         (True, (1, 2, 1))
         sage: W21.solve_tiling_a_box((1,2,1), cyclic=True, solver='kissat') # optional: kissat
-        {(0, 0, 0): 18, (0, 1, 0): 20}
+        array([[[18],
+                [20]]], dtype=int8)
         sage: W21[18]
         (1, ('0/2', 1), (0, 1), 1, ('1/2', 1), (0, 1))
         sage: W21[20]
