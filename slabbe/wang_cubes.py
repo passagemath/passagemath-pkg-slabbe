@@ -16,6 +16,7 @@ other well-known problems like linear problem, exact cover problem and SAT.
 #                  http://www.gnu.org/licenses/
 #*****************************************************************************
 import itertools
+from sage.misc.cachefunc import cached_method
 
 class WangCubeSet(object):
     r"""
