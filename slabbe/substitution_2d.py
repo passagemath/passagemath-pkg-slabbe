@@ -1181,7 +1181,7 @@ class Substitution2d(object):
                 S.update(set_of_factors(self(table), shape))
             return [ [[a, b], [c, d]] for (a,b,c,d) in S]
 
-    def list_dominoes(self, direction):
+    def list_dominoes(self, direction, output_format='tuple'):
         r"""
         Return the list of 1x2 or 2x1 factors in the language of the
         associated substitutive shift.
@@ -1190,6 +1190,7 @@ class Substitution2d(object):
 
         - ``self`` -- expansive and primitive 2d substitution
         - ``direction`` -- string, ``'horizontal'`` or ``'vertical'``
+        - ``output_format`` -- string, ``'tuple'`` or ``'list_of_lists'``
 
         OUTPUT:
 
@@ -1209,6 +1210,13 @@ class Substitution2d(object):
 
         ::
 
+            sage: sorted(s.list_dominoes(direction='horizontal', output_format='list_of_lists'))
+            [[[0], [0]], [[0], [1]], [[1], [0]], [[1], [1]]]
+            sage: sorted(s.list_dominoes(direction='vertical', output_format='list_of_lists'))
+            [[[0, 0]], [[0, 1]], [[1, 0]], [[1, 1]]]
+
+        ::
+
             sage: A = [[3]]
             sage: B = [[3],[2]]
             sage: C = [[3,1]]
@@ -1222,8 +1230,20 @@ class Substitution2d(object):
 
         """
         R = self.domino_language_rec_enum_set(direction)
-        #return [create_table(f) for f in R]
-        return list(R)
+        if output_format == 'tuple':
+            return list(R)
+        elif output_format == 'list_of_lists':
+            if direction == 'horizontal':
+                create_table = lambda factor: [[factor[0]], [factor[1]]]
+            elif direction == 'vertical':
+                create_table = lambda factor: [[factor[0], factor[1]]]
+            else:
+                raise ValueError("direction (={}) should be 'horizontal' or"
+                        " 'vertical'".format(direction))
+            return [create_table(f) for f in R]
+        else:
+            raise ValueError("output_format (={}) should be 'tuple' or"
+                    " 'list_of_lists'".format(output_format))
 
     def domino_language_rec_enum_set(self, direction):
         r"""
