@@ -1181,7 +1181,7 @@ class Substitution2d(object):
                 S.update(set_of_factors(self(table), shape))
             return [ [[a, b], [c, d]] for (a,b,c,d) in S]
 
-    def list_dominoes(self, direction, output_format='tuple'):
+    def list_dominoes(self, direction, output_format='list_of_lists'):
         r"""
         Return the list of 1x2 or 2x1 factors in the language of the
         associated substitutive shift.
@@ -1204,16 +1204,16 @@ class Substitution2d(object):
             sage: d = {0:A, 1:B}
             sage: s = Substitution2d(d)
             sage: sorted(s.list_dominoes(direction='horizontal'))
-            [(0, 0), (0, 1), (1, 0), (1, 1)]
+            [[[0], [0]], [[0], [1]], [[1], [0]], [[1], [1]]]
             sage: sorted(s.list_dominoes(direction='vertical'))
-            [(0, 0), (0, 1), (1, 0), (1, 1)]
+            [[[0, 0]], [[0, 1]], [[1, 0]], [[1, 1]]]
 
         ::
 
-            sage: sorted(s.list_dominoes(direction='horizontal', output_format='list_of_lists'))
-            [[[0], [0]], [[0], [1]], [[1], [0]], [[1], [1]]]
-            sage: sorted(s.list_dominoes(direction='vertical', output_format='list_of_lists'))
-            [[[0, 0]], [[0, 1]], [[1, 0]], [[1, 1]]]
+            sage: sorted(s.list_dominoes(direction='horizontal', output_format='tuple'))
+            [(0, 0), (0, 1), (1, 0), (1, 1)]
+            sage: sorted(s.list_dominoes(direction='vertical', output_format='tuple'))
+            [(0, 0), (0, 1), (1, 0), (1, 1)]
 
         ::
 
@@ -1223,9 +1223,9 @@ class Substitution2d(object):
             sage: D = [[3,1],[2,0]]
             sage: d = {0:A, 1:B, 2:C, 3:D}
             sage: s = Substitution2d(d)
-            sage: sorted(s.list_dominoes(direction='horizontal'))
+            sage: sorted(s.list_dominoes(direction='horizontal', output_format='tuple'))
             [(0, 1), (1, 0), (1, 1), (2, 3), (3, 2), (3, 3)]
-            sage: sorted(s.list_dominoes(direction='vertical'))
+            sage: sorted(s.list_dominoes(direction='vertical', output_format='tuple'))
             [(0, 2), (1, 3), (2, 0), (2, 2), (3, 1), (3, 3)]
 
         """
@@ -1349,7 +1349,7 @@ class Substitution2d(object):
         from sage.combinat.words.morphism import WordMorphism
         from sage.combinat.words.words import Words
 
-        dominoesV = self.list_dominoes(direction='vertical')
+        dominoesV = self.list_dominoes(direction='vertical', output_format='tuple')
         partition = DisjointSet(alphabet)
         for a,b in dominoesV:
             partition.union(a,b)
@@ -1401,7 +1401,7 @@ class Substitution2d(object):
         from sage.combinat.words.morphism import WordMorphism
         from sage.combinat.words.words import Words
 
-        dominoesH = self.list_dominoes(direction='horizontal')
+        dominoesH = self.list_dominoes(direction='horizontal', output_format='tuple')
         partition = DisjointSet(alphabet)
         for a,b in dominoesH:
             partition.union(a,b)
@@ -1901,7 +1901,7 @@ class Substitution2d(object):
         # in the language of the substitution
         G_h = self.periodic_horizontal_domino_seeds_graph(clean_sources=True)
         seeds_h = set(vertices_in_a_cycle(G_h))
-        dominoes_h = set(self.list_dominoes(direction='horizontal'))
+        dominoes_h = set(self.list_dominoes(direction='horizontal', output_format='tuple'))
         if not seeds_h <= dominoes_h:
             if verbose:
                 seeds_h_minus_dominoes_h = seeds_h - dominoes_h
@@ -1916,7 +1916,7 @@ class Substitution2d(object):
         # in the language of the substitution
         G_v = self.periodic_vertical_domino_seeds_graph(clean_sources=True)
         seeds_v = set(vertices_in_a_cycle(G_v))
-        dominoes_v = set(self.list_dominoes(direction='vertical'))
+        dominoes_v = set(self.list_dominoes(direction='vertical', output_format='tuple'))
         if not seeds_v <= dominoes_v:
             if verbose:
                 seeds_v_minus_dominoes_v = seeds_v - dominoes_v
