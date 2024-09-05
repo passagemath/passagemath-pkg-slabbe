@@ -138,6 +138,62 @@ class WangCubeSet(object):
         """
         return self._cubes
 
+    def tikz(self, ncols=3, scale=1, node_scale=1):
+        r"""
+
+        EXAMPLES::
+
+            sage: from slabbe import WangCubeSet
+            sage: cubes = [(i,i,i,i,i,i) for i in range(7)]
+            sage: cubes.append((0,1,2,3,4,5))
+            sage: T = WangCubeSet(cubes)
+            sage: t = T.tikz()
+        """
+        from sage.misc.latex_standalone import TikzPicture
+
+        def unwrapped_cube(id, cube):
+            lines = []
+            lines.append(r"\draw (0,0) rectangle (4,1);")
+            lines.append(r"\draw (1,-1) rectangle (2,2);")
+            lines.append(r"\draw (3,0) -- (3,1);")
+            lines.append(r"\node at (0.5,.5) {{{}}};".format(cube[0]))
+            lines.append(r"\node at (1.5,.5) {{{}}};".format(cube[1]))
+            lines.append(r"\node at (2.5,.5) {{{}}};".format(cube[3]))
+            lines.append(r"\node at (3.5,.5) {{{}}};".format(cube[4]))
+            lines.append(r"\node at (1.5,1.5) {{{}}};".format(cube[2]))
+            lines.append(r"\node at (1.5,-.5) {{{}}};".format(cube[5]))
+            lines.append(r"\node[left] at (1,-.5) {{\bf\#{}}};".format(id))
+            return lines
+
+        lines = []
+        lines.append(r'\begin{tikzpicture}')
+        lines.append(r"[")
+        lines.append(r"baseline=-\the\dimexpr\fontdimen22\textfont2\relax,")
+        lines.append(r"ampersand replacement=\&,")
+        lines.append(r"scale={},".format(scale))
+        lines.append(r"every node/.style={{scale={}}}".format(node_scale))
+        lines.append(r"]")
+        #lines.append(r"  \matrix[matrix of math nodes,nodes={")
+        #lines.append(r"       minimum size=1.2ex,text width=1.2ex,")
+        #lines.append(r"       text height=1.2ex,inner sep=3pt,draw={gray!20},align=center,")
+        #lines.append(r"       anchor=base")
+        #lines.append(r"     }, row sep=1pt,column sep=1pt]")
+        lines.append(r"  \matrix [column sep=5mm,row sep=7mm]")
+        lines.append(r"  (config) {")
+        for i,cube in self.cubes().items():
+            lines.extend(unwrapped_cube(i, cube))
+            if i % ncols == ncols-1:
+                lines.append(r'\\')
+            else:
+                lines.append(r'\&')
+        if len(self) % ncols != 0:
+            lines.append(r'\\')
+        lines.append(r"};")
+
+        lines.append(r'\end{tikzpicture}')
+        usetikzlibrary = "matrix,fit".split(',')
+        return TikzPicture('\n'.join(lines), usetikzlibrary=usetikzlibrary)
+
     @cached_method
     def sat_variable_to_cube_position_bijection(self, box):
         r"""
