@@ -240,7 +240,7 @@ class WangCubeSet(object):
         """
         (X,Y,Z) = box
         n_cubes = len(self)
-        L = list(itertools.product(range(n_cubes), range(X), range(Y), range(Z)))
+        L = list(itertools.product(self.indices(), range(X), range(Y), range(Z)))
         var_to_cube_pos = dict(enumerate(L, start=1))
         cube_pos_to_var = dict((b,a) for (a,b) in enumerate(L, start=1))
         return var_to_cube_pos, cube_pos_to_var
@@ -732,11 +732,11 @@ def KariCulik21cubes(version='what_seems_to_work'):
         sage: W21.is_periodic(5, certificate=True, solver='kissat') # optional: kissat
         (True, (1, 2, 1))
         sage: W21.solve_tiling_a_box((1,2,1), cyclic=True, solver='kissat') # optional: kissat
-        array([[[18],
-                [20]]], dtype=int8)
-        sage: W21[18]
+        array([[[19],
+                [21]]], dtype=int8)
+        sage: W21[19]
         (1, ('0/2', 1), (0, 1), 1, ('1/2', 1), (0, 1))
-        sage: W21[20]
+        sage: W21[21]
         (1, ('1/2', 1), (0, 1), 1, ('0/2', 1), (0, 1))
 
     The typo can be found by comparing the set of tiles in the set C with
@@ -874,7 +874,9 @@ def KariCulik21cubes(version='what_seems_to_work'):
     W_21_reordered = [(front, right, top, back, left, bottom)
                       for (left, front, back, right, top, bottom) in W_21]
 
-    return WangCubeSet(W_21_reordered)
+    d = dict(enumerate(W_21_reordered, start=1))
+
+    return WangCubeSet(d)
 
 
 class WangCubeSets(object):
