@@ -695,7 +695,7 @@ def vertices_in_a_cycle(G, verbose=False):
     return V
 
 @cached_function
-def digraphs_with_n_edges(n_edges):
+def digraphs_with_n_edges(n_edges, connected=None):
     r"""
     Return the list of directed multigraphs with loops with n
     edges with no sink nor sources up to graph isomorphisms.
@@ -706,6 +706,8 @@ def digraphs_with_n_edges(n_edges):
     INPUT:
 
     - ``n_edges`` -- integer
+    - ``connected`` -- bool (defaut: ``None``), if ``True``, returns only
+      those that are connected.
 
     EXAMPLES::
 
@@ -740,9 +742,9 @@ def digraphs_with_n_edges(n_edges):
 
     ::
 
-        sage: len(list(digraphs_with_n_edges(4))) # long time (10s)
+        sage: len(digraphs_with_n_edges(4)) # long time (10s)
         29
-        sage: len(list(digraphs_with_n_edges(5))) # not tested (1h)
+        sage: len(digraphs_with_n_edges(5)) # not tested (1h)
         110
 
     .. NOTE::
@@ -750,6 +752,11 @@ def digraphs_with_n_edges(n_edges):
         List [1,3,8,29,110] does not exist in OEIS but is almost related to
         https://oeis.org/A350907 "Number of unlabeled initially connected
         digraphs with n arcs."
+
+    ::
+
+        sage: [len(digraphs_with_n_edges(i, connected=True)) for i in range(1,6)] # not tested (<1h)
+        [1, 2, 5, 18, 71]
 
     .. TODO::
 
@@ -790,7 +797,8 @@ def digraphs_with_n_edges(n_edges):
         if any(g.is_isomorphic(h) for h in L):
             continue
 
-        L.append(g)
+        if connected is None or g.is_connected() == connected:
+            L.append(g)
 
     return L
 
