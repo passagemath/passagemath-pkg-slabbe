@@ -180,8 +180,8 @@ class WangCubeSet(object):
         #lines.append(r"     }, row sep=1pt,column sep=1pt]")
         lines.append(r"  \matrix [column sep=5mm,row sep=7mm]")
         lines.append(r"  (config) {")
-        for i,cube in self.cubes().items():
-            lines.extend(unwrapped_cube(i, cube))
+        for i,(key,cube) in enumerate(self.cubes().items()):
+            lines.extend(unwrapped_cube(key, cube))
             if i % ncols == ncols-1:
                 lines.append(r'\\')
             else:
