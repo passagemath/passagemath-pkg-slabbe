@@ -675,14 +675,14 @@ class WangCubeSet(object):
             sage: cubes = [(0,0,1,0,1,0), (1,1,3,1,2,1), (2,0,2,0,2,2)]
             sage: T = WangCubeSet(cubes)
             sage: T.is_aperiodic_candidate(5, certificate=True)
-            (False, ('is_finite',), (True, (2, 2, 2)))
+            (False, 'is_finite', (True, (2, 2, 2)))
 
         ::
 
             sage: cubes = [(0,0,0,0,0,0), (1,1,1,1,1,1), (2,2,2,2,2,2)]
             sage: T = WangCubeSet(cubes)
             sage: T.is_aperiodic_candidate(5, certificate=True)
-            (False, ('is_periodic',), (True, (1, 1, 1)))
+            (False, 'is_periodic', (True, (1, 1, 1)))
 
         """
         from sage.parallel.decorate import parallel
@@ -695,9 +695,10 @@ class WangCubeSet(object):
         methods = ['is_periodic', 'is_finite']
         #methods = ['is_periodic_parallel', 'is_finite']
         for ((args,kwds),result) in call_method(methods):
+            (arg,) = args
             if result:
                 if certificate:
-                    return False, args, result
+                    return False, arg, result
                 else:
                     return False
 
@@ -943,10 +944,10 @@ class WangCubeSets(object):
             sage: S = WangCubeSets(2)
             sage: c = Counter(T.is_aperiodic_candidate(7, solver='kissat') for T in S) # long time
             sage: dict(c)                                                              # long time
-            {(False, ('is_periodic',), (True, (1, 1, 1))): 11,
-             (False, ('is_periodic',), (True, (1, 1, 2))): 10,
-             (False, ('is_periodic',), (True, (1, 2, 2))): 8,
-             (False, ('is_periodic',), (True, (2, 2, 2))): 4}
+            {(False, 'is_periodic', (True, (1, 1, 1))): 11,
+             (False, 'is_periodic', (True, (1, 1, 2))): 10,
+             (False, 'is_periodic', (True, (1, 2, 2))): 8,
+             (False, 'is_periodic', (True, (2, 2, 2))): 4}
 
         """
         from sage.combinat.permutation import Permutations
@@ -1001,23 +1002,23 @@ class WangCubeSets(object):
         ::
 
             sage: %time L = list(S.aperiodic_candidates(stop=13, verbose=True)) # not tested (6min)
-            {(False, ('is_finite',), 'NO DATA'): 11,
-             (False, ('is_finite',), (True, (2, 2, 2))): 792,
-             (False, ('is_finite',), (True, (3, 3, 3))): 289,
-             (False, ('is_periodic',), 'NO DATA'): 33,
-             (False, ('is_periodic',), (True, [1, 1, 2])): 155,
-             (False, ('is_periodic',), (True, [1, 1, 3])): 145,
-             (False, ('is_periodic',), (True, [1, 2, 1])): 23,
-             (False, ('is_periodic',), (True, [1, 2, 2])): 127,
-             (False, ('is_periodic',), (True, [1, 3, 3])): 220,
-             (False, ('is_periodic',), (True, [2, 1, 1])): 16,
-             (False, ('is_periodic',), (True, [2, 1, 2])): 26,
-             (False, ('is_periodic',), (True, [2, 2, 1])): 4,
-             (False, ('is_periodic',), (True, [2, 2, 2])): 34,
-             (False, ('is_periodic',), (True, [3, 1, 3])): 34
-             (False, ('is_periodic',), (True, [3, 3, 1])): 23, 
-             (False, ('is_periodic',), (True, [3, 3, 3])): 136, 
-             (False, ('is_periodic',), (True, [1, 1, 1])): 1074} 
+            {(False, 'is_finite', 'NO DATA'): 11,
+             (False, 'is_finite', (True, (2, 2, 2))): 792,
+             (False, 'is_finite', (True, (3, 3, 3))): 289,
+             (False, 'is_periodic', 'NO DATA'): 33,
+             (False, 'is_periodic', (True, [1, 1, 2])): 155,
+             (False, 'is_periodic', (True, [1, 1, 3])): 145,
+             (False, 'is_periodic', (True, [1, 2, 1])): 23,
+             (False, 'is_periodic', (True, [1, 2, 2])): 127,
+             (False, 'is_periodic', (True, [1, 3, 3])): 220,
+             (False, 'is_periodic', (True, [2, 1, 1])): 16,
+             (False, 'is_periodic', (True, [2, 1, 2])): 26,
+             (False, 'is_periodic', (True, [2, 2, 1])): 4,
+             (False, 'is_periodic', (True, [2, 2, 2])): 34,
+             (False, 'is_periodic', (True, [3, 1, 3])): 34
+             (False, 'is_periodic', (True, [3, 3, 1])): 23, 
+             (False, 'is_periodic', (True, [3, 3, 3])): 136, 
+             (False, 'is_periodic', (True, [1, 1, 1])): 1074} 
 
         """
         from sage.parallel.decorate import parallel
