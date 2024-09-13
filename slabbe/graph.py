@@ -746,17 +746,21 @@ def digraphs_with_n_edges(n_edges, connected=None):
         29
         sage: len(digraphs_with_n_edges(5)) # not tested (1h)
         110
+        sage: len(digraphs_with_n_edges(6)) # not tested (6d 18h 48min 21s)
+	509
 
     .. NOTE::
 
-        List [1,3,8,29,110] does not exist in OEIS but is almost related to
+        List [1,3,8,29,110,509] does not exist in OEIS but is almost related to
         https://oeis.org/A350907 "Number of unlabeled initially connected
         digraphs with n arcs."
 
-    ::
+    Those that are connected::
 
         sage: [len(digraphs_with_n_edges(i, connected=True)) for i in range(1,6)] # not tested (<1h)
         [1, 2, 5, 18, 71]
+        sage: [len(digraphs_with_n_edges(i, connected=True)) for i in range(1,7)] # not tested (<7days)
+        [1, 2, 5, 18, 71, 344]
 
     .. TODO::
 
