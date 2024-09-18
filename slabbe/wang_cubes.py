@@ -613,12 +613,13 @@ class WangCubeSet(object):
                     print('no solution')
 
 
-    def is_finite(self, stop=None, solver=None, certificate=False, verbose=False):
+    def is_finite(self, stop=None, start=1, solver=None, certificate=False, verbose=False):
         r"""
 
         INPUT:
 
         - ``stop`` -- integer
+        - ``start`` -- integer (default: ``1``)
         - ``solver`` -- string or None (default: ``None``), 
           ``'dancing_links'`` or the name of a MILP solver in Sage like
           ``'GLPK'``, ``'Coin'``, ``'cplex'`` or ``'Gurobi'`` or the name
@@ -635,7 +636,7 @@ class WangCubeSet(object):
             (True, (2, 2, 2))
 
         """
-        it = itertools.count(1) if stop is None else range(1, stop)
+        it = itertools.count(start) if stop is None else range(start, stop)
         for n in it:
             X_Y_Z = (n,n,n)
             if verbose:
