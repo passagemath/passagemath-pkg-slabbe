@@ -7,24 +7,24 @@ doctest this file with "sage -t article_doctest.sage".
 It is always safe to delete this file; it is not used in typesetting your
 document.
 
-Sage commandline, line 4962::
+Sage commandline, line 4992::
 
 sage: version()
-'SageMath version ...'
+'SageMath version ..., Release Date: ...'
 sage: import importlib.metadata
 sage: importlib.metadata.version("slabbe")
 '...'
 
-Sage commandline, line 4973::
+Sage commandline, line 5005::
 
 sage: from slabbe import Substitution2d
 sage: omega1 = Substitution2d({0: [[9], [15]], 1: [[6], [7]], 2: [[13], [14]], 3: [[6]], 4: [[5], [7]], 5: [[12, 4], [11, 3]], 6: [[12, 1], [11, 3]], 7: [[8, 4]], 8: [[13, 0], [14, 3]], 9: [[12, 4], [14, 3]], 10: [[12, 1], [14, 3]], 11: [[6, 2]], 12: [[9, 0], [15, 3]], 13: [[8, 4], [15, 3]], 14: [[10, 2]], 15: [[9, 0]]})
-sage: patterns_1x2_in_subst_shift = set(omega1.list_dominoes(direction="vertical"))
+sage: patterns_1x2_in_subst_shift = set((a,b) for [[a,b]] in omega1.list_dominoes(direction="vertical"))
 sage: len(patterns_1x2_in_subst_shift)
 30
 sage: min(patterns_1x2_in_subst_shift)   # show some element
 (0, 5)
-sage: patterns_2x1_in_subst_shift = set(omega1.list_dominoes(direction="horizontal"))
+sage: patterns_2x1_in_subst_shift = set((a,b) for [[a],[b]] in omega1.list_dominoes(direction="horizontal"))
 sage: len(patterns_2x1_in_subst_shift)
 30
 sage: min(patterns_2x1_in_subst_shift)   # show some element
@@ -35,7 +35,7 @@ sage: len(patterns_2x2_in_subst_shift)
 sage: min(patterns_2x2_in_subst_shift)   # show some element
 [[0, 5], [3, 7]]
 
-Sage commandline, line 4998::
+Sage commandline, line 5030::
 
 sage: from slabbe import WangTileSet
 sage: tiles = [("111", "012", "112", "001"), ("111", "001", "111", "000"), ("112", "012", "112", "011"), ("112", "112", "111", "111"), ("111", "011", "112", "000"), ("011", "001", "011", "012"), ("011", "011", "012", "012"), ("012", "112", "011", "112"), ("001", "000", "001", "011"), ("001", "001", "011", "011"), ("001", "011", "012", "011"), ("001", "111", "000", "111"), ("000", "000", "001", "001"), ("000", "001", "011", "001"), ("011", "111", "000", "112"), ("012", "111", "001", "112")]
@@ -59,7 +59,7 @@ sage: len(patterns_2x2_in_sft)
 sage: min(patterns_2x2_in_sft)    # show some element
 [[0, 5], [3, 7]]
 
-Sage commandline, line 5035::
+Sage commandline, line 5067::
 
 sage: patterns_1x2_in_subst_shift == patterns_1x2_in_sft
 True
@@ -68,22 +68,22 @@ True
 sage: patterns_2x2_in_subst_shift == patterns_2x2_in_sft
 True
 
-Sage commandline, line 5259::
+Sage commandline, line 5294::
 
 sage: version()
-'SageMath version ...'
+'SageMath version ..., Release Date: ...'
 sage: import importlib.metadata
 sage: importlib.metadata.version("slabbe")
 '...'
 
-Sage commandline, line 5266::
+Sage commandline, line 5303::
 
 sage: from slabbe import WangTileSet
 sage: tiles = [("111", "013", "113", "002"), ("111", "002", "112", "001"), ("112", "013", "113", "012"), ("112", "113", "111", "112"), ("113", "113", "112", "112"), ("111", "012", "113", "001"), ("111", "001", "112", "000"), ("112", "012", "113", "011"), ("112", "112", "111", "111"), ("113", "112", "112", "111"), ("111", "011", "113", "000"), ("011", "001", "012", "013"), ("011", "011", "013", "013"), ("012", "112", "011", "113"), ("013", "112", "012", "113"), ("001", "000", "002", "012"), ("001", "001", "012", "012"), ("001", "011", "013", "012"), ("001", "111", "000", "112"), ("002", "111", "001", "112"), ("000", "000", "002", "002"), ("000", "001", "012", "002"), ("011", "111", "000", "113"), ("012", "111", "001", "113"), ("013", "111", "002", "113")]
 sage: T2 = WangTileSet(tiles)
 sage: T2_tikz = T2.tikz(ncolumns=10, scale=1.2, label_shift=.15)
 
-Sage commandline, line 5280::
+Sage commandline, line 5317::
 
 sage: T2.find_markers(i=1, radius=1, solver="dancing_links")
 [[0, 1, 2, 5, 6, 7, 10, 11, 12, 15, 16, 17, 20, 21]]
@@ -91,11 +91,11 @@ sage: M = [0, 1, 2, 5, 6, 7, 10, 11, 12, 15, 16, 17, 20, 21]
 sage: U1, s1 = T2.find_substitution(M=M, i=1, radius=2, solver="dancing_links", side="left")
 sage: s1_tikz = s1.wang_tikz(domain_tiles=U1, codomain_tiles=T2, ncolumns=5, scale=1.2, label_shift=.15, direction='left', extra_space=1.2)
 
-Sage commandline, line 5294::
+Sage commandline, line 5331::
 
 sage: U1_tikz = U1.tikz(scale=1.4, label_shift=0.15)
 
-Sage commandline, line 5302::
+Sage commandline, line 5339::
 
 sage: U1.find_markers(i=1, radius=1, solver="dancing_links")
 [[0, 1, 2, 3, 4, 5, 6]]
@@ -103,7 +103,7 @@ sage: M = [0, 1, 2, 3, 4, 5, 6]
 sage: U2, s2 = U1.find_substitution(M=M, i=1, radius=1, solver="dancing_links")
 sage: U2_tikz = U2.tikz(scale=1.6, label_shift=0.15)
 
-Sage commandline, line 5314::
+Sage commandline, line 5351::
 
 sage: U2.find_markers(i=2, radius=1, solver="dancing_links")
 [[9, 10, 11, 12, 13, 14, 15, 16, 24, 25, 27, 28, 29, 30, 31, 32, 33]]
@@ -111,7 +111,7 @@ sage: M = [9, 10, 11, 12, 13, 14, 15, 16, 24, 25, 27, 28, 29, 30, 31, 32, 33]
 sage: U3, s3 = U2.find_substitution(M=M, i=2, radius=1, solver="dancing_links", side="left")
 sage: U3_tikz = U3.tikz(scale=1.9, label_shift=0.1)
 
-Sage commandline, line 5326::
+Sage commandline, line 5363::
 
 sage: U3.find_markers(i=2, radius=1, solver="dancing_links")
 [[0, 1, 2, 3, 4, 5, 6]]
@@ -119,12 +119,12 @@ sage: M = [0, 1, 2, 3, 4, 5, 6]
 sage: U4, s4 = U3.find_substitution(M=M, i=2, radius=1, solver="dancing_links")
 sage: U4_tikz = U4.tikz(scale=2.2, label_shift=.1)
 
-Sage commandline, line 5342::
+Sage commandline, line 5381::
 
 sage: U5 = U4.tiles_allowing_surrounding(radius=2, solver="dancing_links")
 sage: U5_tikz = U5.tikz(scale=2.1, label_shift=.1)
 
-Sage commandline, line 5351::
+Sage commandline, line 5390::
 
 sage: U4_tiles = U4.tiles()
 sage: U5_tiles = U5.tiles()
@@ -132,7 +132,7 @@ sage: d = {i:U4_tiles.index(U5_tiles[i]) for i in range(len(U5))}
 sage: from slabbe import Substitution2d
 sage: s5 = Substitution2d.from_permutation(d)
 
-Sage commandline, line 5365::
+Sage commandline, line 5404::
 
 sage: T2.is_equivalent(U5)
 True
@@ -150,19 +150,18 @@ sage: vert_bijection #@\label{vert_bijection}
  '112': '012113',
  '113': '012112'}
 
-Sage commandline, line 5376::
+Sage commandline, line 5424::
 
 sage: self_similarity = s1*s2*s3*s4*s5*s6
 sage: self_similarity
 Substitution 2d: {0: [[16, 1], [19, 8], [24, 9]], 1: [[16, 5], [23, 8], [14, 4]], 2: [[21, 1], [18, 8], [23, 9]], 3: [[17, 7], [23, 9]], 4: [[16, 5], [23, 8]], 5: [[16, 1], [23, 8], [14, 4]], 6: [[11, 5], [13, 3], [14, 4]], 7: [[21, 1], [22, 8], [13, 4]], 8: [[12, 7], [13, 4]], 9: [[11, 5], [13, 3]], 10: [[11, 1], [13, 3], [14, 4]], 11: [[20, 6, 5], [18, 8, 3], [19, 9, 4]], 12: [[20, 6, 1], [18, 8, 3], [19, 9, 4]], 13: [[15, 10, 7], [19, 8, 4]], 14: [[15, 6, 5], [19, 8, 3]], 15: [[21, 1, 0], [18, 8, 3], [23, 9, 4]], 16: [[20, 6, 5], [18, 8, 3], [23, 9, 4]], 17: [[20, 6, 1], [18, 8, 3], [23, 9, 4]], 18: [[17, 7, 2], [23, 9, 4]], 19: [[16, 5, 2], [23, 8, 4]], 20: [[16, 1, 0], [19, 8, 3], [24, 9, 4]], 21: [[15, 6, 5], [19, 8, 3], [24, 9, 4]], 22: [[17, 7, 2], [19, 9, 4]], 23: [[16, 5, 2], [19, 8, 4]], 24: [[16, 1, 0], [19, 8, 3]]}
 
-
-Sage commandline, line 5382::
+Sage commandline, line 5431::
 
 sage: matrix(self_similarity).charpoly().factor()
 (x - 1)^3 * (x + 1)^5 * x^11 * (x^2 - 6*x + 1) * (x^2 + 2*x - 1)^2
 
-Sage commandline, line 5388::
+Sage commandline, line 5438::
 
 sage: sim_tikz = self_similarity.wang_tikz(domain_tiles=T2, codomain_tiles=T2, ncolumns=5, scale=1.2, label_shift=.15)
 
