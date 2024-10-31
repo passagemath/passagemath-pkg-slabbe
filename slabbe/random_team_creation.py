@@ -4,10 +4,11 @@ Creation of random balanced teams
 
 EXAMPLES::
 
-    sage: from slabbe.random_team_creation import print_teams
+    sage: from slabbe.random_team_creation import print_teams, create_teams
     sage: A = list(range(10))
     sage: B = list(range(10))
-    sage: print_teams(A,B,4)       # random
+    sage: d = create_teams(A, B, 4)
+    sage: print_teams(d)       # random
     Équipe  0
     3
     5
@@ -87,14 +88,16 @@ def create_teams(boys, girls, nteams):
             d[i].append(player)
     return dict(d)
 
-def print_teams(boys, girls, nteams):
+def print_teams(d):
     r"""
     EXAMPLES::
 
+        sage: from slabbe.random_team_creation import create_teams
         sage: from slabbe.random_team_creation import print_teams
         sage: A = list(range(10))
         sage: B = list(range(10))
-        sage: print_teams(A,B,4)        # random
+        sage: d = create_teams(A,B,4)
+        sage: print_teams(d)          # random
         Équipe  0
         1
         4
@@ -121,11 +124,39 @@ def print_teams(boys, girls, nteams):
         9
 
     """
-    d = create_teams(boys, girls, nteams)
-    for i in range(nteams):
+    for i in range(len(d)):
         team = d[i]
         print("Équipe ", i)
         for player in team:
             print(player)
+        print("")
+
+
+def print_teams_as_table(d):
+    r"""
+    EXAMPLES::
+
+        sage: from slabbe.random_team_creation import create_teams
+        sage: from slabbe.random_team_creation import print_teams_as_table
+        sage: A = list(range(10))
+        sage: B = list(range(10))
+        sage: d = create_teams(A,B,4)
+        sage: print_teams_as_table(d)      # random
+          0      1      2   3
+        ├──────┼──────┼───┼──────┤
+          1      0      2   3
+          5      4      7   6
+          2      0      8   9
+          5      4      3   1
+          9      None   7   6
+          None   None   8   None
+
+    """
+    from itertools import zip_longest
+    from sage.misc.table import table
+
+    rows = [row for row in zip_longest(*[d[i] for i in range(len(d))])]
+    header_row = list(range(len(d)))
+    return table(rows, header_row=header_row)
 
 
