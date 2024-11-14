@@ -31,7 +31,7 @@ dist:
 check: dist
 	VERSION=`cat VERSION`; sage -sh -c "twine check dist/slabbe-$$VERSION.tar.gz"
 upload: dist
-	VERSION=`cat VERSION`; sage -sh -c "twine upload dist/slabbe-$$VERSION.tar.gz"
+	VERSION=`cat VERSION`; sage -sh -c "twine upload dist/slabbe-$$VERSION.tar.gz --repository slabbe"
 
 clean: clean-doc
 clean-doc:
