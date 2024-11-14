@@ -169,6 +169,22 @@ __ https://trac.sagemath.org/
 Release history
 ---------------
 
+*Version 0.7.7 (Nov 14, 2024)*
+  New (small) module on q-Markoff numbers.
+  New (small) module on Wang cubes.
+  Added demo files containing the code used in `arXiv:2312.03652`__ and
+  `arXiv:2403.03197`__.
+  New module to generate random balanced teams used for managing a weekly
+  local Ultimate frisbee league.
+  Various small improvements in many modules.
+  Updated cython code to work with latest Cython versions.
+  Updated doctests to adapt to changes made in SageMath.
+  All tests passed on SageMath version 10.4.beta9 (Release Date: 2024-06-09) using Python 3.10.12.
+  All tests passed on SageMath version 10.5.beta6 (Release Date: 2024-09-29) using Python 3.12.5.
+
+__ https://arxiv.org/abs/2403.03197
+__ https://arxiv.org/abs/2312.03652
+
 *Version 0.7.6 (Dec 6, 2023)*
   New module to deal with piecewise affine transformations, the module
   on polyhedron exchange transformations is now based on it.
