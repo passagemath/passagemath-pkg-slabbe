@@ -85,6 +85,7 @@ Tilings
    aperiodic_monotile
    cut_and_project_scheme
    wang_tiles
+   wang_cubes
 
 Vizualization
 -------------
@@ -112,6 +113,7 @@ Miscellaneous
 
    analyze_sage_build
    ranking_scale
+   random_team_creation
    fruit
    write_to_file
 
