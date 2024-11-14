@@ -624,7 +624,7 @@ def check_open_question(d, n, prefix_length=10000):
         Counting each abelian factor:
         WARNING: Factor complexity is p(5)=501, but only 496 factors found in the prefix of length 180000
           abelian vector    number of factors
-        +-----------------+-------------------+
+        ├─────────────────┼───────────────────┤
           (0, 0, 2, 2, 1)   3
           (0, 2, 1, 1, 1)   6
           (0, 0, 2, 1, 2)   7
@@ -648,7 +648,7 @@ def check_open_question(d, n, prefix_length=10000):
         Counting each abelian factor:
         WARNING: Factor complexity is p(4)=501, but only 476 factors found in the prefix of length 180000
           abelian vector       number of factors
-        +--------------------+-------------------+
+        ├────────────────────┼───────────────────┤
           (0, 0, 0, 2, 1, 1)   2
           (0, 0, 0, 0, 2, 2)   3
           (1, 0, 0, 0, 2, 1)   4

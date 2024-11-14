@@ -13,7 +13,7 @@ sage: version()
 'SageMath version ..., Release Date: ...'
 sage: import importlib.metadata
 sage: importlib.metadata.version("slabbe")
-'0.7.6'
+'...'
 
 Sage commandline, line 3925::
 

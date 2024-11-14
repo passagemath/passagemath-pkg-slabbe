@@ -747,7 +747,7 @@ def digraphs_with_n_edges(n_edges, connected=None):
         sage: len(digraphs_with_n_edges(5)) # not tested (1h)
         110
         sage: len(digraphs_with_n_edges(6)) # not tested (6d 18h 48min 21s)
-	509
+        509
 
     .. NOTE::
 

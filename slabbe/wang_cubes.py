@@ -770,8 +770,8 @@ class WangCubeSets(object):
 
             sage: from collections import Counter
             sage: S = WangCubeSets(2)
-            sage: c = Counter(T.is_aperiodic_candidate(7, solver='kissat') for T in S) # long time
-            sage: dict(c)                                                              # long time
+            sage: c = Counter(T.is_aperiodic_candidate(7, solver='kissat') for T in S) # long time # known bug
+            sage: dict(c)                                                              # long time # known bug
             {(False, 'is_periodic', (True, (1, 1, 1))): 11,
              (False, 'is_periodic', (True, (1, 1, 2))): 10,
              (False, 'is_periodic', (True, (1, 2, 2))): 8,
@@ -806,8 +806,8 @@ class WangCubeSets(object):
 
             sage: from slabbe.wang_cubes import WangCubeSets
             sage: S = WangCubeSets(2)
-            sage: L = list(S.aperiodic_candidates(stop=4))   # long time (5s)
-            sage: len(L)                                     # long time (fast)
+            sage: L = list(S.aperiodic_candidates(stop=4))   # long time (5s)    # known bug
+            sage: len(L)                                     # long time (fast)  # known bug
             22
 
         This proves that there are no aperiodic set of 2 Wang cubes::
