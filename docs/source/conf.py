@@ -112,14 +112,17 @@ pygments_style = 'sphinx'
 
 pythonversion = sys.version.split(' ')[0]
 # Python and Sage trac ticket shortcuts. For example, :trac:`7549` .
+# In SageMath version 10.5, these are available in sage/src/sage/misc/sagedoc.py
+# and can be copy-pasted from there.
 extlinks = {
-    'python': ('https://docs.python.org/release/'+pythonversion+'/%s', ''),
-    'trac': ('http://trac.sagemath.org/%s', 'trac ticket #'),
-    'wikipedia': ('https://en.wikipedia.org/wiki/%s', 'Wikipedia article '),
-    'arxiv': ('http://arxiv.org/abs/%s', 'Arxiv '),
-    'oeis': ('https://oeis.org/%s', 'OEIS sequence '),
-    'doi': ('https://dx.doi.org/%s', 'doi:'),
-    'mathscinet': ('http://www.ams.org/mathscinet-getitem?mr=%s', 'MathSciNet ')
+    'python': (f'https://docs.python.org/release/{pythonversion}/%s', None),
+    'issue': ('https://github.com/sagemath/sage/issues/%s', 'Issue #%s'),
+    'trac': ('http://trac.sagemath.org/%s', 'trac ticket # %s'),
+    'wikipedia': ('https://en.wikipedia.org/wiki/%s', 'Wikipedia article %s'),
+    'arxiv': ('https://arxiv.org/abs/%s', 'arXiv %s'),
+    'oeis': ('https://oeis.org/%s', 'OEIS sequence %s'),
+    'doi': ('https://doi.org/%s', 'doi:%s'),
+    'mathscinet': ('https://www.ams.org/mathscinet-getitem?mr=%s', 'MathSciNet %s'),
     }
 
 # -- Options for HTML output ----------------------------------------------

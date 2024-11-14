@@ -4779,6 +4779,8 @@ class WangTilesGenerator:
     """
     def JeandelRao(self):
         r"""
+        Return the set of 11 Jeandel-Rao Wang tiles according to [JR21]_.
+
         EXAMPLES::
 
             sage: from slabbe import wang_tiles
@@ -4797,6 +4799,8 @@ class WangTilesGenerator:
 
     def Kari(self):
         r"""
+        Return the set of 14 Kari Wang tiles according to [K96]_.
+
         EXAMPLES::
 
             sage: from slabbe import wang_tiles
@@ -4819,6 +4823,8 @@ class WangTilesGenerator:
 
     def Culik(self):
         r"""
+        Return the set of 13 Culik Wang tiles according to [C96]_.
+
         EXAMPLES::
 
             sage: from slabbe import wang_tiles
@@ -4839,6 +4845,8 @@ class WangTilesGenerator:
 
     def Ammann(self):
         r"""
+        Return the set of 16 Ammann Wang tiles according to [GS87]_.
+
         EXAMPLES::
 
             sage: from slabbe import wang_tiles

@@ -44,6 +44,7 @@ Combinatorics
    graph
    partial_injection
    magic_hexagon
+   q_markoff
 
 Combinatorics on words
 ----------------------
