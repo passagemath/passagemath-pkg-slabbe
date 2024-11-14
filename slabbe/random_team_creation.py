@@ -46,6 +46,8 @@ EXAMPLES::
 from collections import defaultdict
 
 try:
+    # itertools.batched is a new addition in Python 3.12
+    # https://docs.python.org/3.12/whatsnew/3.12.html
     from itertools import batched
 except ImportError:
     #https://stackoverflow.com/questions/8290397/how-to-split-an-iterable-in-constant-size-chunks
@@ -56,15 +58,15 @@ except ImportError:
             sage: from slabbe.random_team_creation import batched
             sage: data = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
             sage: for x in batched(data, 3): print(x)
-            [0, 1, 2]
-            [3, 4, 5]
-            [6, 7, 8]
-            [9, 10]
+            (0, 1, 2)
+            (3, 4, 5)
+            (6, 7, 8)
+            (9, 10)
 
         """
         l = len(iterable)
         for ndx in range(0, l, n):
-            yield iterable[ndx:min(ndx + n, l)]
+            yield tuple(iterable[ndx:min(ndx + n, l)])
 
 def create_teams(boys, girls, nteams):
     r"""
