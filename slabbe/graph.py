@@ -806,3 +806,91 @@ def digraphs_with_n_edges(n_edges, connected=None):
 
     return L
 
+def eulerian_paths(G):
+    r"""
+    Return a sequence of paths covering all edges of the graph exactly
+    once.
+
+    INPUT:
+
+    - ``G`` -- undirected graph
+
+    ALGORITHM:
+
+    Euler's Theorem says that (https://en.wikipedia.org/wiki/Eulerian_path):
+
+        A connected graph has an Euler cycle if and only if every vertex has
+        even degree.
+
+    Therefore, we may construct a partition of the edges of any graph into
+    a union of k paths where k is equal to the number of odd degree
+    vertices divided by 2. The idea is to add an additional dummy vertex
+    and link every odd degree vertex to it and solve for the Eulerian
+    circuit in that even degree graph.
+
+    EXAMPLES:
+
+    The following graph has two vertices of odd degree. Thus, it
+    has no Eulerian circuit, but it has an Eulerian path::
+
+        sage: G = Graph([(0,1), (1,2), (0,3), (3,2), (0,4), (4,2)])
+        sage: G
+        Graph on 5 vertices
+        sage: G.degree()
+        [3, 2, 3, 2, 2]
+        sage: G.eulerian_circuit()
+        False
+        sage: G.eulerian_circuit(path=True)
+        [(2, 4, None),
+         (4, 0, None),
+         (0, 3, None),
+         (3, 2, None),
+         (2, 1, None),
+         (1, 0, None)]
+        sage: from slabbe.graph import eulerian_paths
+        sage: eulerian_paths(G)
+        [[(2, 4), (4, 0), (0, 3), (3, 2), (2, 1), (1, 0)]]
+
+    The following has four odd degree vertices. Thus, it has
+    no Eulerian circuit nor Eulerian paths. But we can cover all the edges
+    with two paths::
+
+        sage: G = Graph([(0,1), (1,2), (0,3), (3,2), (0,4), (4,2), (1,4)])
+        sage: G.eulerian_circuit()
+        False
+        sage: G.eulerian_circuit(path=True)
+        False
+        sage: eulerian_paths(G)
+        [[(4, 2), (2, 3), (3, 0), (0, 4), (4, 1), (1, 2)], [(1, 0)]]
+
+    """
+    G_copy = G.copy()
+    odd_degree_vertices = [v for (v,d) in G_copy.degree_iterator(labels=True) if d % 2 == 1]
+
+    # construct a dummy vertex which is not already a vertex of the graph
+    dummy_vertex = -1
+    while dummy_vertex in G_copy:
+        dummy_vertex = (dummy_vertex,)
+    assert dummy_vertex not in G_copy
+
+    G_copy.add_edges((v,dummy_vertex) for v in odd_degree_vertices)
+    assert G_copy.is_eulerian(), "this graph should be Eulerian, i.e., degree sequence should be all even: {}".format(G_copy.degree())
+
+    L = G_copy.eulerian_circuit(labels=False)
+
+    # find the first position of the dummy vertex in the circuit
+    first_dummy = 0
+    while L[first_dummy][0] != dummy_vertex:
+        first_dummy += 1
+    assert L[first_dummy][0] == dummy_vertex
+
+    # rotate the circuit
+    L = L[first_dummy:] + L[:first_dummy]
+
+    starts = [i for (i,(a,b)) in enumerate(L) if a == dummy_vertex]
+    starts.append(len(L))
+    assert starts[0] == 0
+
+    paths = [L[starts[i]:starts[i+1]] for i in range(len(starts)-1)]
+    return [path[1:-1] for path in paths]
+
