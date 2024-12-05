@@ -658,12 +658,20 @@ class MonotileSolver():
 
         return edges
 
-    def one_solution_tikz(self, ignore_incomplete=True, extra=4, solver=None):
+    def one_solution_tikz(self, ignore_incomplete=True, extra=4,
+            solver=None, verbose=False):
         r"""
         Return the list of edges of a solution.
 
         Each edge appears only once in the output. This allows to avoid the
         laser cut machine to pass twice at the same place.
+
+        INPUT:
+
+        - ``ignore_incomplete`` -- bool (default ``True``)
+        - ``extra`` -- integer (default: ``4``)
+        - ``solver`` -- string (default ``None``)
+        - ``verbose`` -- bool (default ``False``)
 
         EXAMPLES::
 
@@ -673,15 +681,8 @@ class MonotileSolver():
             \documentclass[tikz]{standalone}
             \begin{document}
             \begin{tikzpicture}
-            \draw[red] (..., ...) -- (..., ...);
-            \draw[red] (..., ...) -- (..., ...);
-            \draw[red] (..., ...) -- (..., ...);
-            \draw[red] (..., ...) -- (..., ...);
-            ...
-            \draw[red] (..., ...) -- (..., ...);
-            \draw[red] (..., ...) -- (..., ...);
-            \draw[red] (..., ...) -- (..., ...);
-            \draw[red] (..., ...) -- (..., ...);
+            \draw[red] (..., ...) -- (..., ...) ...
+                       (..., ...) -- (..., ...);
             \end{tikzpicture}
             \end{document}
 
@@ -689,13 +690,25 @@ class MonotileSolver():
         edges = self.one_solution_list_of_edges(ignore_incomplete=ignore_incomplete,
                                                 extra=extra, 
                                                 solver=solver)
-        edges = sorted(edges)
+        from sage.graphs.graph import Graph
+        G = Graph(edges, format='list_of_edges')
+
+        from slabbe.graph import eulerian_paths
+        paths = eulerian_paths(G)
+
+        if verbose:
+            print("Number of edges:",len(edges))
+            print("Number of paths:",len(paths))
+            print("Lengths of paths:",sorted([len(path) for path in paths]))
 
         lines = []
         lines.append(r"\begin{tikzpicture}")
-        for edge in edges:
-            x,y = edge
-            lines.append(r"\draw[red] {} -- {};".format(x.n(),y.n()))
+        for path in paths:
+            V = [a for (a,b) in path]
+            V.append(path[-1][1])
+            path_str = ' -- '.join(f"({x.n()}, {y.n()})" for (x,y) in V)
+            lines.append(r"\draw[red] {};".format(path_str))
+
         lines.append(r"\end{tikzpicture}")
         from sage.misc.latex_standalone import TikzPicture
         return TikzPicture('\n'.join(lines))
