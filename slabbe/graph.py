@@ -806,6 +806,51 @@ def digraphs_with_n_edges(n_edges, connected=None):
 
     return L
 
+def minimal_perfect_matching(vertices, cost=None, solver=None, verbose=False):
+    r"""
+    Return a perfect matching of points minimizing the sum of the cost of all pairs.
+
+    INPUT:
+
+    - ``vertices`` -- list of vertices
+    - ``cost`` -- function (vertices x vertices -> R) or ``None``. If
+      ``None``, it computes the Euclidean distance between points.
+    - ``solver`` -- string (default:``None``), name of a MILP solver,
+      default is ``default_mip_solver()``
+    - ``verbose`` -- bool (default:``False``)
+
+    OUTPUT:
+
+    list of pairs of vertices
+
+    EXAMPLES::
+
+        sage: from slabbe.graph import minimal_perfect_matching
+        sage: minimal_perfect_matching([(0,0), (10,0), (0,1), (10,1)])
+        [((0, 0), (0, 1)), ((10, 0), (10, 1))]
+
+    """
+    if cost is None:
+        from sage.modules.free_module_element import vector
+        cost = lambda u,v: (vector(v)-vector(u)).norm().n()
+
+    edges = list(itertools.combinations(vertices, 2))
+    cost_dict = {(u,v):cost(u,v) for (u,v) in edges}
+
+    from sage.numerical.mip import MixedIntegerLinearProgram
+    p = MixedIntegerLinearProgram(solver=solver)
+    matching = p.new_variable(binary=True)
+    p.set_objective(-p.sum(cost_dict[e]*matching[e] for e in edges))
+    for v in vertices:
+        p.add_constraint(p.sum(matching[(x,y)] for (x,y) in edges if y == v) 
+                        +p.sum(matching[(x,y)] for (x,y) in edges if x == v) == 1)
+    if verbose:
+        p.show()
+
+    p.solve()
+    matching = p.get_values(matching, convert=bool, tolerance=1e-3)
+    return sorted(e for (e, b) in matching.items() if b)
+
 def eulerian_paths(G):
     r"""
     Return a sequence of paths covering all edges of the graph exactly
@@ -893,4 +938,99 @@ def eulerian_paths(G):
 
     paths = [L[starts[i]:starts[i+1]] for i in range(len(starts)-1)]
     return [path[1:-1] for path in paths]
+
+def minimal_eulerian_paths(G, cost=None):
+    r"""
+    Return a sequence of paths covering all edges of the graph exactly
+    once and minimizing the distance between the end and start of the next
+    path.
+
+    INPUT:
+
+    - ``G`` -- undirected graph
+    - ``cost`` -- function (vertices x vertices -> R) or ``None``. If
+      ``None``, it computes the Euclidean distance between points.
+
+    ALGORITHM:
+
+    Euler's Theorem says that (https://en.wikipedia.org/wiki/Eulerian_path):
+
+        A connected graph has an Euler cycle if and only if every vertex has
+        even degree.
+
+    We add edges between vertices of odd degree (a matching of minimal
+    Euclidean distance). We compute a Euler cycle. We decompose the cycle.
+
+    EXAMPLES:
+
+    The following graph has two vertices of odd degree. Thus, it
+    has no Eulerian circuit, but it has an Eulerian path::
+
+        sage: G = Graph([(0,1), (1,2), (0,3), (3,2), (0,4), (4,2)])
+        sage: G
+        Graph on 5 vertices
+        sage: G.degree()
+        [3, 2, 3, 2, 2]
+        sage: G.eulerian_circuit()
+        False
+        sage: G.eulerian_circuit(path=True)
+        [(2, 4, None),
+         (4, 0, None),
+         (0, 3, None),
+         (3, 2, None),
+         (2, 1, None),
+         (1, 0, None)]
+        sage: from slabbe.graph import minimal_eulerian_paths
+        sage: cost = lambda u,v : abs(v-u)
+        sage: minimal_eulerian_paths(G, cost)
+        [[(2, 1), (1, 0), (0, 4), (4, 2), (2, 3), (3, 0)]]
+
+    The following has four odd degree vertices. Thus, it has
+    no Eulerian circuit nor Eulerian paths. But we can cover all the edges
+    with two paths::
+
+        sage: G = Graph([(0,1), (1,2), (0,3), (3,2), (0,4), (4,2), (1,4)])
+        sage: G.eulerian_circuit()
+        False
+        sage: G.eulerian_circuit(path=True)
+        False
+        sage: cost = lambda u,v : abs(v-u)
+        sage: minimal_eulerian_paths(G, cost)       # known bug
+        [[(4, 2), (2, 3), (3, 0), (0, 4), (4, 1), (1, 2)], [(1, 0)]]
+
+    TODO:
+
+    - the matchings should not be part of the edges of the graph!!
+
+    """
+    G_copy = G.copy()
+    odd_degree_vertices = [v for (v,d) in G_copy.degree_iterator(labels=True) if d % 2 == 1]
+
+    assert len(odd_degree_vertices) % 2 == 0, "there should be an even # of odd degree vertices"
+
+    # we add the edges of a minimal perfect matching between odd degree
+    # vertices
+    matching = minimal_perfect_matching(odd_degree_vertices, cost=cost)
+    #print(matching)
+    G_copy.add_edges(matching)
+
+    #print(G_copy.edges())
+
+    assert G_copy.is_eulerian(), "this graph should be Eulerian, i.e., degree sequence should be all even: {}".format(G_copy.degree())
+
+    L = G_copy.eulerian_circuit(labels=False)
+
+    paths = []
+    path = []
+    for edge in L:
+        if edge in matching or (edge[1], edge[0]) in matching:
+            paths.append(path)
+            path = []
+        else:
+            path.append(edge)
+    else:
+        # insert the last path found at the beginning of the first
+        paths[0][0:0] = path
+
+    return paths
 
