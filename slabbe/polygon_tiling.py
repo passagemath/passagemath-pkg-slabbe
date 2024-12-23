@@ -175,8 +175,16 @@ class PolygonTiling:
         for s in self._patch_symmetries:
             yield [s*v for v in self._polygon] 
 
-    def iter_polygons(self, depth):
+    def iter_polygons(self, depth, region=None):
         r"""
+        Iterator of the polygons of the tiling
+
+        INPUT:
+
+        - ``depth`` -- integer
+        - ``region`` -- ``None`` or polyhedron, polygons in the output are
+          restricted to this region
+
         EXAMPLES::
 
             sage: from slabbe.polygon_tiling import PolygonTiling
@@ -190,6 +198,17 @@ class PolygonTiling:
              [(0, 0), (1, 0), (sqrt(3) + 1, 1), (1/2*sqrt(3) + 1, 3/2), (0, 1)],
              [(1, 0), (2, 0), (sqrt(3) + 2, 1), (1/2*sqrt(3) + 2, 3/2), (1, 1)]]
 
+        Restricted to a region::
+
+            sage: box = polytopes.hypercube(dim=2, intervals=[(-2,2), (-2,2)])
+            sage: list(J.iter_polygons(depth=2, region=box))
+            [[(-1/2*sqrt(3) - 1, -1/2),
+              (-1, 0),
+              (0, 0),
+              (1, 0),
+              (1/2, -1/2*sqrt(3)),
+              (-1/2*sqrt(3) - 1/2, -1/2*sqrt(3) - 1/2)]]
+
         """
         import itertools
         from sage.misc.misc_c import prod
@@ -197,11 +216,19 @@ class PolygonTiling:
         for r in itertools.product(range(-depth, depth), repeat=k):
             t_r = prod(t**ri for (t,ri) in zip(self._translations, r))
             for polygon in self.patch():
-                yield [t_r*v for v in polygon] 
+                t_r_polygon = [t_r*v for v in polygon] 
+                if region is None or all(v in region for v in t_r_polygon):
+                    yield t_r_polygon
 
-    def vertices(self, depth):
+    def vertices(self, depth, region=None):
         r"""
         Return the set of vertices of the tiling.
+
+        INPUT:
+
+        - ``depth`` -- integer
+        - ``region`` -- ``None`` or polyhedron, polygons in the output are
+          restricted to this region
 
         EXAMPLES::
 
@@ -217,16 +244,35 @@ class PolygonTiling:
              (1.86602540378444, 1.50000000000000),
              (2.73205080756888, 1.00000000000000)]
 
+        Restricted to a region::
+
+            sage: box = polytopes.hypercube(dim=2, intervals=[(-2,2), (-2,2)])
+            sage: sorted(v.n() for v in J.vertices(1, region=box))  # abs tol 0.0001
+            [(-1.86602540378444, -0.500000000000000),
+             (-1.36602540378444, -1.36602540378444),
+             (-1.00000000000000, 0.000000000000000),
+             (2.93873587705572e-39, -5.87747175411144e-39),
+             (0.500000000000000, -0.866025403784439),
+             (1.00000000000000, -5.87747175411144e-39)]
+
         """
         s = set()
-        for p in self.iter_polygons(depth):
+        for p in self.iter_polygons(depth, region=region):
             for v in p:
                 v.set_immutable()
                 s.add(v)
         return s
 
-    def plot(self, depth):
+    def plot(self, depth, region=None):
         r"""
+        Return a graphics 2d of the polygon of the tiling.
+
+        INPUT:
+
+        - ``depth`` -- integer
+        - ``region`` -- ``None`` or polyhedron, polygons in the output are
+          restricted to this region
+
         EXAMPLES::
 
             sage: from slabbe.polygon_tiling import PolygonTiling
@@ -254,90 +300,17 @@ class PolygonTiling:
             sage: J.plot(1)
             Graphics object consisting of 2 graphics primitives
 
+        Restricted to a region::
+
+            sage: box = polytopes.hypercube(dim=2, intervals=[(-2,2), (-2,2)])
+            sage: J.plot(1, region=box)
+            Graphics object consisting of 1 graphics primitive
+
         """
         from sage.plot.graphics import Graphics
         from sage.plot.polygon import polygon2d
         G = Graphics()
-        for p in self.iter_polygons(depth):
-            G += polygon2d(p, fill=False, thickness=4, color='orange')
-        return G
-
-    def polygons_restricted_to_region(self, region):
-        r"""
-        Return the recursively enumerated set of polygons that lie inside a
-        convex region.
-
-        INPUT:
-
-        - ``region`` -- polyhedron, ideally it should contain entirely the initial
-          patch of polygons
-
-        EXAMPLES::
-
-            sage: from slabbe.polygon_tiling import PolygonTiling
-            sage: domino = [(0,0), (2,0), (2,1), (0,1)]
-            sage: F = AffineGroup(2, ZZ)
-            sage: T = [F.translation((2,0)), F.translation((1,1))]
-            sage: J = PolygonTiling(domino, translations=T)
-            sage: box = polytopes.hypercube(dim=2, intervals=[(-3,3), (-2,4)])
-            sage: J.polygons_restricted_to_region(box)
-            A recursively enumerated set with a symmetric structure (breadth first search)
-
-        TODO:
-
-        - Very slow compare to ``iter_polygons`` with a large enough depth
-          to be filtered inside a box.
-
-        """
-        from sage.sets.recursively_enumerated_set import RecursivelyEnumeratedSet
-
-        seeds = []
-        for polygon in self.patch():
-            P = tuple(sorted(v for v in polygon))
-            for p in P: p.set_immutable()
-            seeds.append(P)
-
-        def successors(polygon):
-            for t in self._translations:
-                P = tuple(sorted(t*v for v in polygon))
-                if all(p in region for p in P):
-                    for p in P: p.set_immutable()
-                    yield P
-                t_inv = t.inverse()
-                P = tuple(sorted(t_inv*v for v in polygon))
-                if all(p in region for p in P):
-                    for p in P: p.set_immutable()
-                    yield P
-
-        return RecursivelyEnumeratedSet(seeds, successors, structure='symmetric')
-
-    def plot_polygons_restricted_to_region(self, region):
-        r"""
-        Return a graphics of the polygons that lie inside a convex region.
-
-        INPUT:
-
-        - ``region`` -- polyhedron
-
-        EXAMPLES::
-
-            sage: from slabbe.polygon_tiling import PolygonTiling
-            sage: domino = [(0,0), (2,0), (2,1), (0,1)]
-            sage: F = AffineGroup(2, ZZ)
-            sage: T = [F.translation((2,0)), F.translation((1,1))]
-            sage: J = PolygonTiling(domino, translations=T)
-            sage: box = polytopes.hypercube(dim=2, intervals=[(-3,3), (-2,4)])
-            sage: J.plot_polygons_restricted_to_region(box)
-        """
-        from sage.plot.graphics import Graphics
-        from sage.plot.polygon import polygon2d
-        from sage.geometry.polyhedron.plot import cyclic_sort_vertices_2d
-        from sage.geometry.polyhedron.constructor import Polyhedron
-
-        R = self.polygons_restricted_to_region(region)
-        G = Graphics()
-        for p in R:
-            p = cyclic_sort_vertices_2d(Polyhedron(p).vertices())
+        for p in self.iter_polygons(depth, region=region):
             G += polygon2d(p, fill=False, thickness=4, color='orange')
         return G
 
