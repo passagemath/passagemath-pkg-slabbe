@@ -193,21 +193,32 @@ class PolygonTiling:
             sage: T = [F.translation((1,0))]
             sage: J = PolygonTiling(jennifer, translations=T)
             sage: list(J.iter_polygons(depth=2))
-            [[(-2, 0), (-1, 0), (sqrt(3) - 1, 1), (1/2*sqrt(3) - 1, 3/2), (-2, 1)],
-             [(-1, 0), (0, 0), (sqrt(3), 1), (1/2*sqrt(3), 3/2), (-1, 1)],
-             [(0, 0), (1, 0), (sqrt(3) + 1, 1), (1/2*sqrt(3) + 1, 3/2), (0, 1)],
-             [(1, 0), (2, 0), (sqrt(3) + 2, 1), (1/2*sqrt(3) + 2, 3/2), (1, 1)]]
+            [[(-2, 0),
+              (-1, 0),
+              (0.732050807568878?, 1),
+              (-0.1339745962155614?, 1.5000000000000000?),
+              (-2, 1)],
+             [(-1, 0),
+              (0, 0),
+              (1.732050807568878?, 1),
+              (0.866025403784439?, 1.5000000000000000?),
+              (-1, 1)],
+             [(0, 0),
+              (1, 0),
+              (2.732050807568878?, 1),
+              (1.866025403784439?, 1.5000000000000000?),
+              (0, 1)],
+             [(1, 0),
+              (2, 0),
+              (3.732050807568878?, 1),
+              (2.866025403784439?, 1.5000000000000000?),
+              (1, 1)]]
 
         Restricted to a region::
 
             sage: box = polytopes.hypercube(dim=2, intervals=[(-2,2), (-2,2)])
             sage: list(J.iter_polygons(depth=2, region=box))
-            [[(-1/2*sqrt(3) - 1, -1/2),
-              (-1, 0),
-              (0, 0),
-              (1, 0),
-              (1/2, -1/2*sqrt(3)),
-              (-1/2*sqrt(3) - 1/2, -1/2*sqrt(3) - 1/2)]]
+            [[(-2, 0), (-1, 0), ..., (-1, 1)]]
 
         """
         import itertools
@@ -219,6 +230,44 @@ class PolygonTiling:
                 t_r_polygon = [t_r*v for v in polygon] 
                 if region is None or all(v in region for v in t_r_polygon):
                     yield t_r_polygon
+
+    def eulerian_paths(self, depth, region=None):
+        r"""
+        Iterator of the paths forming a partition of the edges of the tiling.
+
+        INPUT:
+
+        - ``depth`` -- integer
+        - ``region`` -- ``None`` or polyhedron, polygons in the output are
+          restricted to this region
+
+        EXAMPLES::
+
+            sage: from slabbe.polygon_tiling import PolygonTiling
+            sage: jennifer = [(0,0), (1,0), (1+sqrt(3),1), (1+sqrt(3)/2,3/2), (0,1)]
+            sage: F = AffineGroup(2, AA)
+            sage: T = [F.translation((1,0))]
+            sage: J = PolygonTiling(jennifer, translations=T)
+            sage: J.eulerian_paths(depth=1)
+            [[(-1, 0), ..., (0, 0), (-1, 0)]]
+
+        Restricted to a region::
+
+            sage: box = polytopes.hypercube(dim=2, intervals=[(-2,2), (-2,2)])
+            sage: J.eulerian_paths(depth=2, region=box)
+            [[(-2, 0), (-2, 1), ..., (-1, 0), (-2, 0)]]
+
+        """
+        from sage.graphs.graph import Graph
+        G = Graph()
+        for p in self.iter_polygons(depth=depth, region=region):
+            for v in p:
+                v.set_immutable()
+            num_vertices = len(p)
+            G.add_edges((p[i],p[(i+1) % num_vertices]) for i in range(len(p)))
+
+        from slabbe.graph import eulerian_paths
+        return eulerian_paths(G)
 
     def vertices(self, depth, region=None):
         r"""
@@ -235,8 +284,8 @@ class PolygonTiling:
             sage: from slabbe.polygon_tiling import PolygonTiling
             sage: jennifer = [(0,0), (1,0), (1+sqrt(3),1), (1+sqrt(3)/2,3/2), (0,1)]
             sage: J = PolygonTiling(jennifer)
-            sage: J.vertices(1)
-            {(0, 0), (0, 1), (1, 0), (1/2*sqrt(3) + 1, 3/2), (sqrt(3) + 1, 1)}
+            sage: J.vertices(1)                               # abs tol 0.0001
+            {(0, 0), (0, 1), (1, 0), (1.866025403784439?, 3/2), (2.732050807568878?, 1)}
             sage: sorted(v.n() for v in J.vertices(1))        # abs tol 0.0001
             [(0.000000000000000, 0.000000000000000),
              (0.000000000000000, 1.00000000000000),
@@ -246,14 +295,13 @@ class PolygonTiling:
 
         Restricted to a region::
 
-            sage: box = polytopes.hypercube(dim=2, intervals=[(-2,2), (-2,2)])
-            sage: sorted(v.n() for v in J.vertices(1, region=box))  # abs tol 0.0001
-            [(-1.86602540378444, -0.500000000000000),
-             (-1.36602540378444, -1.36602540378444),
-             (-1.00000000000000, 0.000000000000000),
-             (2.93873587705572e-39, -5.87747175411144e-39),
-             (0.500000000000000, -0.866025403784439),
-             (1.00000000000000, -5.87747175411144e-39)]
+            sage: box = polytopes.hypercube(dim=2, intervals=[(-5,5), (-5,5)])
+            sage: sorted(v.n() for v in J.vertices(2, region=box))  # abs tol 0.0001
+            [(0.000000000000000, 0.000000000000000),
+             (0.000000000000000, 1.00000000000000),
+             (1.00000000000000, 0.000000000000000),
+             (1.86602540378444, 1.50000000000000),
+             (2.73205080756888, 1.00000000000000)]
 
         """
         s = set()
@@ -313,6 +361,60 @@ class PolygonTiling:
         for p in self.iter_polygons(depth, region=region):
             G += polygon2d(p, fill=False, thickness=4, color='orange')
         return G
+
+    def tikz(self, depth, region=None, color='red'):
+        r"""
+        Return a graphics 2d of the polygon of the tiling.
+
+        INPUT:
+
+        - ``depth`` -- integer
+        - ``region`` -- ``None`` or polyhedron, polygons in the output are
+          restricted to this region
+        - ``color`` -- string (default: ``'red'``) 
+
+        EXAMPLES::
+
+            sage: from slabbe.polygon_tiling import PolygonTiling
+            sage: jennifer = [(0,0), (1,0), (1+sqrt(3),1), (1+sqrt(3)/2,3/2), (0,1)]
+            sage: F = AffineGroup(2, AA)
+            sage: T = [F.translation((1,0))]
+            sage: J = PolygonTiling(jennifer, translations=T)
+            sage: tikz = J.tikz(depth=1); tikz
+            \documentclass[tikz]{standalone}
+            \begin{document}
+            \begin{tikzpicture}
+            \draw[red] (-1.00000,0.00000) -- (-1.00000,1.00000) --
+            (0.86603,1.50000) -- (1.73205,1.00000) -- (0.00000,0.00000) --
+            (0.00000,1.00000) -- (1.86603,1.50000) -- (2.73205,1.00000) --
+            (1.00000,0.00000) -- (0.00000,0.00000) -- (-1.00000,0.00000);
+            \end{tikzpicture}
+            \end{document}
+
+        Restricted to a region::
+
+            sage: box = polytopes.hypercube(dim=2, intervals=[(-2,2), (-2,2)])
+            sage: tikz = J.tikz(depth=2, region=box); tikz
+            \documentclass[tikz]{standalone}
+            \begin{document}
+            \begin{tikzpicture}
+            \draw[red] (-2.00000,0.00000) -- (-2.00000,1.00000) --
+            (-0.13397,1.50000) -- (0.73205,1.00000) -- (-1.00000,0.00000)
+            -- (-1.00000,1.00000) -- (0.86603,1.50000) -- (1.73205,1.00000)
+            -- (0.00000,0.00000) -- (-1.00000,0.00000) --
+            (-2.00000,0.00000);
+            \end{tikzpicture}
+            \end{document}
+
+        """
+        lines = []
+        lines.append(r"\begin{tikzpicture}")
+        for path in self.eulerian_paths(depth, region=region):
+            s = " -- ".join(["({:.5f},{:.5f})".format(*v.n()) for v in path])
+            lines.append(r"\draw[{}] {};".format(color, s))
+        lines.append(r"\end{tikzpicture}")
+        from sage.misc.latex_standalone import TikzPicture
+        return TikzPicture('\n'.join(lines))
 
 def symmetrie(p1, p2):
     r"""
