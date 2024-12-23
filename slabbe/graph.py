@@ -894,7 +894,7 @@ def eulerian_paths(G):
          (1, 0, None)]
         sage: from slabbe.graph import eulerian_paths
         sage: eulerian_paths(G)
-        [[(2, 4), (4, 0), (0, 3), (3, 2), (2, 1), (1, 0)]]
+        [[2, 4, 0, 3, 2, 1, 0]]
 
     The following has four odd degree vertices. Thus, it has
     no Eulerian circuit nor Eulerian paths. But we can cover all the edges
@@ -906,9 +906,19 @@ def eulerian_paths(G):
         sage: G.eulerian_circuit(path=True)
         False
         sage: eulerian_paths(G)
-        [[(4, 2), (2, 3), (3, 0), (0, 4), (4, 1), (1, 2)], [(1, 0)]]
+        [[1, 0], [4, 2, 3, 0, 4, 1, 2]]
+
+    Works if G is already Eulerian::
+
+        sage: G = Graph([(0,1), (1,2), (2,3), (3,4), (4,0)])
+        sage: eulerian_paths(G)
+        [[0, 4, 3, 2, 1, 0]]
 
     """
+    if G.is_eulerian():
+        edge_seq,vertex_seq = G.eulerian_circuit(labels=False, return_vertices=True)
+        return [vertex_seq]
+
     G_copy = G.copy()
     odd_degree_vertices = [v for (v,d) in G_copy.degree_iterator(labels=True) if d % 2 == 1]
 
@@ -921,23 +931,26 @@ def eulerian_paths(G):
     G_copy.add_edges((v,dummy_vertex) for v in odd_degree_vertices)
     assert G_copy.is_eulerian(), "this graph should be Eulerian, i.e., degree sequence should be all even: {}".format(G_copy.degree())
 
-    L = G_copy.eulerian_circuit(labels=False)
+    edge_sequence,L = G_copy.eulerian_circuit(labels=False, return_vertices=True)
+
+    assert L[0] == L[-1]
+    del L[0]
 
     # find the first position of the dummy vertex in the circuit
     first_dummy = 0
-    while L[first_dummy][0] != dummy_vertex:
+    while L[first_dummy] != dummy_vertex:
         first_dummy += 1
-    assert L[first_dummy][0] == dummy_vertex
+    assert L[first_dummy] == dummy_vertex
 
     # rotate the circuit
     L = L[first_dummy:] + L[:first_dummy]
+    L.append(L[0])
 
-    starts = [i for (i,(a,b)) in enumerate(L) if a == dummy_vertex]
-    starts.append(len(L))
+    starts = [i for (i,v) in enumerate(L) if v == dummy_vertex]
     assert starts[0] == 0
-
+    
     paths = [L[starts[i]:starts[i+1]] for i in range(len(starts)-1)]
-    return [path[1:-1] for path in paths]
+    return [path[1:] for path in paths]
 
 def minimal_eulerian_paths(G, cost=None):
     r"""
@@ -1007,14 +1020,15 @@ def minimal_eulerian_paths(G, cost=None):
     odd_degree_vertices = [v for (v,d) in G_copy.degree_iterator(labels=True) if d % 2 == 1]
 
     assert len(odd_degree_vertices) % 2 == 0, "there should be an even # of odd degree vertices"
-
     # we add the edges of a minimal perfect matching between odd degree
     # vertices
     matching = minimal_perfect_matching(odd_degree_vertices, cost=cost)
     #print(matching)
-    G_copy.add_edges(matching)
 
-    #print(G_copy.edges())
+    # ignore edges of the matching which are already in the graph
+    matching_to_add = [(a,b) for (a,b) in matching if not G_copy.has_edge(a,b)]
+
+    G_copy.add_edges(matching_to_add)
 
     assert G_copy.is_eulerian(), "this graph should be Eulerian, i.e., degree sequence should be all even: {}".format(G_copy.degree())
 
@@ -1023,7 +1037,7 @@ def minimal_eulerian_paths(G, cost=None):
     paths = []
     path = []
     for edge in L:
-        if edge in matching or (edge[1], edge[0]) in matching:
+        if edge in matching_to_add or (edge[1], edge[0]) in matching_to_add:
             paths.append(path)
             path = []
         else:
