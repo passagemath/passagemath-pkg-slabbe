@@ -135,6 +135,29 @@ class PolygonTiling:
         """
         return self._dimension
 
+    def polygon_angles(self):
+        r"""
+        EXAMPLES::
+
+            sage: from slabbe.polygon_tiling import PolygonTiling
+            sage: jennifer = [(0,0), (1,0), (1+sqrt(3),1), (1+sqrt(3)/2,3/2), (0,1)]
+            sage: J = PolygonTiling(jennifer)
+            sage: J.polygon_angles()
+            [1/2*pi,
+             pi - arccos(0.866025403784439?),
+             1/3*pi,
+             pi - arccos(0.7071067811865475?),
+             pi - arccos(0.2588190451025208?)]
+
+        """
+        from sage.functions.trig import arccos
+        N = len(self._polygon)
+        edges = [self._polygon[(i+1)%N]-self._polygon[i] for i in range(N)]
+
+        L = [arccos(-edges[i]*edges[(i-1)%N] /
+             (edges[i].norm()*edges[(i-1)%N].norm())) for i in range(N)]
+        return L
+
     def polygon_vertex_distances(self):
         r"""
         EXAMPLES::
@@ -154,6 +177,51 @@ class PolygonTiling:
             v = q - p
             distances.append(v.norm())
         return distances
+
+    def pp(self):
+        r"""
+        EXAMPLES::
+
+            sage: from slabbe.polygon_tiling import PolygonTiling
+            sage: jennifer = [(0,0), (1,0), (1+sqrt(3),1), (1+sqrt(3)/2,3/2), (0,1)]
+            sage: J = PolygonTiling(jennifer)
+            sage: J.pp()
+            Angles of the polygon:
+             A = 90.000 degrees
+             B = 150.000 degrees
+             C = 60.000 degrees
+             D = 135.000 degrees
+             E = 105.000 degrees
+            Side-lengths of the polygon:
+             a = 1.000
+             b = 1.000
+             c = 2.000
+             d = 1.000
+             e = 1.932
+        """
+        if len(self._polygon) != 5:
+            raise NotImplementedError
+
+        from sage.symbolic.constants import pi
+        angles_rad = self.polygon_angles()
+        angles_degrees = [a.n()/pi.n()*180 for a in angles_rad]
+
+        print("Angles of the polygon:")
+        print(" A = {:.3f} degrees".format(angles_degrees[0]))
+        print(" B = {:.3f} degrees".format(angles_degrees[1]))
+        print(" C = {:.3f} degrees".format(angles_degrees[2]))
+        print(" D = {:.3f} degrees".format(angles_degrees[3]))
+        print(" E = {:.3f} degrees".format(angles_degrees[4]))
+
+        side_lengths = self.polygon_vertex_distances()
+
+        print("Side-lengths of the polygon:")
+        print(" a = {:.3f}".format(side_lengths[4].n()))
+        print(" b = {:.3f}".format(side_lengths[0].n()))
+        print(" c = {:.3f}".format(side_lengths[1].n()))
+        print(" d = {:.3f}".format(side_lengths[2].n()))
+        print(" e = {:.3f}".format(side_lengths[3].n()))
+
 
     def patch(self):
         r"""
@@ -480,60 +548,141 @@ def symmetrie_mediatrice(p1, p2):
     assert tuple(p1) == tuple(T(p2)), "{} == {}".format(p1, T(p2))
     return T
 
-def Jennifer():
-    r"""
-    EXAMPLES::
 
-        sage: from slabbe.polygon_tiling import Jennifer
-        sage: Jennifer()
-        Tiling by the polygon [(0, 0), (1, 0), (1.866025403784439?, 1/2),
-        (2.732050807568878?, 1), (1.866025403784439?, 3/2), (0, 1)]
+class PentagonalTilings:
+    def type_10(self, c, e, B):
+        r"""
+        Return a type 10 pentagonal tiling.
 
-    """
-    import itertools
-    from sage.misc.functional import sqrt
-    from sage.rings.rational_field import QQ
-    from sage.rings.qqbar import AA
-    A = (0,0) 
-    B1 = (1,0)
-    B2 = (1+sqrt(3)/2,QQ(1/2))
-    C = (1+sqrt(3),1)
-    D = (1+sqrt(3)/2,QQ(3/2))
-    E = (0,1)
-    jennifer = [A, B1, B2, C, D, E]
+        INPUT:
 
-    # transformations
-    F = AffineGroup(2, AA)
-    rotate30 = F([sqrt(3)/2,QQ(1/2),-QQ(1/2),sqrt(3)/2])
-    exchange_xy = F([0,1,1,0])
+        - ``c`` -- length of side c
+        - ``e`` -- length of side e
+        - ``B`` -- angle of vertex B
 
-    patch3 = [F.one(), 
-              #rotate30,
-              F.translation(D)*rotate30*exchange_xy,
-              symmetrie(D, E),
-              ]
+        .. NOTE::
 
-    g = F.translation((-QQ(1/2), sqrt(3)/2 + 1))
-    patch6 = [t for t in patch3]
-    patch6.extend(g*rotate30.inverse()*exchange_xy*t for t in patch3)
+            Length constraints: a=b=c+e.
+            Angle constraints: A=90, B+E=180, B+2C=360, (C+D=270).
 
-    #h1 = (sqrt(3)*3/2 + QQ(3/2), sqrt(3)/2 + QQ(5/2))
-    #h2 = (sqrt(3)*3/2 + QQ(3/2), sqrt(3)/2 + QQ(3/2))
-    #h1 = (sqrt(3)/2 - QQ(1/2), sqrt(3)*3/2 + QQ(7/2))
-    h1 = (-QQ(1/2), sqrt(3)*3/2 + 4)
-    h2 = (sqrt(3)/2 - QQ(1/2), sqrt(3)*3/2 + QQ(9/2))
-    h  = symmetrie(h1, h2)
-    hm = symmetrie_mediatrice(h1, h2)
-    patch12 = [t for t in patch6]
-    patch12.extend(hm*h*t for t in patch6)
+        .. TODO::
 
-    t1 = F.translation((sqrt(3)/2 + QQ(1/2), sqrt(3)/2 + QQ(3/2)))
-    t2 = F.translation((-5*sqrt(3)/2 - 4, 2*sqrt(3) + QQ(9/2)))
-    translations = [t1,t2]
+            Not all inputs are valid. Can we remove one argument and turn
+            this into a function?
 
-    J = PolygonTiling(jennifer, patch12, translations)
-    return J
+        EXAMPLES::
 
-#J = Jennifer()
+            sage: from slabbe.polygon_tiling import pentagonal_tilings
+            sage: t = pentagonal_tilings.type_10(c=1, e=1, B=pi/2)
+            sage: t
+            Tiling by the polygon [(0, 0), (2, 0), (2, 1), (1, 2), (0, 2)]
 
+        Bad inputs::
+
+            sage: t = pentagonal_tilings.type_10(c=1, e=2, B=3*pi/5)
+            Traceback (most recent call last):
+            ...
+            AssertionError: 1.90538514345210
+
+        """
+        from sage.rings.qqbar import AA
+        from sage.functions.trig import cos, sin
+
+        vA = (0,0) 
+        vB = (c+e, 0)
+        vC = (c+e-c*cos(B),c*sin(B))
+        vD = (e*sin(B), c+e+e*cos(B))
+        vE = (0, c+e)
+
+        pentagon = [vA, vB, vC, vD, vE]
+
+        # transformations
+        F = AffineGroup(2, AA)
+        rotate90 = F([0,-1,1,0])
+        rotate180 = rotate90**2
+        s = symmetrie(vC, vD)
+
+        patch = [F.one(), 
+                rotate90,
+                rotate180,
+                rotate90**3,
+                s,
+                rotate180 * s,
+                ]
+
+        p = (rotate180 * s) (vE)
+        q = (rotate180 * s) (vB)
+
+        t1 = F.translation(vD) * F.translation(p).inverse()
+        t2 = F.translation(vC) * F.translation(q).inverse()
+        translations = [t1, t2]
+
+        p = PolygonTiling(pentagon, patch, translations)
+
+        A,B,C,D,E = p.polygon_angles()
+
+        from sage.symbolic.constants import pi
+        assert (2*A/pi).n()     == 1, (2*A/pi).n()
+        assert ((B+E)/pi).n()   == 1, ((B+E)/pi).n()
+        assert ((B+2*C)/pi).n() == 2, ((B+2*C)/pi).n()
+        assert (2*(C+D)/pi).n() == 3, (2*(C+D)/pi).n()
+
+        return p
+
+
+
+    def type_15(self):
+        r"""
+        EXAMPLES::
+
+            sage: from slabbe.polygon_tiling import pentagonal_tilings
+            sage: pentagonal_tilings.type_15()
+            Tiling by the polygon [(0, 0), (1, 0), (1.866025403784439?, 1/2),
+            (2.732050807568878?, 1), (1.866025403784439?, 3/2), (0, 1)]
+
+        """
+        import itertools
+        from sage.misc.functional import sqrt
+        from sage.rings.rational_field import QQ
+        from sage.rings.qqbar import AA
+        A = (0,0) 
+        B1 = (1,0)
+        B2 = (1+sqrt(3)/2,QQ(1/2))
+        C = (1+sqrt(3),1)
+        D = (1+sqrt(3)/2,QQ(3/2))
+        E = (0,1)
+        pentagon = [A, B1, B2, C, D, E]
+
+        # transformations
+        F = AffineGroup(2, AA)
+        rotate30 = F([sqrt(3)/2,QQ(1/2),-QQ(1/2),sqrt(3)/2])
+        exchange_xy = F([0,1,1,0])
+
+        patch3 = [F.one(), 
+                #rotate30,
+                F.translation(D)*rotate30*exchange_xy,
+                symmetrie(D, E),
+                ]
+
+        g = F.translation((-QQ(1/2), sqrt(3)/2 + 1))
+        patch6 = [t for t in patch3]
+        patch6.extend(g*rotate30.inverse()*exchange_xy*t for t in patch3)
+
+        #h1 = (sqrt(3)*3/2 + QQ(3/2), sqrt(3)/2 + QQ(5/2))
+        #h2 = (sqrt(3)*3/2 + QQ(3/2), sqrt(3)/2 + QQ(3/2))
+        #h1 = (sqrt(3)/2 - QQ(1/2), sqrt(3)*3/2 + QQ(7/2))
+        h1 = (-QQ(1/2), sqrt(3)*3/2 + 4)
+        h2 = (sqrt(3)/2 - QQ(1/2), sqrt(3)*3/2 + QQ(9/2))
+        h  = symmetrie(h1, h2)
+        hm = symmetrie_mediatrice(h1, h2)
+        patch12 = [t for t in patch6]
+        patch12.extend(hm*h*t for t in patch6)
+
+        t1 = F.translation((sqrt(3)/2 + QQ(1/2), sqrt(3)/2 + QQ(3/2)))
+        t2 = F.translation((-5*sqrt(3)/2 - 4, 2*sqrt(3) + QQ(9/2)))
+        translations = [t1,t2]
+
+        return PolygonTiling(pentagon, patch12, translations)
+
+pentagonal_tilings = PentagonalTilings()
 
