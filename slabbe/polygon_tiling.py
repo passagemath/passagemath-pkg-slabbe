@@ -536,7 +536,7 @@ class PolygonTiling:
             G += polygon2d(p, fill=False, thickness=4, color='orange')
         return G
 
-    def tikz(self, depth, region=None, color='red', round=None):
+    def tikz(self, depth, region=None, color='red', round=None, verbose=False):
         r"""
         Return a graphics 2d of the polygon of the tiling.
 
@@ -546,6 +546,9 @@ class PolygonTiling:
         - ``region`` -- ``None`` or polyhedron, polygons in the output are
           restricted to this region
         - ``color`` -- string (default: ``'red'``) 
+        - ``round`` -- rounding map to avoid 2 very close vertices to be
+          considered different
+        - ``verbose`` -- bool (default: ``False``) 
 
         EXAMPLES::
 
@@ -593,7 +596,13 @@ class PolygonTiling:
         lines.append(r"\begin{tikzpicture}")
 
         if self.is_edge_to_edge(round=round):
-            for path in self.eulerian_paths(depth, region=region, round=round):
+            paths = self.eulerian_paths(depth, region=region, round=round)
+            if verbose:
+                from collections import Counter
+                print("Decomposition of the tiling graph into {} eulerian"
+                      " paths\nwhose distribution of lengths is:\n"
+                      "{}".format(len(paths), dict(Counter(len(path) for path in paths))))
+            for path in paths:
                 s = " -- ".join(["({:.5f},{:.5f})".format(*v.n()) for v in path])
                 lines.append(r"\draw[{}] {};".format(color, s))
         else:
