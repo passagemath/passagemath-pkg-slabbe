@@ -295,7 +295,12 @@ class PolygonTiling:
               (2, 0),
               (3.732050807568878?, 1),
               (2.866025403784439?, 1.5000000000000000?),
-              (1, 1)]]
+              (1, 1)],
+             [(2, 0),
+              (3, 0),
+              (4.732050807568877?, 1),
+              (3.866025403784439?, 1.5000000000000000?),
+              (2, 1)]]
 
         Restricted to a region::
 
@@ -307,7 +312,7 @@ class PolygonTiling:
         import itertools
         from sage.misc.misc_c import prod
         k = len(self._translations)
-        for r in itertools.product(range(-depth, depth), repeat=k):
+        for r in itertools.product(range(-depth, depth+1), repeat=k):
             t_r = prod(t**ri for (t,ri) in zip(self._translations, r))
             for polygon in self.patch():
                 t_r_polygon = [t_r*v for v in polygon] 
@@ -410,7 +415,7 @@ class PolygonTiling:
             sage: jennifer = [(0,0), (1,0), (1+sqrt(3),1), (1+sqrt(3)/2,3/2), (0,1)]
             sage: J = PolygonTiling(jennifer)
             sage: J.plot(1)
-            Graphics object consisting of 2 graphics primitives
+            Graphics object consisting of 3 graphics primitives
 
 
         ::
@@ -420,7 +425,7 @@ class PolygonTiling:
             sage: patch_symmetries = [F.one(), F.translation((2,2))]
             sage: J = PolygonTiling(jennifer, patch_symmetries)
             sage: J.plot(1)
-            Graphics object consisting of 4 graphics primitives
+            Graphics object consisting of 6 graphics primitives
 
         ::
 
@@ -429,7 +434,7 @@ class PolygonTiling:
             sage: T = [F.translation((1,0))]
             sage: J = PolygonTiling(jennifer, translations=T)
             sage: J.plot(1)
-            Graphics object consisting of 2 graphics primitives
+            Graphics object consisting of 3 graphics primitives
 
         Restricted to a region::
 
@@ -470,7 +475,9 @@ class PolygonTiling:
             \draw[red] (-1.00000,0.00000) -- (-1.00000,1.00000) --
             (0.86603,1.50000) -- (1.73205,1.00000) -- (0.00000,0.00000) --
             (0.00000,1.00000) -- (1.86603,1.50000) -- (2.73205,1.00000) --
-            (1.00000,0.00000) -- (0.00000,0.00000) -- (-1.00000,0.00000);
+            (1.00000,0.00000) -- (1.00000,1.00000) -- (2.86603,1.50000) --
+            (3.73205,1.00000) -- (2.00000,0.00000) -- (1.00000,0.00000) --
+            (0.00000,0.00000) -- (-1.00000,0.00000);
             \end{tikzpicture}
             \end{document}
 
@@ -584,9 +591,9 @@ class PentagonalTilings:
             sage: from slabbe.polygon_tiling import pentagonal_tilings
             sage: t = pentagonal_tilings.type_3(d=2, c=1/3)
             sage: t
-            Tiling by the polygon [(0, 0), (-7/6, -1.443375672974065?),
-            (-1, -1.732050807568878?), (1, -1.732050807568878?), (11/6,
-            -0.2886751345948129?)]
+            Tiling by the polygon [(0, 0), (-7/6, -1.443375672974065?), 
+            (-1, -1.732050807568878?), (-2/3, -1.732050807568878?), (1, -1.732050807568878?),
+            (11/6, -0.2886751345948129?)]
 
         """
         from sage.rings.polynomial.polynomial_ring import polygen
