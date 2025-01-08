@@ -319,6 +319,35 @@ class PolygonTiling:
                 if region is None or all(v in region for v in t_r_polygon):
                     yield t_r_polygon
 
+    def is_edge_to_edge(self):
+        r"""
+        Return whether the tiling is edge to edge
+        """
+        from collections import Counter
+
+        c_depth0 = Counter()
+        for p in self.iter_polygons(depth=0):
+            for v in p:
+                v.set_immutable()
+            len_p = len(p)
+            for i in range(len_p):
+                edge = (p[i],p[(i+1) % len_p]) 
+                c_depth0[frozenset(edge)] += 1
+
+        c_depth1 = Counter()
+        for p in self.iter_polygons(depth=1):
+            for v in p:
+                v.set_immutable()
+            len_p = len(p)
+            for i in range(len_p):
+                edge = (p[i],p[(i+1) % len_p]) 
+                c_depth1[frozenset(edge)] += 1
+
+        Sd0_mul1 = set(edge for (edge,mul) in c_depth0.items() if mul == 1) 
+        Sd1_mul2 = set(edge for (edge,mul) in c_depth1.items() if mul == 2) 
+
+        return Sd0_mul1 <= Sd1_mul2
+
     def eulerian_paths(self, depth, region=None):
         r"""
         Iterator of the paths forming a partition of the edges of the tiling.
@@ -595,6 +624,11 @@ class PentagonalTilings:
             (-1, -1.732050807568878?), (-2/3, -1.732050807568878?), (1, -1.732050807568878?),
             (11/6, -0.2886751345948129?)]
 
+        TESTS::
+
+            sage: t.is_edge_to_edge()
+            True
+
         """
         from sage.rings.polynomial.polynomial_ring import polygen
         from sage.rings.rational_field import QQ
@@ -615,7 +649,7 @@ class PentagonalTilings:
         vB = (1-c_d)*vC + c_d*K2((-d,0))
         vE = c_d*vD + (1-c_d)*K2((d,0))
 
-        vCD = (1-c_d)*vC + c_d*vD
+        vCD = (1-c_d)*vC + c_d*vD   # so that the tiling is edge to edge
 
         pentagon = [vA, vB, vC, vCD, vD, vE]
 
@@ -666,6 +700,12 @@ class PentagonalTilings:
             Traceback (most recent call last):
             ...
             AssertionError: 1.90538514345210
+
+        TESTS::
+
+            sage: t = pentagonal_tilings.type_10(c=1, e=1, B=pi/2)
+            sage: t.is_edge_to_edge()
+            False
 
         """
         from sage.rings.qqbar import AA
@@ -719,9 +759,15 @@ class PentagonalTilings:
         EXAMPLES::
 
             sage: from slabbe.polygon_tiling import pentagonal_tilings
-            sage: pentagonal_tilings.type_15()
+            sage: t = pentagonal_tilings.type_15()
+            sage: t
             Tiling by the polygon [(0, 0), (1, 0), (1.866025403784439?, 1/2),
             (2.732050807568878?, 1), (1.866025403784439?, 3/2), (0, 1)]
+
+        TESTS::
+
+            sage: t.is_edge_to_edge()
+            True
 
         """
         import itertools
