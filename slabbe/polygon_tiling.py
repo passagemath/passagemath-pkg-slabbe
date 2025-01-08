@@ -774,7 +774,7 @@ class PentagonalTilings:
 
     def type_6(self, a, c, A, B):
         r"""
-        Return a type 5 pentagonal tiling.
+        Return a type 6 pentagonal tiling.
 
         INPUT:
 
@@ -855,7 +855,7 @@ class PentagonalTilings:
 
     def type_7(self, a, B, ring=None, check=False):
         r"""
-        Return a type 5 pentagonal tiling.
+        Return a type 7 pentagonal tiling.
 
         INPUT:
 
@@ -1045,12 +1045,18 @@ class PentagonalTilings:
 
 
 
-    def type_15(self):
+    def type_15(self, a):
         r"""
+        Return a type 15 pentagonal tiling.
+
+        INPUT:
+
+        - ``a`` -- length of side a
+
         EXAMPLES::
 
             sage: from slabbe.polygon_tiling import pentagonal_tilings
-            sage: t = pentagonal_tilings.type_15()
+            sage: t = pentagonal_tilings.type_15(a=1)
             sage: t
             Tiling by the polygon [(0, 0), (1, 0), (1.866025403784439?, 1/2),
             (2.732050807568878?, 1), (1.866025403784439?, 3/2), (0, 1)]
@@ -1069,12 +1075,12 @@ class PentagonalTilings:
 
         VS = AA**2 # (2-dim vector space)
 
-        A  = VS((0,0))
-        B1 = VS((1,0))
-        B2 = VS((1+sqrt3/2,one/2))
-        C  = VS((1+sqrt3,1))
-        D  = VS((1+sqrt3/2,3*one/2))
-        E  = VS((0,1))
+        A  = a*VS((0,0))
+        B1 = a*VS((1,0))
+        B2 = a*VS((1+sqrt3/2,one/2))
+        C  = a*VS((1+sqrt3,1))
+        D  = a*VS((1+sqrt3/2,3*one/2))
+        E  = a*VS((0,1))
 
         pentagon = [A, B1, B2, C, D, E]
 
@@ -1088,19 +1094,19 @@ class PentagonalTilings:
                 symmetrie(D, E),
                 ]
 
-        g = F.translation((-one/2, sqrt3/2 + 1))
+        g = F.translation((-a/2, a*sqrt3/2 + a))
         patch6 = [t for t in patch3]
         patch6.extend(g*rotate30.inverse()*exchange_xy*t for t in patch3)
 
-        h1 = (-one/2, sqrt3*3/2 + 4)
-        h2 = (sqrt3/2 - one/2, sqrt3*3/2 + 9*one/2)
+        h1 = a*VS((-one/2, sqrt3*3/2 + 4))
+        h2 = a*VS((sqrt3/2 - one/2, sqrt3*3/2 + 9*one/2))
         h  = symmetrie(h1, h2)
         hm = symmetrie_mediatrice(h1, h2)
         patch12 = [t for t in patch6]
         patch12.extend(hm*h*t for t in patch6)
 
-        t1 = F.translation((sqrt3/2 + one/2, sqrt3/2 + 3*one/2))
-        t2 = F.translation((-5*sqrt3/2 - 4, 2*sqrt3 + 9*one/2))
+        t1 = F.translation((a*sqrt3/2 + a/2, a*sqrt3/2 + 3*a/2))
+        t2 = F.translation((-5*a*sqrt3/2 - 4*a, 2*a*sqrt3 + 9*a/2))
         translations = [t1,t2]
 
         return PolygonTiling(pentagon, patch12, translations)
