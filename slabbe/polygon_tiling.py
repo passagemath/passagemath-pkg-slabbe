@@ -178,6 +178,21 @@ class PolygonTiling:
             distances.append(v.norm())
         return distances
 
+    def polygon_area(self):
+        r"""
+        EXAMPLES::
+
+            sage: from slabbe.polygon_tiling import PolygonTiling
+            sage: jennifer = [(0,0), (1,0), (1+sqrt(3),1), (1+sqrt(3)/2,3/2), (0,1)]
+            sage: J = PolygonTiling(jennifer)
+            sage: J.polygon_area()
+            2.549038105676658?
+
+        """
+        from sage.geometry.polyhedron.constructor import Polyhedron
+        p = Polyhedron(self._polygon)
+        return p.volume()
+
     def pp(self):
         r"""
         EXAMPLES::
@@ -550,6 +565,67 @@ def symmetrie_mediatrice(p1, p2):
 
 
 class PentagonalTilings:
+    def type_3(self, c, d):
+        r"""
+        Return a type 3 pentagonal tiling.
+
+        INPUT:
+
+        - ``c`` -- length of side c
+        - ``d`` -- length of side d
+
+        .. NOTE::
+
+            Length constraints: a=b, d=c+e
+            Angle constraints: A=C=D=120
+
+        EXAMPLES::
+
+            sage: from slabbe.polygon_tiling import pentagonal_tilings
+            sage: t = pentagonal_tilings.type_3(d=2, c=1/3)
+            sage: t
+            Tiling by the polygon [(0, 0), (-7/6, -1.443375672974065?),
+            (-1, -1.732050807568878?), (1, -1.732050807568878?), (11/6,
+            -0.2886751345948129?)]
+
+        """
+        from sage.rings.polynomial.polynomial_ring import polygen
+        from sage.rings.rational_field import QQ
+        from sage.rings.number_field.number_field import NumberField
+        from sage.rings.real_mpfr import RR
+
+        z = polygen(QQ, 'z')
+        K = NumberField(z**2-3, 'sqrt3', embedding=RR(1.7))
+        sqrt3 = K.gen()
+
+        K2 = K**2 # (2-dim vector space)
+
+        c_d = c/d
+
+        vA = K2((0,0))
+        vD = d * K2((K.one()/2, -sqrt3/2))
+        vC = d * K2((-K.one()/2, -sqrt3/2))
+        vB = (1-c_d)*vC + c_d*K2((-d,0))
+        vE = c_d*vD + (1-c_d)*K2((d,0))
+
+        vCD = (1-c_d)*vC + c_d*vD
+
+        pentagon = [vA, vB, vC, vCD, vD, vE]
+
+        # transformations
+        F = AffineGroup(2, K)
+        rotate60 = F([K.one()/2, sqrt3/2, -sqrt3/2, K.one()/2])
+
+        patch = [F.one(),
+                 rotate60**2,
+                 rotate60**4]
+
+        t1 = F.translation(vD + K2((d,0)))
+        t2 = F.translation((0,-d*sqrt3))
+        translations = [t1, t2]
+
+        return PolygonTiling(pentagon, patch, translations)
+
     def type_10(self, c, e, B):
         r"""
         Return a type 10 pentagonal tiling.
