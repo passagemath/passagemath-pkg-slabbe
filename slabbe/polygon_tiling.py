@@ -257,7 +257,7 @@ class PolygonTiling:
         for s in self._patch_symmetries:
             yield [s*v for v in self._polygon] 
 
-    def iter_polygons(self, depth, region=None):
+    def iter_polygons(self, depth, region=None, round=None):
         r"""
         Iterator of the polygons of the tiling
 
@@ -266,6 +266,8 @@ class PolygonTiling:
         - ``depth`` -- integer
         - ``region`` -- ``None`` or polyhedron, polygons in the output are
           restricted to this region
+        - ``round`` -- rounding map to avoid 2 very close vertices to be
+          considered different
 
         EXAMPLES::
 
@@ -308,6 +310,9 @@ class PolygonTiling:
             [[(-2, 0), (-1, 0), ..., (-1, 1)]]
 
         """
+        if round is None:
+            round = lambda x:x
+
         import itertools
         from sage.misc.misc_c import prod
         k = len(self._translations)
@@ -316,16 +321,22 @@ class PolygonTiling:
             for polygon in self.patch():
                 t_r_polygon = [t_r*v for v in polygon] 
                 if region is None or all(v in region for v in t_r_polygon):
-                    yield t_r_polygon
+                    polygon = [v.apply_map(round) for v in t_r_polygon]
+                    yield polygon
 
-    def is_edge_to_edge(self, verbose=False):
+    def is_edge_to_edge(self, verbose=False, round=None):
         r"""
         Return whether the tiling is edge to edge
+
+        INPUT:
+
+        - ``round`` -- rounding map to avoid 2 very close vertices to be
+          considered different
         """
         from collections import Counter
 
         c_depth0 = Counter()
-        for p in self.iter_polygons(depth=0):
+        for p in self.iter_polygons(depth=0, round=round):
             for v in p:
                 v.set_immutable()
             len_p = len(p)
@@ -334,7 +345,7 @@ class PolygonTiling:
                 c_depth0[frozenset(edge)] += 1
 
         c_depth1 = Counter()
-        for p in self.iter_polygons(depth=1):
+        for p in self.iter_polygons(depth=1, round=round):
             for v in p:
                 v.set_immutable()
             len_p = len(p)
@@ -352,7 +363,54 @@ class PolygonTiling:
                 print(Sd0_mul1 - Sd1_mul2)
             return False
 
-    def eulerian_paths(self, depth, region=None):
+    def graph(self, depth, region=None, round=None):
+        r"""
+        Return the graph of the tiling.
+
+        INPUT:
+
+        - ``depth`` -- integer
+        - ``region`` -- ``None`` or polyhedron, polygons in the output are
+          restricted to this region
+        - ``round`` -- rounding map to avoid 2 very close vertices to be
+          considered different
+
+        EXAMPLES::
+
+            sage: from slabbe.polygon_tiling import PolygonTiling
+            sage: jennifer = [(0,0), (1,0), (1+sqrt(3),1), (1+sqrt(3)/2,3/2), (0,1)]
+            sage: F = AffineGroup(2, AA)
+            sage: T = [F.translation((1,0))]
+            sage: J = PolygonTiling(jennifer, translations=T)
+            sage: J.graph(depth=1)
+            Graph on 13 vertices
+
+        Restricted to a region::
+
+            sage: box = polytopes.hypercube(dim=2, intervals=[(-2,2), (-2,2)])
+            sage: J.graph(depth=2, region=box)
+            Graph on 9 vertices
+
+        Rounding avoids having doubled copies of the same vertices::
+
+            sage: from slabbe.polygon_tiling import pentagonal_tilings
+            sage: t = pentagonal_tilings.type_7(a=2, B=4*pi/5, ring=RealField(53))
+            sage: t.graph(depth=0, round=lambda x:round(2^10*x)/2^10)
+            Graph on 22 vertices
+            sage: t.graph(depth=0, round=None)
+            Graph on 38 vertices
+
+        """
+        from sage.graphs.graph import Graph
+        G = Graph()
+        for p in self.iter_polygons(depth=depth, region=region, round=round):
+            for v in p:
+                v.set_immutable()
+            len_p = len(p)
+            G.add_edges((p[i],p[(i+1) % len_p]) for i in range(len_p))
+        return G
+
+    def eulerian_paths(self, depth, region=None, round=None):
         r"""
         Iterator of the paths forming a partition of the edges of the tiling.
 
@@ -361,6 +419,8 @@ class PolygonTiling:
         - ``depth`` -- integer
         - ``region`` -- ``None`` or polyhedron, polygons in the output are
           restricted to this region
+        - ``round`` -- rounding map to avoid 2 very close vertices to be
+          considered different
 
         EXAMPLES::
 
@@ -379,15 +439,8 @@ class PolygonTiling:
             [[(-2, 0), (-2, 1), ..., (-1, 0), (-2, 0)]]
 
         """
-        from sage.graphs.graph import Graph
-        G = Graph()
-        for p in self.iter_polygons(depth=depth, region=region):
-            for v in p:
-                v.set_immutable()
-            num_vertices = len(p)
-            G.add_edges((p[i],p[(i+1) % num_vertices]) for i in range(len(p)))
-
         from slabbe.graph import eulerian_paths
+        G = self.graph(depth=depth, region=region, round=round)
         return eulerian_paths(G)
 
     def vertices(self, depth, region=None):
@@ -483,7 +536,7 @@ class PolygonTiling:
             G += polygon2d(p, fill=False, thickness=4, color='orange')
         return G
 
-    def tikz(self, depth, region=None, color='red'):
+    def tikz(self, depth, region=None, color='red', round=None):
         r"""
         Return a graphics 2d of the polygon of the tiling.
 
@@ -529,12 +582,24 @@ class PolygonTiling:
             \end{tikzpicture}
             \end{document}
 
+        Use a rounding map to avoid precision issues ::
+
+            sage: from slabbe.polygon_tiling import pentagonal_tilings
+            sage: t = pentagonal_tilings.type_7(a=2, B=4*pi/5, ring=RealField(53))
+            sage: tikz = t.tikz(depth=1, round=lambda x:round(2^10*x)/2^10)
+
         """
         lines = []
         lines.append(r"\begin{tikzpicture}")
-        for path in self.eulerian_paths(depth, region=region):
-            s = " -- ".join(["({:.5f},{:.5f})".format(*v.n()) for v in path])
-            lines.append(r"\draw[{}] {};".format(color, s))
+
+        if self.is_edge_to_edge(round=round):
+            for path in self.eulerian_paths(depth, region=region, round=round):
+                s = " -- ".join(["({:.5f},{:.5f})".format(*v.n()) for v in path])
+                lines.append(r"\draw[{}] {};".format(color, s))
+        else:
+            raise NotImplementedError("graph is not edge to edge (you may want"
+                    " to use 'round' input: see doc)")
+
         lines.append(r"\end{tikzpicture}")
         from sage.misc.latex_standalone import TikzPicture
         return TikzPicture('\n'.join(lines))
@@ -880,7 +945,9 @@ class PentagonalTilings:
 
         TESTS::
 
-            sage: t.is_edge_to_edge()   # known bug
+            sage: t.is_edge_to_edge()
+            False
+            sage: t.is_edge_to_edge(round=lambda x:round(2^10*x)/2^10)
             True
 
         """
