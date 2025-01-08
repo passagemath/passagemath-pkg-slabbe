@@ -638,30 +638,31 @@ class PentagonalTilings:
         z = polygen(QQ, 'z')
         K = NumberField(z**2-3, 'sqrt3', embedding=RR(1.7))
         sqrt3 = K.gen()
+        one = K.one()
 
-        K2 = K**2 # (2-dim vector space)
+        VS = K**2 # (2-dim vector space)
 
         c_d = c/d
 
-        vA = K2((0,0))
-        vD = d * K2((K.one()/2, -sqrt3/2))
-        vC = d * K2((-K.one()/2, -sqrt3/2))
-        vB = (1-c_d)*vC + c_d*K2((-d,0))
-        vE = c_d*vD + (1-c_d)*K2((d,0))
+        vA = VS((0,0))
+        vD = d * VS((one/2, -sqrt3/2))
+        vC = d * VS((-one/2, -sqrt3/2))
+        vB = (1-c_d)*vC + c_d*VS((-d,0))
+        vE = c_d*vD + (1-c_d)*VS((d,0))
 
         vCD = (1-c_d)*vC + c_d*vD   # so that the tiling is edge to edge
 
         pentagon = [vA, vB, vC, vCD, vD, vE]
 
         # transformations
-        F = AffineGroup(2, K)
-        rotate60 = F([K.one()/2, sqrt3/2, -sqrt3/2, K.one()/2])
+        F = AffineGroup(VS)
+        rotate60 = F([one/2, sqrt3/2, -sqrt3/2, one/2])
 
         patch = [F.one(),
                  rotate60**2,
                  rotate60**4]
 
-        t1 = F.translation(vD + K2((d,0)))
+        t1 = F.translation(vD + VS((d,0)))
         t2 = F.translation((0,-d*sqrt3))
         translations = [t1, t2]
 
@@ -776,16 +777,18 @@ class PentagonalTilings:
         from sage.rings.qqbar import AA
         from sage.functions.trig import cos, sin
 
-        vA = (0,0) 
-        vB = (c+e, 0)
-        vC = (c+e-c*cos(B),c*sin(B))
-        vD = (e*sin(B), c+e+e*cos(B))
-        vE = (0, c+e)
+        VS = AA**2 # (2-dim vector space)
+
+        vA = VS((0,0))
+        vB = VS((c+e, 0))
+        vC = VS((c+e-c*cos(B),c*sin(B)))
+        vD = VS((e*sin(B), c+e+e*cos(B)))
+        vE = VS((0, c+e))
 
         pentagon = [vA, vB, vC, vD, vE]
 
         # transformations
-        F = AffineGroup(2, AA)
+        F = AffineGroup(VS)
         rotate90 = F([0,-1,1,0])
         rotate180 = rotate90**2
         s = symmetrie(vC, vD)
@@ -835,45 +838,46 @@ class PentagonalTilings:
             True
 
         """
-        import itertools
         from sage.misc.functional import sqrt
-        from sage.rings.rational_field import QQ
         from sage.rings.qqbar import AA
-        A = (0,0) 
-        B1 = (1,0)
-        B2 = (1+sqrt(3)/2,QQ(1/2))
-        C = (1+sqrt(3),1)
-        D = (1+sqrt(3)/2,QQ(3/2))
-        E = (0,1)
+
+        sqrt3 = AA(sqrt(3))
+        one = AA.one()
+
+        VS = AA**2 # (2-dim vector space)
+
+        A  = VS((0,0))
+        B1 = VS((1,0))
+        B2 = VS((1+sqrt3/2,one/2))
+        C  = VS((1+sqrt3,1))
+        D  = VS((1+sqrt3/2,3*one/2))
+        E  = VS((0,1))
+
         pentagon = [A, B1, B2, C, D, E]
 
         # transformations
-        F = AffineGroup(2, AA)
-        rotate30 = F([sqrt(3)/2,QQ(1/2),-QQ(1/2),sqrt(3)/2])
+        F = AffineGroup(VS)
+        rotate30 = F([sqrt3/2,one/2,-one/2,sqrt3/2])
         exchange_xy = F([0,1,1,0])
 
         patch3 = [F.one(), 
-                #rotate30,
                 F.translation(D)*rotate30*exchange_xy,
                 symmetrie(D, E),
                 ]
 
-        g = F.translation((-QQ(1/2), sqrt(3)/2 + 1))
+        g = F.translation((-one/2, sqrt3/2 + 1))
         patch6 = [t for t in patch3]
         patch6.extend(g*rotate30.inverse()*exchange_xy*t for t in patch3)
 
-        #h1 = (sqrt(3)*3/2 + QQ(3/2), sqrt(3)/2 + QQ(5/2))
-        #h2 = (sqrt(3)*3/2 + QQ(3/2), sqrt(3)/2 + QQ(3/2))
-        #h1 = (sqrt(3)/2 - QQ(1/2), sqrt(3)*3/2 + QQ(7/2))
-        h1 = (-QQ(1/2), sqrt(3)*3/2 + 4)
-        h2 = (sqrt(3)/2 - QQ(1/2), sqrt(3)*3/2 + QQ(9/2))
+        h1 = (-one/2, sqrt3*3/2 + 4)
+        h2 = (sqrt3/2 - one/2, sqrt3*3/2 + 9*one/2)
         h  = symmetrie(h1, h2)
         hm = symmetrie_mediatrice(h1, h2)
         patch12 = [t for t in patch6]
         patch12.extend(hm*h*t for t in patch6)
 
-        t1 = F.translation((sqrt(3)/2 + QQ(1/2), sqrt(3)/2 + QQ(3/2)))
-        t2 = F.translation((-5*sqrt(3)/2 - 4, 2*sqrt(3) + QQ(9/2)))
+        t1 = F.translation((sqrt3/2 + one/2, sqrt3/2 + 3*one/2))
+        t2 = F.translation((-5*sqrt3/2 - 4, 2*sqrt3 + 9*one/2))
         translations = [t1,t2]
 
         return PolygonTiling(pentagon, patch12, translations)
