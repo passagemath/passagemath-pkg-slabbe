@@ -667,6 +667,71 @@ class PentagonalTilings:
 
         return PolygonTiling(pentagon, patch, translations)
 
+    def type_5(self, a, c, B):
+        r"""
+        Return a type 5 pentagonal tiling.
+
+        INPUT:
+
+        - ``a`` -- length of side a
+        - ``c`` -- length of side c
+        - ``B`` -- angle of vertex B
+
+        .. NOTE::
+
+            Length constraints: a=b, c=d
+            Angle constraints: A=120, C=60
+
+        EXAMPLES::
+
+            sage: from slabbe.polygon_tiling import pentagonal_tilings
+            sage: t = pentagonal_tilings.type_5(a=1, c=3, B=3*pi/5)
+            sage: t
+            Tiling by the polygon [(-3.309016994374948?,
+            0.9510565162951536?), (-3, 0), (0, 0), (-3/2,
+            2.598076211353316?), (-2.639886388016089?, 1.694201341772548?)]
+
+        TESTS::
+
+            sage: t.is_edge_to_edge()
+            True
+
+        """
+        from sage.misc.functional import sqrt
+        from sage.rings.qqbar import AA
+        from sage.functions.trig import cos, sin
+
+        sqrt3 = AA(sqrt(3))
+        one = AA.one()
+
+        VS = AA**2 # (2-dim vector space)
+
+        # transformations
+        F = AffineGroup(VS)
+        rotate60 = F([one/2, sqrt3/2, -sqrt3/2,one/2])
+        rotateB = F([cos(B), -sin(B), sin(B), cos(B)])
+
+        vC = VS((0,0))
+        vB = VS((-c,0))
+        vD = c*VS((-one/2,sqrt3/2))
+        vA = vB + rotateB(a*VS((1,0)))
+        vE = vB + rotateB(a*VS((3*one/2, -sqrt3/2)))
+
+        pentagon = [vA, vB, vC, vD, vE]
+
+        patch = [F.one(),
+                 rotate60**1,
+                 rotate60**2,
+                 rotate60**3,
+                 rotate60**4,
+                 rotate60**5]
+
+        t1 = F.translation(vE + vD)
+        t2 = F.translation(rotate60(vE + vD))
+        translations = [t1, t2]
+
+        return PolygonTiling(pentagon, patch, translations)
+
     def type_10(self, c, e, B):
         r"""
         Return a type 10 pentagonal tiling.
