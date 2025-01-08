@@ -228,14 +228,13 @@ class PolygonTiling:
         print(" D = {:.3f} degrees".format(angles_degrees[3]))
         print(" E = {:.3f} degrees".format(angles_degrees[4]))
 
-        side_lengths = self.polygon_vertex_distances()
-
+        (b,c,d,e,a) = self.polygon_vertex_distances()
         print("Side-lengths of the polygon:")
-        print(" a = {:.3f}".format(side_lengths[4].n()))
-        print(" b = {:.3f}".format(side_lengths[0].n()))
-        print(" c = {:.3f}".format(side_lengths[1].n()))
-        print(" d = {:.3f}".format(side_lengths[2].n()))
-        print(" e = {:.3f}".format(side_lengths[3].n()))
+        print(" a = {:.3f}".format(a.n()))
+        print(" b = {:.3f}".format(b.n()))
+        print(" c = {:.3f}".format(c.n()))
+        print(" d = {:.3f}".format(d.n()))
+        print(" e = {:.3f}".format(e.n()))
 
 
     def patch(self):
@@ -319,7 +318,7 @@ class PolygonTiling:
                 if region is None or all(v in region for v in t_r_polygon):
                     yield t_r_polygon
 
-    def is_edge_to_edge(self):
+    def is_edge_to_edge(self, verbose=False):
         r"""
         Return whether the tiling is edge to edge
         """
@@ -346,7 +345,12 @@ class PolygonTiling:
         Sd0_mul1 = set(edge for (edge,mul) in c_depth0.items() if mul == 1) 
         Sd1_mul2 = set(edge for (edge,mul) in c_depth1.items() if mul == 2) 
 
-        return Sd0_mul1 <= Sd1_mul2
+        if Sd0_mul1 <= Sd1_mul2:
+            return True
+        else:
+            if verbose:
+                print(Sd0_mul1 - Sd1_mul2)
+            return False
 
     def eulerian_paths(self, depth, region=None):
         r"""
@@ -535,7 +539,7 @@ class PolygonTiling:
         from sage.misc.latex_standalone import TikzPicture
         return TikzPicture('\n'.join(lines))
 
-def symmetrie(p1, p2):
+def symmetrie(p1, p2, ring=None, check=False):
     r"""
     Return la transformation lineraire qui fait la symmetrie dans la droite
     passant par p1 et p2.
@@ -556,18 +560,22 @@ def symmetrie(p1, p2):
 
     """
     from sage.matrix.constructor import matrix
-    from sage.rings.qqbar import AA
-    F = AffineGroup(2, AA)
+    if ring is None:
+        from sage.rings.qqbar import AA
+        F = AffineGroup(2, AA)
+    else:
+        F = AffineGroup(2, ring)
     F_p1 = F.translation(p1)
     (x2,y2) = F_p1.inverse()(p2)
     F_rotate_p2 = F(matrix.column([(x2,y2),(-y2,x2)]))
     F_symmetry = F(matrix.column([(1,0),(0,-1)]))
     T = (F_p1 * F_rotate_p2 * F_symmetry * F_rotate_p2.inverse() * F_p1.inverse())
-    assert tuple(p1) == tuple(T(p1)), "{} == {}".format(p1, T(p1))
-    assert tuple(p2) == tuple(T(p2)), "{} == {}".format(p2, T(p2))
+    if check:
+        assert (T(p1)-p1).norm()<1e-10, "{} == {}, {}".format(p1, T(p1), (T(p1)-p1).norm())
+        assert (T(p2)-p2).norm()<1e-10, "{} == {}, {}".format(p2, T(p2), (T(p2)-p2).norm())
     return T
 
-def symmetrie_mediatrice(p1, p2):
+def symmetrie_mediatrice(p1, p2, ring=None, check=False):
     r"""
     Return la transformation lineraire qui fait la symmetrie dans la
     mediatrice du segment passant par p1 et p2.
@@ -588,17 +596,47 @@ def symmetrie_mediatrice(p1, p2):
 
     """
     from sage.matrix.constructor import matrix
-    from sage.rings.qqbar import AA
-    F = AffineGroup(2, AA)
+    if ring is None:
+        from sage.rings.qqbar import AA
+        F = AffineGroup(2, AA)
+    else:
+        F = AffineGroup(2, ring)
     F_p1 = F.translation(p1)
     (x2,y2) = F_p1.inverse()(p2)
     F_rotate_p2 = F(matrix.column([(x2,y2),(-y2,x2)]))
     F_symmetry = F(matrix.column([(-1,0),(0,1)]),(1,0))
     T = (F_p1 * F_rotate_p2 * F_symmetry * F_rotate_p2.inverse() * F_p1.inverse())
-    assert tuple(p2) == tuple(T(p1)), "{} == {}".format(p2, T(p1))
-    assert tuple(p1) == tuple(T(p2)), "{} == {}".format(p1, T(p2))
+    if check:
+        assert (T(p1)-p2).norm()<1e-10, "{} == {}, {}".format(T(p1), p2, (T(p1)-p2).norm())
+        assert (T(p2)-p1).norm()<1e-10, "{} == {}, {}".format(T(p2), p1, (T(p2)-p1).norm())
     return T
 
+
+def rotation_180(VS, p):
+    r"""
+    Return the 180-degrees rotation around point p.
+
+    INPUT:
+
+    - ``VS`` - vector space
+    - ``point`` - point in the vector space
+    
+    EXAMPLES::
+
+        sage: from slabbe.polygon_tiling import rotation_180
+        sage: p = (10, 200)
+        sage: T = rotation_180(QQ^2, p)
+        sage: T
+              [-1  0]     [ 20]
+        x |-> [ 0 -1] x + [400]
+        sage: T(p)
+        (10, 200)
+
+    """
+    F = AffineGroup(VS)
+    T = F.translation(p)
+    R = F([-1,0,0,-1])
+    return T * R * T.inverse()
 
 class PentagonalTilings:
     def type_3(self, c, d):
@@ -732,6 +770,191 @@ class PentagonalTilings:
         translations = [t1, t2]
 
         return PolygonTiling(pentagon, patch, translations)
+
+
+    def type_6(self, a, c, A, B):
+        r"""
+        Return a type 5 pentagonal tiling.
+
+        INPUT:
+
+        - ``a`` -- length of side a
+        - ``c`` -- length of side c
+        - ``A`` -- angle of vertex A
+        - ``B`` -- angle of vertex B
+
+        .. NOTE::
+
+            Length constraints: a=b=e, c=d
+            Angle constraints: A+B+D=360, A=2C
+
+        EXAMPLES::
+
+            sage: from slabbe.polygon_tiling import pentagonal_tilings
+            sage: t = pentagonal_tilings.type_6(a=1, c=3, A=pi/2, B=4*pi/5)
+            Traceback (most recent call last):
+            ...
+            AssertionError: 1.86459371714417
+
+        TESTS::
+
+            sage: t.is_edge_to_edge() # not tested
+            True
+
+        """
+        from sage.misc.functional import sqrt
+        from sage.rings.qqbar import AA
+        from sage.functions.trig import cos, sin
+
+        sqrt3 = AA(sqrt(3))
+        one = AA.one()
+        C = A/2
+
+        # transformations
+        VS = AA**2 # (2-dim vector space)
+        F = AffineGroup(VS)
+        rotateA = F([cos(A), -sin(A), sin(A), cos(A)])
+        rotateB = F([cos(B), -sin(B), sin(B), cos(B)])
+        rotateC = F([cos(C), -sin(C), sin(C), cos(C)])
+        rotateCinv = rotateC.inverse()
+
+        vC = VS((0,0))
+        vB = VS((-c,0))
+        vD = rotateC.inverse()(vB)
+        vA = vB + rotateB(a*VS((1,0)))
+        vE = vB + rotateB(a*VS((1,0)) + rotateA(a*VS((-1,0))))
+
+        pentagon = [vA, vB, vC, vD, vE]
+
+        patch2 = [F.one(),
+                rotateCinv]
+
+        R = rotation_180(VS,(vD+rotateCinv(vA))/2)
+
+        patch4 = [t for t in patch2]
+        patch4.extend(R*t for t in patch2)
+
+        t1 = F.translation(vE + vD)
+        #t2 = F.translation(rotate60(vE + vD))
+        #translations = [t1, t2]
+        translations = [F.one()]
+
+        p = PolygonTiling(pentagon, patch4, translations)
+
+        A,B,C,D,E = p.polygon_angles()
+        from sage.symbolic.constants import pi
+        assert (A-2*C) < 1e-10, (A-2*C).n()
+        assert ((A+B+D)/pi).n() == 2, ((A+B+D)/pi).n()
+
+        (b,c,d,e,a) = p.polygon_vertex_distances()
+        assert a == b == e
+        assert c == d
+
+        return p
+
+
+    def type_7(self, a, B, ring=None, check=False):
+        r"""
+        Return a type 5 pentagonal tiling.
+
+        INPUT:
+
+        - ``a`` -- length of side a
+        - ``B`` -- angle of vertex B
+
+        .. NOTE::
+
+            Length constraints: a=b=c=d
+            Angle constraints: 2B+C=360, 2D+A=360
+
+        EXAMPLES::
+
+            sage: from slabbe.polygon_tiling import pentagonal_tilings
+            sage: t = pentagonal_tilings.type_7(a=1, B=4*pi/5)
+            sage: t
+            Tiling by the polygon [(0.000000000000000, 0.000000000000000),
+                    (1.00000000000000, 0.000000000000000),
+                    (1.80901699437495, 0.587785252292473),
+                    (1.00000000000000, 1.17557050458495),
+                    (-0.0255593590340535, 0.999673306218471)]
+
+        TESTS::
+
+            sage: t.is_edge_to_edge()   # known bug
+            True
+
+        """
+        from sage.misc.functional import sqrt
+        from sage.rings.qqbar import AA
+        from sage.functions.trig import cos, sin
+        from sage.symbolic.constants import pi
+
+        if ring is None:
+            from sage.rings.real_mpfr import RR
+            ring = RR
+
+        sqrt3 = ring(sqrt(3))
+        one = ring.one()
+        C = 2*pi - 2*B
+
+        # transformations
+        VS = ring**2 # (2-dim vector space)
+        F = AffineGroup(VS)
+        rotateB = F([cos(B), -sin(B), sin(B), cos(B)])
+        rotateC = F([cos(C), -sin(C), sin(C), cos(C)])
+        rotateBinv = rotateB.inverse()
+        rotateCinv = rotateC.inverse()
+        R = rotation_180(VS, (0,0))
+
+        vA = VS((0,0))
+        vB = VS((a,0))
+        vC = vB + a*VS((-cos(B), sin(B)))
+        vD = vB + R*rotateBinv(a*VS((1,0)) + rotateCinv(a*VS((-1,0))))
+
+        # solving to find vertex E
+        from sage.functions.trig import arccos
+        from sage.calculus.var import var
+        from sage.modules.free_module_element import vector
+        from sage.numerical.optimize import find_root
+        theta = var('theta')
+        xy = a*vector((cos(theta),sin(theta)))
+        u = vC-vD
+        v = xy-vD
+        angleD = arccos(u*v / (u.norm()*v.norm()))
+        A = find_root(angleD == pi - theta/2, a=0,b=2*pi)
+        vE = a*VS((cos(A), sin(A)))
+
+        pentagon = [vA, vB, vC, vD, vE]
+
+        s1 = F(symmetrie(vD, vE, ring=ring))
+        patch2 = [F.one(), s1]
+
+        pB = F.translation(s1(vB))
+        r1 = pB*F(rotateB.inverse())*pB.inverse()
+        patch4 = [t for t in patch2]
+        patch4.extend(r1*t for t in patch2)
+
+        r2 = rotation_180(VS, (s1(vB)+r1*s1(vA))/2)
+        also = F.translation(vD - s1(vB))
+        patch8 = [t for t in patch4]
+        patch8.extend(also*r2*t for t in patch4)
+
+        t1 = F.translation(also*r2*r1(vD) - vA)
+        t2 = F.translation(r1(vB) - vB)
+        translations = [t1, t2]
+
+        p = PolygonTiling(pentagon, patch8, translations, ring=ring)
+
+        if check:
+            A,B,C,D,E = p.polygon_angles()
+            assert ((A+2*D)/pi).n() - 2 < 1e-10, ((A+2*D)/pi).n() 
+            assert ((C+2*B)/pi).n() - 2 < 1e-10, ((C+2*B)/pi).n()
+
+            (b,c,d,e,a) = p.polygon_vertex_distances()
+            assert (a - b)**2 + (b - c)**2 + (c - d)**2 < 1e-6, (a,b,c,d)
+
+        return p
+
 
     def type_10(self, c, e, B):
         r"""
