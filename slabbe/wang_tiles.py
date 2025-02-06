@@ -3198,6 +3198,39 @@ class WangTileSolver(object):
               (0, 1, 2),
               (0, 1, 3),
               (0, 1, 4)])
+
+        This is a bug::
+
+            sage: tiles = [(0,0,0,0), (1,1,1,1), (2,2,2,2)]
+            sage: preassigned_color = [{(0,0):0}, {(0,0):0}, {(0,0):0}, {(0,0):0}]
+            sage: solver = WangTileSolver(tiles, 1, 1, preassigned_color=preassigned_color)
+            sage: sum(1 for sol in solver.solutions_iterator())
+            3
+
+        ::
+
+            sage: tiles = [(0,0,0,0), (1,1,1,1), (2,2,2,2)]
+            sage: preassigned_color = [{(0,0):0}, {}, {}, {}]
+            sage: solver = WangTileSolver(tiles, 1, 1, preassigned_color=preassigned_color)
+            sage: sum(1 for sol in solver.solutions_iterator())
+            3
+
+        ::
+
+            sage: tiles = [(0,0,0,0), (1,1,1,1), (2,2,2,2)]
+            sage: preassigned_color = [{}, {}, {(0,0):0}, {}]
+            sage: solver = WangTileSolver(tiles, 1, 1, preassigned_color=preassigned_color)
+            sage: sum(1 for sol in solver.solutions_iterator())
+            3
+
+        No bug::
+
+            sage: tiles = [(0,0,0,0), (1,1,1,1), (2,2,2,2)]
+            sage: preassigned_color = [{(0,0):0}, {}, {}, {}]
+            sage: solver = WangTileSolver(tiles, 1, 2, preassigned_color=preassigned_color)
+            sage: sum(1 for sol in solver.solutions_iterator())
+            1
+
         """
         from math import log, ceil
 
@@ -3255,6 +3288,9 @@ class WangTileSolver(object):
                  or (j,k) in leftPRE and leftPRE[(j,k)] != left
                  or (j,k) in bottomPRE and bottomPRE[(j,k)] != bottom
                  or (j,k) in topPRE and topPRE[(j,k)] != top)
+
+        #for i,tile in enumerate(self._tiles):
+        #    print(i, is_forbidden_at_position(tile, 0, 0))
 
         # matching vertical colors
         for j in range(W):
