@@ -1149,6 +1149,37 @@ class CutAndProjectSchemeGenerator():
         E = matrix([[-1,0,phi,phi], [0,1,phi,1]])
         return CutAndProjectScheme.from_slope(E)
 
+    def AmmannBeenker(self):
+        r"""
+        Return the Ammann-Beenker cut and project scheme
+
+        EXAMPLES::
+
+            sage: from slabbe import cut_and_project_schemes
+            sage: cut_and_project_schemes.AmmannBeenker()
+            4-to-2 cut and project scheme
+
+        ::
+
+            sage: c = cut_and_project_schemes.AmmannBeenker()
+            sage: m = c.canonical_model_set(shift=vector((1,1,1,1))/100)
+            sage: W = polytopes.hypercube(2, intervals=[(-10,10), (-10,10)])
+            sage: G = m.plot_in_physical_space(W)      # long time (1s)
+            sage: G.show(aspect_ratio=1, figsize=20)   # long time
+
+        """
+        from sage.rings.rational_field import QQ
+        from sage.rings.real_mpfr import RR
+        from sage.rings.polynomial.polynomial_ring import polygen
+        from sage.rings.number_field.number_field import NumberField
+        from sage.matrix.constructor import matrix
+
+        z = polygen(QQ, 'z')
+        K = NumberField(z**2-2, 'sqrt2', embedding=RR(1.4))
+        sqrt2 = K.gen()
+        E = matrix([[sqrt2,1,0,-1], [0,1,sqrt2,1]])
+        return CutAndProjectScheme.from_slope(E)
+
 cut_and_project_schemes = CutAndProjectSchemeGenerator()
 class ModelSetGenerator():
     r"""
