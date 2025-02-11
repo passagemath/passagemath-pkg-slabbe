@@ -360,6 +360,56 @@ class CutAndProjectScheme(SageObject):
             u.set_immutable()
         return L
 
+    def canonical_model_set(self, intervals='zero_one', shift=None):
+        r"""
+        INPUT:
+
+        - ``intervals`` -- (default: ``'zero_one'``) intervals defining the
+          hypercube
+        - ``shift`` -- 5-dimensional vector translating the internal window
+          to avoid singular tilings and Conway worms
+
+        EXAMPLES::
+
+            sage: from slabbe import CutAndProjectScheme
+            sage: E = matrix([[1,1,1,1], [1,2,3,4]])
+            sage: c = CutAndProjectScheme.from_slope(E)
+            sage: m = c.canonical_model_set()
+            sage: m
+            Model Set of a 4-to-2 cut and project scheme
+
+        Golden-Octagonal::
+
+            sage: z = polygen(QQ, 'z')
+            sage: K = NumberField(z**2-z-1, 'phi', embedding=RR(1.6))
+            sage: phi = K.gen()
+            sage: E = matrix([[-1,0,phi,phi], [0,1,phi,1]])
+            sage: c = CutAndProjectScheme.from_slope(E)
+            sage: m = c.canonical_model_set()
+            sage: m
+            Model Set of a 4-to-2 cut and project scheme
+
+        With shift::
+
+            sage: from slabbe import cut_and_project_schemes
+            sage: c = cut_and_project_schemes.Penrose()
+            sage: shift = vector((1,-1,2,-1,-1)) / 1000
+            sage: c.canonical_model_set(shift=shift)
+            Model Set of a 5-to-2 cut and project scheme
+
+        """
+        from sage.geometry.polyhedron.library import polytopes
+        H = polytopes.hypercube(self.ambiant_space_dimension(),
+                                intervals=intervals)
+        if shift is None:
+            shift = self.ambiant_space().zero()
+        else:
+            shift = self.ambiant_space()(shift)
+
+        W = self.internal_space_projection() * (H+shift)
+        return ModelSet(self, W)
+
+
 class ModelSet(SageObject):
     r"""
     Regular Euclidean model set
@@ -888,7 +938,7 @@ class ModelSet(SageObject):
 
         return G
 
-    def plot_in_physical_space(self, physical_window, pointsize=100):
+    def plot_in_physical_space(self, physical_window, pointsize=20):
         r"""
         Return a Graphics representing the model set restricted to a window
         in the physical space
@@ -977,15 +1027,13 @@ class CutAndProjectSchemeGenerator():
         from sage.rings.polynomial.polynomial_ring import polygen
         from sage.rings.number_field.number_field import NumberField
         from sage.matrix.constructor import matrix
-        from sage.matrix.special import identity_matrix
 
         z = polygen(QQ, 'z')
         K = NumberField(z**2-z-1, 'phi', embedding=RR(1.6))
         phi = K.gen()
         pi = matrix([[1, ~phi]])
         pi_int = matrix([[-~phi, 1]])
-        lattice = identity_matrix(2)
-        return CutAndProjectScheme(K, pi, pi_int, lattice)
+        return CutAndProjectScheme(K, pi, pi_int)
 
     def Fibonacci_the_Minkowski_way(self):
         r"""
@@ -1041,15 +1089,13 @@ class CutAndProjectSchemeGenerator():
         from sage.rings.polynomial.polynomial_ring import polygen
         from sage.rings.number_field.number_field import NumberField
         from sage.matrix.constructor import matrix
-        from sage.matrix.special import identity_matrix
 
         z = polygen(QQ, 'z')
         K = NumberField(z**2-z-1, 'phi', embedding=RR(1.6))
         phi = K.gen()
         pi = matrix([[1, ~phi, 0, 0], [0, 0, 1, ~phi]])
         pi_int = matrix([[-~phi, 1, 0, 0], [0, 0, -~phi, 1]])
-        lattice = identity_matrix(4)
-        return CutAndProjectScheme(K, pi, pi_int, lattice)
+        return CutAndProjectScheme(K, pi, pi_int)
 
     def Penrose(self):
         r"""
@@ -1067,7 +1113,6 @@ class CutAndProjectSchemeGenerator():
         from sage.rings.polynomial.polynomial_ring import polygen
         from sage.rings.number_field.number_field import NumberField
         from sage.matrix.constructor import matrix
-        from sage.matrix.special import identity_matrix
         from sage.symbolic.constants import pi
         from sage.functions.trig import cos, sin
 
@@ -1078,9 +1123,31 @@ class CutAndProjectSchemeGenerator():
         entries = [(cos(2*pi*n/5), sin(2*pi*n/5)) for n in range(5)]
         projection_phys = matrix.column(K, entries)
         projection_int = projection_phys.right_kernel_matrix()
-        lattice = identity_matrix(5)
-        return CutAndProjectScheme(K, projection_phys, projection_int, lattice)
+        return CutAndProjectScheme(K, projection_phys, projection_int)
 
+
+    def GoldenOctagonal(self):
+        r"""
+        Return the Golden-Octagonal cut and project scheme
+
+        EXAMPLES::
+
+            sage: from slabbe import cut_and_project_schemes
+            sage: cut_and_project_schemes.GoldenOctagonal()
+            4-to-2 cut and project scheme
+
+        """
+        from sage.rings.rational_field import QQ
+        from sage.rings.real_mpfr import RR
+        from sage.rings.polynomial.polynomial_ring import polygen
+        from sage.rings.number_field.number_field import NumberField
+        from sage.matrix.constructor import matrix
+
+        z = polygen(QQ, 'z')
+        K = NumberField(z**2-z-1, 'phi', embedding=RR(1.6))
+        phi = K.gen()
+        E = matrix([[-1,0,phi,phi], [0,1,phi,1]])
+        return CutAndProjectScheme.from_slope(E)
 
 cut_and_project_schemes = CutAndProjectSchemeGenerator()
 class ModelSetGenerator():
@@ -1175,13 +1242,34 @@ class ModelSetGenerator():
         from sage.modules.free_module_element import vector
         from sage.geometry.polyhedron.library import polytopes
         cap = cut_and_project_schemes.Penrose()
-        pi_int = cap.internal_space_projection()
-        H = polytopes.hypercube(5, intervals='zero_one')
-        if shift is None:
-            shift = vector((0,0,0,0,0))
-        else:
-            shift = vector(shift)
-        window = pi_int * (H+shift)
-        return ModelSet(cap, window)
+        return cap.canonical_model_set(shift=shift)
+
+    def GoldenOctagonal(self, shift=None):
+        r"""
+        Return the Golden-Octagonal cut and project scheme
+
+        INPUT:
+
+        - ``shift`` -- 4-dimensional vector translating the internal window
+          to avoid singular tilings and Conway worms
+
+        EXAMPLES::
+
+            sage: from slabbe import model_sets
+            sage: model_sets.GoldenOctagonal()
+            Model Set of a 4-to-2 cut and project scheme
+
+        ::
+
+            sage: shift = vector((1,-1,2,-1)) / 1000
+            sage: model_sets.GoldenOctagonal(shift)
+            Model Set of a 4-to-2 cut and project scheme
+
+        """
+        from sage.modules.free_module_element import vector
+        from sage.geometry.polyhedron.library import polytopes
+
+        cap = cut_and_project_schemes.GoldenOctagonal()
+        return cap.canonical_model_set(shift=shift)
 
 model_sets = ModelSetGenerator()
