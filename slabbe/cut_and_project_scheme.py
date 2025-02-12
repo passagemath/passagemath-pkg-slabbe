@@ -30,6 +30,9 @@ REFERENCES:
 from sage.misc.cachefunc import cached_method
 from sage.structure.sage_object import SageObject
 
+############################################
+# Classes
+############################################
 class CutAndProjectScheme(SageObject):
     r"""
     INPUT:
@@ -86,7 +89,7 @@ class CutAndProjectScheme(SageObject):
             raise ValueError("pi and pi_int matrices must have the same number of columns")
 
     @classmethod
-    def from_slope(self, E, projection='gram_schmidt'):
+    def from_slope(self, E, projection='gram_schmidt', verbose=False):
         r"""
         Compute the orthogonal projection on the internal space (orthogonal
         of the slope)
@@ -104,6 +107,7 @@ class CutAndProjectScheme(SageObject):
         - ``projection`` -- string (default:``'gram_schmidt'``), 
           possible values are ``'gram_schmidt'`` and ``'roots_of_unity'``
           (works only for n->2 tilings)
+        - ``verbose`` -- bool (default:``False``)
 
         OUTPUT:
 
@@ -155,7 +159,7 @@ class CutAndProjectScheme(SageObject):
         import itertools
         from sage.symbolic.constants import pi
         from sage.functions.trig import cos, sin
-        from sage.rings.qqbar import AA
+        from sage.rings.number_field.number_field import CyclotomicField
         from sage.matrix.constructor import matrix
 
         (d,n) = E.dimensions()
@@ -175,13 +179,18 @@ class CutAndProjectScheme(SageObject):
             c = CutAndProjectScheme(base_ring, projection_phys, pi_int)
 
             entries = [(cos(k*pi/n), sin(k*pi/n)) for k in range(2*n)]
-            M = matrix.column(AA, entries)
+            C_2n = CyclotomicField(2*n)
+            C_2n_real, morphism = C_2n.maximal_totally_real_subfield()
+            M = matrix.column(C_2n_real, entries)
 
             # Can we find p directly and avoid a for-loop in what follows?
             for p in itertools.combinations(range(2*n), n):
                 projection_phys = M.matrix_from_columns(p)
                 if c.is_valid(projection_phys):
                     return CutAndProjectScheme(base_ring, projection_phys, pi_int)
+                else:
+                    if verbose:
+                        print(f'p(={p}) not valid at column indices')
 
         else:
             raise ValueError(f'projection(={projection}) unknown')
@@ -268,11 +277,11 @@ class CutAndProjectScheme(SageObject):
             sage: from slabbe import cut_and_project_schemes
             sage: cap = cut_and_project_schemes.Fibonacci()
             sage: cap.ambiant_space()
-            Vector space of dimension 2 over Number Field in phi with
-            defining polynomial z^2 - z - 1 with phi = 1.618033988749895?
+            Ambient free module of rank 2 over the principal ideal domain
+            Integer Ring
 
         """
-        return self.physical_space_projection().row_ambient_module()
+        return self.lattice().column_ambient_module()
     def physical_space(self):
         r"""
         Return the physical space
@@ -743,16 +752,27 @@ class CutAndProjectScheme(SageObject):
             sage: c.canonical_model_set(shift=shift)
             Model Set of a 5-to-2 cut and project scheme
 
+        TESTS::
+
+            sage: c = cut_and_project_schemes.GoldenOctagonal(projection='roots_of_unity')
+            sage: m = c.canonical_model_set(shift=None)
+
         """
         from sage.geometry.polyhedron.library import polytopes
-        H = polytopes.hypercube(self.ambiant_space_dimension(),
-                                intervals=intervals)
+        dimension = self.ambiant_space_dimension()
+        H = polytopes.hypercube(dimension, intervals=intervals)
+
         if shift is None:
             shift = self.ambiant_space().zero()
         else:
-            shift = self.ambiant_space()(shift)
+            try:
+                shift = self.ambiant_space()(shift)
+            except TypeError:
+                from sage.modules.free_module_element import vector
+                shift = vector(shift)
 
-        W = self.internal_space_projection() * (H+shift)
+        H_shifted = H + shift
+        W = self.internal_space_projection() * (H_shifted)
         return ModelSet(self, W)
 
     def change_physical_projection(self, pi):
@@ -885,6 +905,17 @@ class ModelSet(SageObject):
             False
             sage: vector((1,1,1,1,1)) in strip
             False
+
+        TESTS::
+
+            sage: from slabbe import cut_and_project_schemes
+            sage: c = cut_and_project_schemes.GoldenOctagonal(projection='roots_of_unity')
+            sage: m = c.canonical_model_set(shift=vector((1,1,1,1))/100)
+            sage: m.internal_space_window_preimage()
+            A 4-dimensional polyhedron in (Number Field in phi with
+            defining polynomial z^2 - z - 1 with phi =
+            1.618033988749895?)^4 defined as the convex hull of 8 vertices
+            and 2 lines
 
         """
         from sage.geometry.polyhedron.constructor import Polyhedron
@@ -1330,6 +1361,18 @@ class ModelSet(SageObject):
             sage: G = m.plot_in_physical_space(W)      # long time (4s)
             sage: G.show(aspect_ratio=1, figsize=20)   # long time
 
+        TODO, Bug!!::
+
+            sage: from slabbe import cut_and_project_schemes
+            sage: c = cut_and_project_schemes.GoldenOctagonal(projection='roots_of_unity')
+            sage: m = c.canonical_model_set(shift=vector((1,1,1,1))/100)
+            sage: m.plot_in_physical_space(W).show(figsize=20)
+            Traceback (most recent call last):
+            ...
+            ValueError: invalid base ring: Number Field in zeta80 with defining
+            polynomial x^2 - 2 with zeta80 = 1.414213562373095? cannot be coerced to a real
+            field
+
         TESTS::
 
             sage: m = model_sets.Fibonacci()
@@ -1405,6 +1448,9 @@ class ModelSet(SageObject):
 
         return Polyhedron(ieqs=ieqs)
 
+############################################
+# Generator of well-known examples (classes)
+############################################
 class CutAndProjectSchemeGenerator():
     r"""
     Constructor of several famous cut and project schemes
@@ -1565,13 +1611,18 @@ class CutAndProjectSchemeGenerator():
         else:
             raise ValueError(f'algorithm(={algorithm}) unknown')
 
-    def GoldenOctagonal(self):
+    def GoldenOctagonal(self, projection='gram_schmidt'):
         r"""
         Return the Golden-Octagonal cut and project scheme
 
         The choice of the matrix E whose rows generate the slope, that is,
         the kernel of the pi_int projection, is made acording to
         Carole Porrier's code available at https://github.com/cporrier/Cyrenaic
+
+        INPUT:
+
+        - ``projection`` -- string (default:``'gram_schmidt'``), 
+          possible values are ``'gram_schmidt'`` and ``'roots_of_unity'``
 
         EXAMPLES::
 
@@ -1590,7 +1641,7 @@ class CutAndProjectSchemeGenerator():
         K = NumberField(z**2-z-1, 'phi', embedding=RR(1.6))
         phi = K.gen()
         E = matrix(K, [[-1,0,phi,phi], [0,1,phi,1]])
-        return CutAndProjectScheme.from_slope(E)
+        return CutAndProjectScheme.from_slope(E, projection=projection)
 
     def AmmannBeenker(self):
         r"""
@@ -1782,7 +1833,6 @@ class CutAndProjectSchemeGenerator():
         pi_int = matrix(K, [[~phi**2, -~phi, 0, 0], [0, 0, ~phi**2, -~phi]])
         return CutAndProjectScheme(K, pi, pi_int)
 
-cut_and_project_schemes = CutAndProjectSchemeGenerator()
 class ModelSetGenerator():
     r"""
     Constructor of several famous model sets
@@ -1905,4 +1955,8 @@ class ModelSetGenerator():
         cap = cut_and_project_schemes.GoldenOctagonal()
         return cap.canonical_model_set(shift=shift)
 
+################
+# the generators
+################
+cut_and_project_schemes = CutAndProjectSchemeGenerator()
 model_sets = ModelSetGenerator()
