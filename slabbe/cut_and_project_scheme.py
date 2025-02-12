@@ -363,9 +363,6 @@ class CutAndProjectScheme(SageObject):
                 self.internal_space_projection(), 
                 self.lattice())
 
-    def star_map(self):
-        pass
-
     def lattice_neighbors(self, v):
         r"""
         Return the neighbors of a point according
@@ -390,6 +387,226 @@ class CutAndProjectScheme(SageObject):
         for u in L:
             u.set_immutable()
         return L
+
+    def star_map(self):
+        pass
+    def slope(self):
+        r"""
+        Return the slope of the cut-and project scheme.
+
+        The *slope* refers to vector space in the ambiant space
+        corresponding to kernel of the pi_int projection [FP24]_.
+
+        EXAMPLES::
+
+            sage: from slabbe import cut_and_project_schemes
+            sage: c = cut_and_project_schemes.Penrose()
+            sage: slope = c.slope(); slope
+            Vector space of degree 5 and dimension 2 over Number Field in a with defining polynomial z^4 - 5*z^2 + 5 with a = 1.175570504584947?
+            Basis matrix:
+            [       1        0       -1  a^2 - 2 -a^2 + 2]
+            [       0        1 -a^2 + 2  a^2 - 2       -1]
+            sage: slope.matrix().n(digits=5)
+            [  1.0000  0.00000  -1.0000 -0.61803  0.61803]
+            [ 0.00000   1.0000  0.61803 -0.61803  -1.0000]
+
+        ::
+
+            sage: c = cut_and_project_schemes.JeandelRao()
+            sage: c.slope()
+            Vector space of degree 4 and dimension 2 over Number Field in phi with defining polynomial z^2 - z - 1 with phi = 1.618033988749895?
+            Basis matrix:
+            [         1          0 -3*phi - 1       -phi]
+            [         0          1    phi + 2          1]
+
+        """
+        pi_int = self.internal_space_projection()
+        return pi_int.right_kernel()
+
+    def shadow_periods(self):
+        r"""
+        Return the periods of the shadows of the cut and project scheme.
+
+        A *shadow period* is the integer entries of a subperiod of the cut and
+        project scheme [BF2015]_.
+
+        A *subperiod* is a vector of n entries where `d+1` are integers.
+
+        The computation of the shadow periods made below comes from
+        Carole Porrier's code available at https://github.com/cporrier/Cyrenaic
+
+        OUTPUT: 
+
+        list of pairs (t,s) where t is a tuple of indices where the entries
+        are integers equal to s
+
+        EXAMPLES::
+            
+            sage: from slabbe import cut_and_project_schemes
+            sage: c = cut_and_project_schemes.Penrose()
+            sage: c.shadow_periods()
+            [((0, 1, 2), (1, 0, -1)),
+             ((0, 1, 3), (1, -1, 0)),
+             ((0, 1, 4), (0, 1, -1)),
+             ((0, 2, 3), (0, 1, -1)),
+             ((0, 2, 4), (1, 0, -1)),
+             ((0, 3, 4), (1, -1, 0)),
+             ((1, 2, 3), (1, 0, -1)),
+             ((1, 2, 4), (1, -1, 0)),
+             ((1, 3, 4), (0, 1, -1)),
+             ((2, 3, 4), (1, 0, -1))]
+
+        ::
+
+             sage: c = cut_and_project_schemes.JeandelRao()
+             sage: c.shadow_periods()
+             [((0, 1, 2), (1, 3, 5)),
+              ((0, 1, 3), (0, 1, 1)),
+              ((0, 2, 3), (1, 0, 0)),
+              ((1, 2, 3), (1, 0, 0))]
+
+        REFERENCE:
+
+        .. [BF2015] Bédaride, Nicolas, et Thomas Fernique. « When
+           Periodicities Enforce Aperiodicity ». Communications in
+           Mathematical Physics 335, nᵒ 3 (1 mai 2015): 1099‑1120.
+           https://doi.org/10.1007/s00220-015-2334-8.
+
+        """
+        import itertools
+        from sage.matrix.constructor import matrix
+        n = self.ambiant_space_dimension()
+        d = self.physical_space_dimension()
+        E = self.slope().matrix()
+        L = []
+        for t in itertools.combinations(range(n), d + 1):
+            G = [(-1)**i*E.matrix_from_columns([j for j in t if j != a]).det() 
+                 for (i,a) in enumerate(t)]
+            #print("G=",G)
+            G = matrix([g.list() for g in G])
+            for s in G.left_kernel().basis():
+                L.append((t,s))
+        return L
+
+    def subperiods(self):
+        r"""
+        Return the subperiods of the cut and project scheme.
+
+        A *subperiod* is a vector of n entries where `d+1` are integers
+        [BF2015]_.
+
+        The computation of the subperiods made below comes from
+        Carole Porrier's code available at https://github.com/cporrier/Cyrenaic
+
+        OUTPUT: 
+
+            todo
+
+        EXAMPLES::
+            
+            sage: from slabbe import cut_and_project_schemes
+            sage: c = cut_and_project_schemes.Penrose()
+            sage: P = c.subperiods()            # long time (3s)
+            sage: P                             # long time
+            [(1, 0, -1, a^2 - 2, -a^2 + 2),
+             (1, -1, a^2 - 3, 0, -a^2 + 3),
+             (0, 1, -a^2 + 2, a^2 - 2, -1),
+             (0, -a^2 + 3, 1, -1, a^2 - 3),
+             (1, -a^2 + 3, 0, a^2 - 3, -1),
+             (1, -a^2 + 2, a^2 - 2, -1, 0),
+             (-a^2 + 2, 1, 0, -1, a^2 - 2),
+             (-a^2 + 3, 1, -1, a^2 - 3, 0),
+             (a^2 - 3, 0, -a^2 + 3, 1, -1),
+             (a^2 - 2, -a^2 + 2, 1, 0, -1)]
+
+        The same in terms of the golden ratio::
+
+            sage: K.<phi> = NumberField(x**2-x-1, 'phi', embedding=RR(1.6))
+            sage: [p.change_ring(K) for p in P]    # long time
+            [(1, 0, -1, -phi + 1, phi - 1),
+             (1, -1, -phi, 0, phi),
+             (0, 1, phi - 1, -phi + 1, -1),
+             (0, phi, 1, -1, -phi),
+             (1, phi, 0, -phi, -1),
+             (1, phi - 1, -phi + 1, -1, 0),
+             (phi - 1, 1, 0, -1, -phi + 1),
+             (phi, 1, -1, -phi, 0),
+             (-phi, 0, phi, 1, -1),
+             (-phi + 1, phi - 1, 1, 0, -1)]
+
+        """
+        from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
+        from sage.matrix.constructor import matrix
+        from sage.rings.ideal import Ideal as ideal
+
+        n = self.ambiant_space_dimension()
+        d = self.physical_space_dimension()
+        E = self.slope().matrix()
+        L = self.shadow_periods()
+        K = self.base_ring()
+        Z = PolynomialRing(K, 'x', len(L)*(n-d-1))
+
+        M = matrix([[s[t.index(i)] if i in t else Z.gens()[L.index((t,s))*(n-d-1)+i-len([j for j in t if j<i])] for i in range(n)] for (t,s) in L])
+
+        I = ideal(Z, M.minors(d+1))
+        if I.dimension() > 0:
+            raise ValueError(f'slope(={E}) not determined by subperiods')
+        for v in I.variety(K):
+            z = M.subs(v).change_ring(K)
+            if z.transpose().augment(E.transpose()).rank() == d:
+                return z.rows()
+
+    def is_determined_by_subperiods(self):
+        r"""
+        Return whether the slope of the cut-and-project scheme is determined by
+        the subperiods.
+
+        A *subperiod* is a vector of n entries where `d+1` are integers
+        [BF2015]_.
+
+        The computation made below comes from Carole Porrier's code available
+        at https://github.com/cporrier/Cyrenaic
+
+        OUTPUT: 
+
+            todo
+
+        EXAMPLES::
+
+        The Penrose hull is determined by its subperiods::
+            
+            sage: from slabbe import cut_and_project_schemes
+            sage: c = cut_and_project_schemes.Penrose()
+            sage: c.is_determined_by_subperiods()
+            True
+
+        Ammann-Beenker is not determined by its subperiods::
+
+            sage: c = cut_and_project_schemes.AmmannBeenker()
+            sage: c.is_determined_by_subperiods()
+            False
+
+        Jeandel-Rao seems not to be determined by its subperiods (?)::
+
+            sage: c = cut_and_project_schemes.JeandelRao()
+            sage: c.is_determined_by_subperiods()
+            False
+
+        """
+        from sage.rings.polynomial.polynomial_ring_constructor import PolynomialRing
+        from sage.matrix.constructor import matrix
+        from sage.rings.ideal import Ideal as ideal
+
+        n = self.ambiant_space_dimension()
+        d = self.physical_space_dimension()
+        E = self.slope().matrix()
+        L = self.shadow_periods()
+        K = self.base_ring()
+        Z = PolynomialRing(K, 'x', len(L)*(n-d-1))
+
+        M = matrix([[s[t.index(i)] if i in t else Z.gens()[L.index((t,s))*(n-d-1)+i-len([j for j in t if j<i])] for i in range(n)] for (t,s) in L])
+
+        return ideal(Z, M.minors(d+1)).dimension() == 0
 
     def canonical_model_set(self, intervals='zero_one', shift=None):
         r"""
