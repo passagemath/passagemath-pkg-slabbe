@@ -2,6 +2,8 @@
 r"""
 Cut and project schemes and model sets
 
+Based on the definitions presented in the book [BG13]_.
+
 AUTHORS:
 
     - Sébastien Labbé, initial version + first plot method, February 2023
@@ -9,6 +11,12 @@ AUTHORS:
     - Carole Porrier and Sébastien Labbé, creation of cut-and-project from
       slopes, Golden-Octagonal, Ammann-Beenker, subperiods, February 2025
       (Sage Days 128, Le Teich)
+
+REFERENCES:
+
+.. [BG13] Baake, Michael, Uwe Grimm. Aperiodic order.  Vol. 1. Vol. 149.
+   Encyclopedia of Mathematics and its Applications.  Cambridge University
+   Press, Cambridge, 2013.
 """
 #*****************************************************************************
 #       Copyright (C) 2023 Sébastien Labbé <slabqc@gmail.com>
