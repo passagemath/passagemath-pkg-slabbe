@@ -86,7 +86,7 @@ class CutAndProjectScheme(SageObject):
             raise ValueError("pi and pi_int matrices must have the same number of columns")
 
     @classmethod
-    def from_slope(self, E, orthonormal=False):
+    def from_slope(self, E, projection='gram_schmidt'):
         r"""
         Compute the orthogonal projection on the internal space (orthogonal
         of the slope)
@@ -101,9 +101,9 @@ class CutAndProjectScheme(SageObject):
         INPUT:
 
         - ``E`` -- matrix, whose rows span the slope
-        - ``orthonormal`` -- boolean (default:``False``), projection of
-          the unit vectors generating the lattice are projected to unit
-          vectors in the physical space.
+        - ``projection`` -- string (default:``'gram_schmidt'``), 
+          possible values are ``'gram_schmidt'`` and ``'roots_of_unity'``
+          (works only for n->2 tilings)
 
         OUTPUT:
 
@@ -135,6 +135,11 @@ class CutAndProjectScheme(SageObject):
             [0 0 1 0]
             [0 0 0 1]
 
+        ::
+
+            sage: E = matrix([[1,1,1,1], [1,2,3,4]])
+            sage: c = CutAndProjectScheme.from_slope(E, projection='roots_of_unity')
+
         REFERENCES:
 
         .. [FP24] Thomas Fernique, Carole Porrier, Ammann Bars for
@@ -142,15 +147,39 @@ class CutAndProjectScheme(SageObject):
            Science 26 (2024), https://doi.org/10.46298/dmtcs.10764
 
         """
-        (d,n) = E.dimensions()
+        import itertools
+        from sage.symbolic.constants import pi
+        from sage.functions.trig import cos, sin
+        from sage.rings.qqbar import AA
+        from sage.matrix.constructor import matrix
 
+        (d,n) = E.dimensions()
         EF = E.right_kernel_matrix().echelon_form()
         pi_int,M1 = EF.gram_schmidt()
-        pi, M2 = E.gram_schmidt(orthonormal=orthonormal)
-
         base_ring = pi_int.base_ring()
 
-        return CutAndProjectScheme(base_ring, pi, pi_int)
+        if projection == 'gram_schmidt':
+            projection_phys, M2 = E.gram_schmidt()
+            return CutAndProjectScheme(base_ring, projection_phys, pi_int)
+
+        elif projection == 'roots_of_unity':
+            if d != 2:
+                raise ValueError(f"d(={d}) works for only for n->2 tilings")
+
+            projection_phys = pi_int.right_kernel_matrix()
+            c = CutAndProjectScheme(base_ring, projection_phys, pi_int)
+
+            entries = [(cos(k*pi/n), sin(k*pi/n)) for k in range(2*n)]
+            M = matrix.column(AA, entries)
+
+            # Can we find p directly and avoid a for-loop in what follows?
+            for p in itertools.combinations(range(2*n), n):
+                projection_phys = M.matrix_from_columns(p)
+                if c.is_valid(projection_phys):
+                    return CutAndProjectScheme(base_ring, projection_phys, pi_int)
+
+        else:
+            raise ValueError(f'projection(={projection}) unknown')
 
     def base_ring(self):
         r"""
@@ -1426,6 +1455,16 @@ class CutAndProjectSchemeGenerator():
         r"""
         Return the Penrose cut and project scheme
 
+        INPUT:
+
+        - ``algorithm`` -- string (default:``'degree4'``), valid options are:
+
+          - ``'degree4'`` -- computations are made in the number field of degree 4
+          - ``'Carole_gram_schmidt'`` -- physical projection is not
+            orthonormal
+          - ``'Carole_roots_of_unity'`` -- computations are made in the
+            Algebraic field (computations are slower)
+
         EXAMPLES::
 
             sage: from slabbe import cut_and_project_schemes
@@ -1434,7 +1473,7 @@ class CutAndProjectSchemeGenerator():
 
         ::
 
-            sage: c = cut_and_project_schemes.Penrose(algorithm='Carole')
+            sage: c = cut_and_project_schemes.Penrose(algorithm='Carole_gram_schmidt')
             sage: c
             5-to-2 cut and project scheme
 
@@ -1457,19 +1496,24 @@ class CutAndProjectSchemeGenerator():
             projection_int = projection_phys.right_kernel_matrix()
             return CutAndProjectScheme(K, projection_phys, projection_int)
 
-        elif algorithm == 'Carole':
+        elif algorithm == 'Carole_gram_schmidt':
             z = polygen(QQ, 'z')
             K = NumberField(z**2-z-1, 'phi', embedding=RR(1.6))
             phi = K.gen()
             E = matrix(K, [[phi,0,-phi,-1, 1],
                            [-1, 1, phi, 0,-phi]])
-            # orthonormal=True does not work, because it raises
-            # TypeError: unable to convert sqrt(sqrt(5) + 5) to Number Field
-            # in phi with defining polynomial z^2 - z - 1 with phi =
-            # 1.618033988749895?
-            return CutAndProjectScheme.from_slope(E, orthonormal=False)
+            return CutAndProjectScheme.from_slope(E, projection='gram_schmidt')
+
+        elif algorithm == 'Carole_roots_of_unity':
+            z = polygen(QQ, 'z')
+            K = NumberField(z**2-z-1, 'phi', embedding=RR(1.6))
+            phi = K.gen()
+            E = matrix(K, [[phi,0,-phi,-1, 1],
+                           [-1, 1, phi, 0,-phi]])
+            return CutAndProjectScheme.from_slope(E, projection='roots_of_unity')
+
         else:
-            raise ValueError('algorithm(={algorithm}) unknown')
+            raise ValueError(f'algorithm(={algorithm}) unknown')
 
     def GoldenOctagonal(self):
         r"""
