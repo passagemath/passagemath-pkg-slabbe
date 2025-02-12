@@ -110,6 +110,11 @@ class CutAndProjectScheme(SageObject):
         A cut and project scheme whose kernel of the internal projection
         is the vector space E.
 
+        .. TODO::
+
+            Roots of unity are currently using algebraic numbers which are
+            slow. Check if they can be turned into number field elements.
+
         EXAMPLES::
 
             sage: from slabbe import CutAndProjectScheme
@@ -1354,6 +1359,51 @@ class ModelSet(SageObject):
             edge = (M*p, M*q)
             G += line(edge)
         return G
+
+    def coding_region(self, P):
+        r"""
+        Return the region in the window associated with a subset of points
+        of the lattice.
+
+        INPUT:
+
+        - ``P``-- list, subset of vertices of the lattice
+
+        OUTPUT:
+
+        a polytope
+
+        EXAMPLES::
+
+            sage: from slabbe import cut_and_project_schemes
+            sage: c = cut_and_project_schemes.Penrose()
+            sage: m = c.canonical_model_set(shift=vector((1,1,1,1,1))/100)
+            sage: P = [(0,0,0,0,0), (0,1,0,0,0), (0,0,1,0,0), (0,0,0,1,0)]
+            sage: m.coding_region(P)
+            A 3-dimensional polyhedron in (Number Field in a with defining
+            polynomial z^4 - 5*z^2 + 5 with a = 1.175570504584947?)^3 defined
+            as the convex hull of 11 vertices
+
+        The region may be empty::
+
+            sage: P = [(0,0,0,0,0),(0,1,0,0,0),(0,0,1,0,0),(0,0,0,10,0)]
+            sage: m.coding_region(P)
+            The empty polyhedron in (Number Field in a with defining
+            polynomial z^4 - 5*z^2 + 5 with a = 1.175570504584947?)^3
+
+        """
+        from sage.modules.free_module_element import vector
+        from sage.geometry.polyhedron.constructor import Polyhedron
+
+        ip = self.cut_and_project_scheme().internal_space_projection()
+        W = self.window()
+
+        ieqs = []
+        for v in P:
+            W_translated = W.translation(-ip*vector(v))
+            ieqs.extend(W_translated.inequalities_list())
+
+        return Polyhedron(ieqs=ieqs)
 
 class CutAndProjectSchemeGenerator():
     r"""
