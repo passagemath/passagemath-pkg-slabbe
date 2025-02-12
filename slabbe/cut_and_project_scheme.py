@@ -86,7 +86,7 @@ class CutAndProjectScheme(SageObject):
             raise ValueError("pi and pi_int matrices must have the same number of columns")
 
     @classmethod
-    def from_slope(self, E):
+    def from_slope(self, E, orthonormal=False):
         r"""
         Compute the orthogonal projection on the internal space (orthogonal
         of the slope)
@@ -98,15 +98,12 @@ class CutAndProjectScheme(SageObject):
         from the slope using Gramm-Schmidt is made acording to Carole
         Porrier's code available at https://github.com/cporrier/Cyrenaic
 
-        REFERENCES:
-
-        .. [FP24] Thomas Fernique, Carole Porrier, Ammann Bars for
-           Octagonal Tilings, Discrete Mathematics & Theoretical Computer
-           Science 26 (2024), https://doi.org/10.46298/dmtcs.10764
-
         INPUT:
 
         - ``E`` -- matrix, whose rows span the slope
+        - ``orthonormal`` -- boolean (default:``False``), projection of
+          the unit vectors generating the lattice are projected to unit
+          vectors in the physical space.
 
         OUTPUT:
 
@@ -138,13 +135,18 @@ class CutAndProjectScheme(SageObject):
             [0 0 1 0]
             [0 0 0 1]
 
+        REFERENCES:
+
+        .. [FP24] Thomas Fernique, Carole Porrier, Ammann Bars for
+           Octagonal Tilings, Discrete Mathematics & Theoretical Computer
+           Science 26 (2024), https://doi.org/10.46298/dmtcs.10764
 
         """
         (d,n) = E.dimensions()
 
         EF = E.right_kernel_matrix().echelon_form()
         pi_int,M1 = EF.gram_schmidt()
-        pi, M2 = E.gram_schmidt()
+        pi, M2 = E.gram_schmidt(orthonormal=orthonormal)
 
         base_ring = pi_int.base_ring()
 
@@ -438,6 +440,19 @@ class CutAndProjectScheme(SageObject):
         W = self.internal_space_projection() * (H+shift)
         return ModelSet(self, W)
 
+    def change_physical_projection(self, pi):
+        pass
+
+    def orthogonal_physical_projection_cut_and_project_scheme(self):
+        r"""
+        EXAMPLES::
+
+            sage: # TODO
+        """
+        K = self.base_ring()
+        pi_int = self.internal_space_projection()
+        pi = pi_int.right_kernel_matrix()   # correct?
+        return CutAndProjectScheme(K, pi, pi_int)
 
 class ModelSet(SageObject):
     r"""
@@ -1126,7 +1141,7 @@ class CutAndProjectSchemeGenerator():
         pi_int = matrix(K, [[-~phi, 1, 0, 0], [0, 0, -~phi, 1]])
         return CutAndProjectScheme(K, pi, pi_int)
 
-    def Penrose(self):
+    def Penrose(self, algorithm='degree4'):
         r"""
         Return the Penrose cut and project scheme
 
@@ -1134,6 +1149,12 @@ class CutAndProjectSchemeGenerator():
 
             sage: from slabbe import cut_and_project_schemes
             sage: cut_and_project_schemes.Penrose()
+            5-to-2 cut and project scheme
+
+        ::
+
+            sage: c = cut_and_project_schemes.Penrose(algorithm='Carole')
+            sage: c
             5-to-2 cut and project scheme
 
         """
@@ -1145,15 +1166,29 @@ class CutAndProjectSchemeGenerator():
         from sage.symbolic.constants import pi
         from sage.functions.trig import cos, sin
 
-        z = polygen(QQ, 'z')
-        K = NumberField(z**4 - 5*z**2 + 5, 'a', embedding=RR(1.17))
-        #a = K.gen()
+        if algorithm == 'degree4':
+            # unit vectors are algebraic numbers of degree 4
+            z = polygen(QQ, 'z')
+            K = NumberField(z**4 - 5*z**2 + 5, 'a', embedding=RR(1.17))
+            #a = K.gen()
+            entries = [(cos(2*pi*n/5), sin(2*pi*n/5)) for n in range(5)]
+            projection_phys = matrix.column(K, entries)
+            projection_int = projection_phys.right_kernel_matrix()
+            return CutAndProjectScheme(K, projection_phys, projection_int)
 
-        entries = [(cos(2*pi*n/5), sin(2*pi*n/5)) for n in range(5)]
-        projection_phys = matrix.column(K, entries)
-        projection_int = projection_phys.right_kernel_matrix()
-        return CutAndProjectScheme(K, projection_phys, projection_int)
-
+        elif algorithm == 'Carole':
+            z = polygen(QQ, 'z')
+            K = NumberField(z**2-z-1, 'phi', embedding=RR(1.6))
+            phi = K.gen()
+            E = matrix(K, [[phi,0,-phi,-1, 1],
+                           [-1, 1, phi, 0,-phi]])
+            # orthonormal=True does not work, because it raises
+            # TypeError: unable to convert sqrt(sqrt(5) + 5) to Number Field
+            # in phi with defining polynomial z^2 - z - 1 with phi =
+            # 1.618033988749895?
+            return CutAndProjectScheme.from_slope(E, orthonormal=False)
+        else:
+            raise ValueError('algorithm(={algorithm}) unknown')
 
     def GoldenOctagonal(self):
         r"""
@@ -1251,6 +1286,113 @@ class CutAndProjectSchemeGenerator():
         sqrt3 = K.gen()
         E = matrix(K, [[sqrt3,0,1,1],[1,sqrt3-1,-1,1]])
         return CutAndProjectScheme.from_slope(E)
+
+    def JeandelRao(self, algorithm=0):
+        r"""
+        Return the Jeandel-Rao cut and proect scheme as given in [L21]_.
+
+        INPUT:
+
+        - ``algorithm`` -- integer
+
+        EXAMPLES::
+
+            sage: from slabbe import cut_and_project_schemes
+            sage: c = cut_and_project_schemes.JeandelRao()
+            sage: c
+            4-to-2 cut and project scheme
+
+        ::
+
+            sage: print(c)
+            4-to-2 cut and project scheme over
+            Number Field in phi with defining polynomial z^2 - z - 1 with
+            phi = 1.618033988749895?
+            Projection to physical space:
+            [1 1 0 0]
+            [0 0 1 1]
+            Projection to internal space:
+            [       1 -phi + 1        0  phi - 1]
+            [       0        0        1 -phi - 2]
+            Lattice generated by the columns of:
+            [1 0 0 0]
+            [0 1 0 0]
+            [0 0 1 0]
+            [0 0 0 1]
+
+        REFERENCES:
+
+        .. [L21] Labbé, Sébastien. Markov Partitions for Toral
+           $\mathbb{Z}^2$-Rotations Featuring Jeandel–Rao Wang Shift and
+           Model Sets, Annales Henri Lebesgue 4 (2021) 283‑324.
+           https://doi.org/10.5802/ahl.73.
+
+        """
+        from sage.rings.rational_field import QQ
+        from sage.rings.real_mpfr import RR
+        from sage.rings.polynomial.polynomial_ring import polygen
+        from sage.rings.number_field.number_field import NumberField
+        from sage.matrix.constructor import matrix
+
+        z = polygen(QQ, 'z')
+        K = NumberField(z**2-z-1, 'phi', embedding=RR(1.6))
+        phi = K.gen()
+
+        if algorithm == 0:
+            projection_int = matrix(K, [[1,-~phi,0,~phi],[0,0,1,-(phi+2)]])
+            projection_phys = matrix(K, [[1,1,0,0],[0,0,1,1]])
+
+        elif algorithm == 1:
+            projection_int = matrix(K, [[1,-~phi,0,~phi],[0,0,1,-(phi+2)]])
+            def galois_conjugate_matrix(M):
+                return matrix([[a.galois_conjugate() for a in row] for row in M.rows()])
+            projection_phys = galois_conjugate_matrix(projection_int)
+
+        elif algorithm == 2:
+            projection_int = matrix(K, [[1,-~phi,0,~phi],[0,0,1,-(phi+2)]])
+            projection_phys = matrix([[1,phi,0,1-phi],[0,0,1,1]])
+
+        elif algorithm == 3:
+            projection_int = matrix(K, [[1,-~phi,0,~phi],[0,0,1,-(phi+2)]])
+            J = matrix(K, [[1,phi,0,0], [-1,phi-1,5*phi,2*phi-1]])
+            projection_phys = J
+
+        else:
+            raise ValueError()
+
+        return CutAndProjectScheme(K, projection_phys, projection_int)
+
+    def self_similar_19_tiles(self):
+        r"""
+        Return the self-similar 19 Wang tiles cut and project scheme from
+        [L21]_.
+
+        EXAMPLES::
+
+            sage: from slabbe import cut_and_project_schemes
+            sage: cut_and_project_schemes.self_similar_19_tiles()
+            4-to-2 cut and project scheme
+
+        REFERENCES:
+
+        .. [L21] Labbé, Sébastien. Markov Partitions for Toral
+           $\mathbb{Z}^2$-Rotations Featuring Jeandel–Rao Wang Shift and
+           Model Sets, Annales Henri Lebesgue 4 (2021) 283‑324.
+           https://doi.org/10.5802/ahl.73.
+
+        """
+        from sage.rings.rational_field import QQ
+        from sage.rings.real_mpfr import RR
+        from sage.rings.polynomial.polynomial_ring import polygen
+        from sage.rings.number_field.number_field import NumberField
+        from sage.matrix.constructor import matrix
+
+        z = polygen(QQ, 'z')
+        K = NumberField(z**2-z-1, 'phi', embedding=RR(1.6))
+        phi = K.gen()
+        pi = matrix(K, [[1, 1, 0, 0], [0, 0, 1, 1]])
+        pi_int = matrix(K, [[~phi**2, -~phi, 0, 0], [0, 0, ~phi**2, -~phi]])
+        return CutAndProjectScheme(K, pi, pi_int)
 
 cut_and_project_schemes = CutAndProjectSchemeGenerator()
 class ModelSetGenerator():
