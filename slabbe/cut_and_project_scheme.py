@@ -207,23 +207,6 @@ class CutAndProjectScheme(SageObject):
         """
         return self._lattice
 
-    def is_orthogonal(self):
-        r"""
-        Return whether the two projections are orthogonal.
-
-        TODO: Is this the good name for this method?
-
-        EXAMPLES::
-
-            sage: from slabbe import CutAndProjectScheme
-            sage: E = matrix([[1,1,1,1], [1,2,3,4]])
-            sage: c = CutAndProjectScheme.from_slope(E)
-            sage: c.is_orthogonal()
-            True
-
-        """
-        return self._pi_int * self._pi.T == 0
-
     def lattice_base(self):
         r"""
         Return the lattice base
@@ -363,6 +346,79 @@ class CutAndProjectScheme(SageObject):
                 self.internal_space_projection(), 
                 self.lattice())
 
+    def is_orthogonal(self):
+        r"""
+        Return whether the two projections are orthogonal.
+
+        TODO: Is this the good name for this method?
+
+        EXAMPLES::
+
+            sage: from slabbe import CutAndProjectScheme
+            sage: E = matrix([[1,1,1,1], [1,2,3,4]])
+            sage: c = CutAndProjectScheme.from_slope(E)
+            sage: c.is_orthogonal()
+            True
+
+        """
+        return self._pi_int * self._pi.T == 0
+
+    def is_valid(self, projection=None, verbose=False):
+        r"""
+        Return True if the physical space projection is valid.
+
+        A projection is *valid* if the rhombi do not overlap after
+        projection in the physical space, that is, tiles do not create
+        accordions in the physical space [H2004]_.
+
+        The computation of the validity made below comes from Carole
+        Porrier's code available at https://github.com/cporrier/Cyrenaic
+
+        .. NOTE::
+
+            The current code checks that the orientation of the projection
+            of each pair of vectors is the same in the slope and after
+            projection in the physical space.
+
+        INPUT:
+
+        - ``projection`` -- matrix (default:``None``), if ``None`` it uses
+          the physical space projection
+        - ``verobse`` -- bool (default:``False``)
+
+        OUTPUT:
+
+            boolean
+
+        EXAMPLES::
+
+            sage: from slabbe import cut_and_project_schemes
+            sage: c = cut_and_project_schemes.Penrose()
+            sage: c.is_valid()
+            True
+
+        REFERENCE:
+
+        .. [H2004] Edmund Harriss, On canonical substitution tilings,
+           Ph. D. Thesis, Univeristy of London, 2004.
+
+        """
+        import itertools
+        n = self.ambiant_space_dimension()
+        d = self.physical_space_dimension()
+        E = self.slope().matrix()
+
+        if projection is None:
+            projection = self.physical_space_projection()
+
+        S1 = [m.sign() for m in projection.minors(d)]
+        S2 = [m.sign() for m in E.minors(d)]
+
+        if verbose:
+            print("projection minors sign = ", S1)
+            print("slope minors sign      = ", S2)
+        return S1 == S2 or S1 == [-s for s in S2]
+
     def lattice_neighbors(self, v):
         r"""
         Return the neighbors of a point according
@@ -480,8 +536,7 @@ class CutAndProjectScheme(SageObject):
         E = self.slope().matrix()
         L = []
         for t in itertools.combinations(range(n), d + 1):
-            G = [(-1)**i*E.matrix_from_columns([j for j in t if j != a]).det() 
-                 for (i,a) in enumerate(t)]
+            G = [(-1)**i*E.matrix_from_columns([j for j in t if j != a]).det() for (i,a) in enumerate(t)]
             #print("G=",G)
             G = matrix([g.list() for g in G])
             for s in G.left_kernel().basis():
@@ -610,12 +665,21 @@ class CutAndProjectScheme(SageObject):
 
     def canonical_model_set(self, intervals='zero_one', shift=None):
         r"""
+        Return the canoncial model set using a hypercube as window
+        after projection in the internal space.
+
         INPUT:
 
         - ``intervals`` -- (default: ``'zero_one'``) intervals defining the
           hypercube
-        - ``shift`` -- 5-dimensional vector translating the internal window
-          to avoid singular tilings and Conway worms
+        - ``shift`` -- `n`-dimensional vector translating the internal window
+          to avoid singular tilings and Conway worms, where `n` is the
+          dimension of the ambiant space
+
+        .. TODO::
+
+            Verify if the hypercube over interval [-1,0] would not be a
+            better choice for the canonical model set.
 
         EXAMPLES::
 
@@ -1536,6 +1600,19 @@ class CutAndProjectSchemeGenerator():
             [0 1 0 0]
             [0 0 1 0]
             [0 0 0 1]
+
+        The third version has valid projection in the physical space::
+
+            sage: c = cut_and_project_schemes.JeandelRao()
+            sage: c.is_valid(verbose=True)
+            projection minors sign =  [0, 1, 1, 1, 1, 0]
+            slope minors sign      =  [1, 1, 1, 1, 1, 0]
+            False
+            sage: c = cut_and_project_schemes.JeandelRao(3)
+            sage: c.is_valid(verbose=True)
+            projection minors sign =  [1, 1, 1, 1, 1, 0]
+            slope minors sign      =  [1, 1, 1, 1, 1, 0]
+            True
 
         REFERENCES:
 
