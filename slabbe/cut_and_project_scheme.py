@@ -1,6 +1,14 @@
 # -*- coding: utf-8 -*-
 r"""
 Cut and project schemes and model sets
+
+AUTHORS:
+
+    - Sébastien Labbé, initial version + first plot method, February 2023
+      (Sage Days 117, Le Teich)
+    - Carole Porrier and Sébastien Labbé, creation of cut-and-project from
+      slopes, Golden-Octagonal, Ammann-Beenker, subperiods, February 2025
+      (Sage Days 128, Le Teich)
 """
 #*****************************************************************************
 #       Copyright (C) 2023 Sébastien Labbé <slabqc@gmail.com>
@@ -75,9 +83,22 @@ class CutAndProjectScheme(SageObject):
         Compute the orthogonal projection on the internal space (orthogonal
         of the slope)
 
+        The *slope* refers to vector space in the ambiant space
+        corresponding to kernel of the pi_int projection [FP24]_.
+
+        The construction of the projection in the internal space
+        from the slope using Gramm-Schmidt is made acording to Carole
+        Porrier's code available at https://github.com/cporrier/Cyrenaic
+
+        REFERENCES:
+
+        .. [FP24] Thomas Fernique, Carole Porrier, Ammann Bars for
+           Octagonal Tilings, Discrete Mathematics & Theoretical Computer
+           Science 26 (2024), https://doi.org/10.46298/dmtcs.10764
+
         INPUT:
 
-        - ``E`` -- matrix, a slope
+        - ``E`` -- matrix, whose rows span the slope
 
         OUTPUT:
 
@@ -1130,6 +1151,10 @@ class CutAndProjectSchemeGenerator():
         r"""
         Return the Golden-Octagonal cut and project scheme
 
+        The choice of the matrix E whose rows generate the slope, that is,
+        the kernel of the pi_int projection, is made acording to
+        Carole Porrier's code available at https://github.com/cporrier/Cyrenaic
+
         EXAMPLES::
 
             sage: from slabbe import cut_and_project_schemes
@@ -1152,6 +1177,10 @@ class CutAndProjectSchemeGenerator():
     def AmmannBeenker(self):
         r"""
         Return the Ammann-Beenker cut and project scheme
+
+        The choice of the matrix E whose rows generate the slope, that is,
+        the kernel of the pi_int projection, is made acording to
+        Carole Porrier's code available at https://github.com/cporrier/Cyrenaic
 
         EXAMPLES::
 
