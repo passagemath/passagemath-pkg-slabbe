@@ -1,7 +1,6 @@
 #!/usr/bin/env sage-python23
 
 from setuptools import setup, Extension
-from codecs import open # To use a consistent encoding
 from os import path
 from Cython.Build import cythonize
 import Cython.Compiler.Options
@@ -34,38 +33,6 @@ def try_cythonize_ext_module():
         print("The slabbe package will be installed without its cython modules")
         return []
 
-# Get the long description from the README file
-here = path.abspath(path.dirname(__file__))
-with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
-    long_description = f.read()
-
-setup(name='slabbe',
-    version=open("VERSION").read().strip(),
-    description="Sebastien Labbe's Research code",
-    long_description=long_description,
-    long_description_content_type='text/x-rst',
-    classifiers=[
-      # How mature is this project? Common values are
-      #   3 - Alpha
-      #   4 - Beta
-      #   5 - Production/Stable
-      'Development Status :: 4 - Beta',
-      'Intended Audience :: Science/Research',
-      'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',
-      'Programming Language :: Python :: 3.7',
-      'Topic :: Scientific/Engineering :: Mathematics',
-    ],
-    keywords='sagemath combinatorics discrete geometry symbolic dynamics',
-    author='Sebastien Labbe',
-    author_email='slabbe@ulg.ac.be',
-    install_requires=[],
-    #install_requires=['pytimeparse', 'roman'], # this creates undesirable dependencies
-    #install_requires=['cython','cysignals'], # this causes update of cysignals
-                                              # which forces recompilation of all cython files!
-    #url='http://www.slabbe.org/Sage',
-    url='http://gitlab.com/seblabbe/slabbe',
-    license = "GPLv2+",
-    packages=['slabbe'],
-    ext_modules = try_cythonize_ext_module()
+setup(
+    ext_modules=try_cythonize_ext_module()
 )
-

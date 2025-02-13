@@ -1,0 +1,58 @@
+[build-system]
+requires = [
+    "setuptools>=61.2",
+    "Cython <3",
+    "cysignals",
+    "sagemath-environment",  # sage.env
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "slabbe"
+description = "Sebastien Labbe's Research code"
+classifiers = [
+    # How mature is this project? Common values are
+    #   3 - Alpha
+    #   4 - Beta
+    #   5 - Production/Stable
+    'Development Status :: 4 - Beta',
+    'Intended Audience :: Science/Research',
+    'License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)',
+    'Programming Language :: Python :: 3.7',
+    'Topic :: Scientific/Engineering :: Mathematics',
+]
+keywords = ['sagemath', 'combinatorics', 'discrete geometry', 'symbolic dynamics']
+authors = [
+    {name = "Sebastien Labbe", email = "slabbe@ulg.ac.be"},
+]
+dependencies = [
+    #'pytimeparse', 'roman', # this creates undesirable dependencies
+    'cysignals',
+]
+license = {text = "GPLv2+"}
+dynamic = ['version']
+
+[project.optional-dependencies]
+timeparse = [
+    "pytimeparse"
+]
+roman = [
+    "roman",
+]
+
+[project.readme]
+file = "README.rst"
+content-type = "text/x-rst"
+
+[project.urls]
+"Homepage" = 'http://gitlab.com/seblabbe/slabbe'
+#'http://www.slabbe.org/Sage'
+
+[tool.setuptools]
+include-package-data = false
+packages = [
+    'slabbe'
+]
+
+[tool.setuptools.dynamic]
+version = {file = ["VERSION"]}
