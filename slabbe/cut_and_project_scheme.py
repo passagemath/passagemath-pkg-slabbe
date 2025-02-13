@@ -1960,3 +1960,99 @@ class ModelSetGenerator():
 ################
 cut_and_project_schemes = CutAndProjectSchemeGenerator()
 model_sets = ModelSetGenerator()
+
+
+###
+
+
+def hypercube_pet(M, i):
+    r"""
+    EXAMPLES::
+
+        sage: from slabbe import cut_and_project_schemes
+        sage: c = cut_and_project_schemes.GoldenOctagonal(projection='roots_of_unity')
+        sage: M = c._pi_int.change_ring(RDF)
+        sage: M
+        [                1.0                 0.0                -1.0   1.618033988749895]
+        [-0.9172881767044976                 1.0 -0.7007458120453971 0.13383054136359823]
+        sage: T = hypercube_pet(M, 0)
+        sage: T
+        Polyhedron Exchange Transformation of
+        Polyhedron partition of 4 atoms with 4 letters
+        with translations {'123': (1.0, -0.9172881767044976), '01':
+        (-2.618033989, -0.8345763534), '03': (1.0000000000000002, 1.7007458117), '02':
+        (-1.618033989, 0.8661694583)}
+
+    """
+    import itertools
+    from sage.geometry.polyhedron.library import polytopes
+    from sage.modules.free_module_element import vector
+    from sage.geometry.polyhedron.constructor import Polyhedron
+    from slabbe import PolyhedronPartition
+    from slabbe import PolyhedronExchangeTransformation as PET
+
+    H = polytopes.hypercube(4, intervals=[(-1,0) for _ in range(4)])
+
+    # vector ei
+    def e(i):
+        L = [0] * 4
+        L[i] = 1
+        return vector(L)
+
+    ei = e(i)
+
+    # Equation x * ei = -1
+    eqn = [1] + list(ei)
+    eq = Polyhedron(eqns=[eqn])
+
+    # lower-half of the hypercube
+    H_eq = H & eq
+    M_H_eq = M * H_eq
+    
+    M_ei = M*ei
+    P_i = Polyhedron([(0,0), M_ei])
+
+    F_pos = [f.as_polyhedron() for f in M_H_eq.facets() if f.normal_cone().rays()[0].vector() * M_ei >= 0]
+    F_neg = [f.as_polyhedron() for f in M_H_eq.facets() if f.normal_cone().rays()[0].vector() * M_ei <= 0]
+
+    lift_edge = {M*edge.as_polyhedron():edge for edge in H_eq.faces(1)}
+
+    def find_edge_index(f):
+        u,v = lift_edge[f].vertices()
+        diff = v.vector() - u.vector()
+        nonzero = [a for (a,b) in enumerate(diff) if b != 0]
+        assert len(nonzero) == 1, str(nonzero)
+        return nonzero[0]
+
+    other_indices = [a for a in range(4) if a != i]
+    concat = lambda L: ''.join(str(a) for a in sorted(L))
+
+    d = {concat(other_indices):M_H_eq}
+    translations = {concat(other_indices): M_ei}
+
+    # computing the partition
+    for f in F_pos:
+        f_index = find_edge_index(f)
+        key = concat([i,f_index])
+        d[key] = f + P_i
+
+        for g in F_neg:
+            g_index = find_edge_index(g)
+            if g_index == f_index:
+                Me = M*e(f_index)
+                f0 = min([v.vector() for v in f.vertices()], key=lambda a:a*Me)
+                g0 = min([v.vector() for v in g.vertices()], key=lambda a:a*Me)     
+                translations[key] = g0 - f0
+                break
+            else:
+                continue
+                
+    P = PolyhedronPartition(d)
+
+    return PET(P, translations)
+
+
+
+
+
+
