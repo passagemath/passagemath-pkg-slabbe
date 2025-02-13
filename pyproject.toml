@@ -1,7 +1,7 @@
 [build-system]
 requires = [
     "setuptools>=61.2",
-    "Cython <3",
+    "Cython>=3",
     "cysignals",
     "sagemath-environment",  # sage.env
 ]
