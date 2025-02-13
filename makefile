@@ -1,9 +1,9 @@
 all: install ptest
 
 install:
-	sage -pip install --upgrade --no-index -v .
-install-internet:
 	sage -pip install --upgrade -v .
+install-nointernet:
+	sage -pip install --upgrade --no-index -v .
 
 develop:
 	# python setup.py develop
