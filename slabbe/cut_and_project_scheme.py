@@ -1975,6 +1975,7 @@ def hypercube_pet(M, i):
         sage: M
         [                1.0                 0.0                -1.0   1.618033988749895]
         [-0.9172881767044976                 1.0 -0.7007458120453971 0.13383054136359823]
+        sage: from slabbe.cut_and_project_scheme import hypercube_pet
         sage: T = hypercube_pet(M, 0)
         sage: T
         Polyhedron Exchange Transformation of
