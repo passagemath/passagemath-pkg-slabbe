@@ -1120,7 +1120,7 @@ class PiecewiseAffineTransformation(object):
             if verbose:
                 print("Volume not yet returned={}={} ({} atoms).".format(
                     Q.volume(),
-                    Q.volume().n(),
+                    float(Q.volume()),
                     len(Q)))
 
             Q = self_inv(Q)
@@ -1137,7 +1137,7 @@ class PiecewiseAffineTransformation(object):
         if verbose:
             print("Volume not yet returned={}={} ({} atoms).".format(
                 Q.volume(),
-                Q.volume().n(),
+                float(Q.volume()),
                 len(Q)))
             print("Under these conditions, we stop the while loop of the Rauzy induction.")
 
