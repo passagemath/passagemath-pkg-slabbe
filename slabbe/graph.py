@@ -1048,3 +1048,77 @@ def minimal_eulerian_paths(G, cost=None):
 
     return paths
 
+
+def has_claw_decomposition(G, certificate=False):
+    r"""
+    Return whether a graph has a claw decomposition.
+
+    This is an answer to the question posted at
+    https://ask.sagemath.org/question/81610/test-if-a-graph-has-a-claw-decomposition/
+
+    INPUT:
+
+    - ``G`` -- undirected graph
+    - ``certificate`` -- boolean
+
+    OUTPUT:
+
+    a boolean or 2-tuple (boolean, solution) if certificate is True
+
+    EXAMPLES::
+
+        sage: from slabbe.graph import has_claw_decomposition
+        sage: G1 = Graph( [(0, 1), (0, 2), (0, 3), (0, 4), (1, 2), (1, 3),
+        ....: (1, 5), (2, 3), (2, 4), (3, 5), (4, 6), (4, 7), (5, 6), (5, 7), (6, 8),
+        ....: (6, 10), (7, 9), (7, 11), (8, 9), (8, 10), (9, 11), (10, 11)])
+        sage: has_claw_decomposition(G1)
+        False
+        sage: has_claw_decomposition(G1, certificate=True)
+        (False, None)
+
+    ::
+
+        sage: G2 = Graph([(0, 1), (0, 2), (0, 3), (0, 4), (1, 2), (1, 3), (1, 4),
+        ....:    (1, 5), (2, 4), (2, 5), (3, 5), (4, 5)])
+        sage: has_claw_decomposition(G2)
+        True
+        sage: has_claw_decomposition(G2, certificate=True)     # random
+        (True,
+         [[(0, 1), (1, 2), (1, 5)],
+          [(0, 3), (1, 3), (3, 5)],
+          [(0, 2), (2, 4), (2, 5)],
+          [(0, 4), (1, 4), (4, 5)]])
+
+    """
+    import itertools
+    from sage.combinat.matrices.dancing_links import dlx_solver
+
+    rows = []
+
+    id_to_edge = [frozenset(edge) for edge in G.edges(labels=False)]
+    edge_to_id = {edge:i for (i,edge) in enumerate(id_to_edge)}
+
+    for u in G:
+        u_neighbors = G.neighbors(u)
+
+        for three_neighbors in itertools.combinations(u_neighbors, 3):
+            L = [edge_to_id[frozenset((u,v))] for v in three_neighbors]
+            L.sort()
+            rows.append(L)
+
+    d = dlx_solver(rows)
+
+    solution = d.one_solution()
+    has_solution = not solution is None
+
+    if not certificate:
+        return has_solution
+    else:
+        if has_solution:
+            solution_vertices = [[tuple(id_to_edge[id]) for id in rows[row_number]]
+                                 for row_number in solution]
+            return (has_solution, solution_vertices)
+        else:
+            return (has_solution, solution)
+
+
