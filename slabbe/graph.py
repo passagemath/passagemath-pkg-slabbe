@@ -1093,19 +1093,16 @@ def has_claw_decomposition(G, certificate=False):
     import itertools
     from sage.combinat.matrices.dancing_links import dlx_solver
 
-    rows = []
-
     id_to_edge = [frozenset(edge) for edge in G.edges(labels=False)]
     edge_to_id = {edge:i for (i,edge) in enumerate(id_to_edge)}
 
+    rows = []
     for u in G:
         u_neighbors = G.neighbors(u)
-
         for three_neighbors in itertools.combinations(u_neighbors, 3):
             L = [edge_to_id[frozenset((u,v))] for v in three_neighbors]
             L.sort()
             rows.append(L)
-
     d = dlx_solver(rows)
 
     solution = d.one_solution()
