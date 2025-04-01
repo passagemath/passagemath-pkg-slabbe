@@ -41,6 +41,16 @@ timeparse = [
 roman = [
     "roman",
 ]
+passagemath = [
+    "passagemath-combinat",
+    "passagemath-graphs[networkx]",
+    "passagemath-groups",
+    "passagemath-modules[fpylll]",
+    "passagemath-polyhedra",
+    "passagemath-plot",
+    "passagemath-repl",
+    "passagemath-symbolics",
+]
 
 [project.readme]
 file = "README.rst"
