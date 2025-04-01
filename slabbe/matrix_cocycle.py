@@ -1047,7 +1047,7 @@ def perron_right_eigenvector(M):
     """
     from sage.modules.free_module_element import vector
     from sage.rings.real_mpfr import RR
-    from sage.rings.all import CC
+    from sage.rings.cc import CC
     import numpy
     eig, vec = numpy.linalg.eig(M)
     index = abs(eig).argmax()
