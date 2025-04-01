@@ -91,7 +91,7 @@ from sage.misc.cachefunc import cached_method
 from sage.structure.sage_object import SageObject
 from sage.rings.integer_ring import ZZ
 from sage.modules.free_module_element import vector, zero_vector
-from sage.rings.all import CC
+from sage.rings.cc import CC
 from sage.combinat.words.morphism import WordMorphism
 from sage.combinat.permutation import Permutation
 from sage.rings.number_field.number_field import NumberField

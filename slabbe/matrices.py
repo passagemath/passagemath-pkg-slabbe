@@ -82,7 +82,7 @@ def perron_right_eigenvector(M):
     """
     import numpy
     from sage.rings.real_mpfr import RR
-    from sage.rings.all import CC
+    from sage.rings.cc import CC
     from sage.modules.free_module_element import vector
     eig, vec = numpy.linalg.eig(M)
     index = abs(eig).argmax()
@@ -144,7 +144,10 @@ def perron_right_eigenvector_in_number_field(M, name='root'):
         (15, (1, 13/7))
 
     """
-    from sage.rings.all import QQ, AA, NumberField
+    from sage.rings.qqbar import AA
+    from sage.rings.number_field.number_field import NumberField
+    from sage.rings.rational_field import QQ
+
     eigs = M.charpoly().roots(AA)
     eigs.sort()
     if not eigs or eigs[-1][1] != 1:

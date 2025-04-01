@@ -120,7 +120,7 @@ cdef class WordDatatype_Kolakoski(object):
         cdef unsigned long long e = 0, f = 0, g, m, i
         if isinstance(n, slice):
             key = n
-            from sage.rings.all import Infinity
+            from sage.rings.infinity import Infinity
             from math import ceil
             if not(key.start is None) and key.start < 0 or \
                     not(key.stop is None) and key.stop < 0:
