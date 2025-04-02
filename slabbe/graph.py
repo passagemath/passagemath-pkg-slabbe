@@ -1119,3 +1119,78 @@ def has_claw_decomposition(G, certificate=False):
             return (has_solution, solution)
 
 
+def has_graph_decomposition(self, G, induced=False, certificate=False):
+    r"""
+    Return whether a graph has a decomposition into isometric copies of
+    another graph.
+
+    This is an answer to the question posted at
+    https://ask.sagemath.org/question/81610/test-if-a-graph-has-a-claw-decomposition/
+
+    INPUT:
+
+    - ``self`` -- undirected graph
+    - ``G`` -- undirected graph
+    - ``induced`` -- boolean (default: ``False``); whether or not to
+      consider only the induced copies of ``G`` in ``self``
+    - ``certificate`` -- boolean
+
+    OUTPUT:
+
+    A boolean or 2-tuple ``(boolean, solution)`` if certificate is ``True``
+
+    In the latter case, ``solution`` is a list of lists of edges.
+
+    EXAMPLES::
+
+        sage: from slabbe.graph import has_graph_decomposition
+        sage: G1 = Graph( [(0, 1), (0, 2), (0, 3), (0, 4), (1, 2), (1, 3),
+        ....: (1, 5), (2, 3), (2, 4), (3, 5), (4, 6), (4, 7), (5, 6), (5, 7), (6, 8),
+        ....: (6, 10), (7, 9), (7, 11), (8, 9), (8, 10), (9, 11), (10, 11)])
+        sage: claw = graphs.ClawGraph()
+        sage: has_graph_decomposition(G1, claw)
+        False
+        sage: has_graph_decomposition(G1, claw, certificate=True)
+        (False, None)
+
+    ::
+
+        sage: G2 = Graph([(0, 1), (0, 2), (0, 3), (0, 4), (1, 2), (1, 3), (1, 4),
+        ....:    (1, 5), (2, 4), (2, 5), (3, 5), (4, 5)])
+        sage: has_graph_decomposition(G2, claw)
+        True
+        sage: has_graph_decomposition(G2, claw, certificate=True)     # random
+        (True,
+         [[(0, 1), (1, 2), (1, 3)],
+          [(0, 2), (0, 3), (0, 4)],
+          [(1, 4), (2, 4), (4, 5)],
+          [(1, 5), (2, 5), (3, 5)]])
+
+    """
+    from sage.combinat.matrices.dancing_links import dlx_solver
+
+    id_to_edge = [frozenset(edge) for edge in self.edges(labels=False)]
+    edge_to_id = {edge:i for (i,edge) in enumerate(id_to_edge)}
+
+    rows = []
+    for g in self.subgraph_search_iterator(G, induced=induced, return_graphs=True):
+        g_edges = g.edges(labels=False)
+        L = [edge_to_id[frozenset(edge)] for edge in g_edges]
+        L.sort()
+        rows.append(L)
+    d = dlx_solver(rows)
+
+    solution = d.one_solution()
+    has_solution = not solution is None
+
+    if not certificate:
+        return has_solution
+    else:
+        if has_solution:
+            solution_edges = [[tuple(id_to_edge[id]) for id in rows[row_number]]
+                                 for row_number in solution]
+            return (has_solution, solution_edges)
+        else:
+            return (has_solution, solution)
+
+
