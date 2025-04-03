@@ -22,7 +22,7 @@ coverage:
 	sage -coverage slabbe/*
 
 doc:install
-	cd docs && sage -sh -c "make html"
+	cd docs && sage -sh -c "make clean && make html"
 doc-pdf:install
 	cd docs && sage -sh -c "make latexpdf"
 
@@ -31,6 +31,8 @@ dist:
 check: dist
 	VERSION=`cat VERSION`; sage -sh -c "twine check dist/slabbe-$$VERSION.tar.gz"
 upload: dist
+	# April 2025: I needed to upgrade 'packaging' to fix licence file/text issue
+	#https://github.com/pypa/twine/issues/1216
 	VERSION=`cat VERSION`; sage -sh -c "twine upload dist/slabbe-$$VERSION.tar.gz --repository slabbe"
 
 clean: clean-doc
