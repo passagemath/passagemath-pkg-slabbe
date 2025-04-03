@@ -169,6 +169,15 @@ __ https://trac.sagemath.org/
 Release history
 ---------------
 
+*Version 0.8.0 (April 2, 2025)*
+  New module to draw polygonal tilings.
+  Improvements of the cut and project scheme module made with Carole Porrier
+  during Sage Days 128 in Le Teich.
+  Now using pyproject.toml file instead of setup.py which brings some regressions (compilation
+  of cython/c files is not cached anymore and takes time).
+  All tests passed on SageMath version 10.5.beta6 (Release Date: 2024-09-29) using Python 3.12.5.
+  All tests passed on SageMath version 10.6.beta7 (Release Date: 2025-02-21) using Python 3.11.0.
+
 *Version 0.7.7 (Nov 14, 2024)*
   New (small) module on q-Markoff numbers.
   New (small) module on Wang cubes.
