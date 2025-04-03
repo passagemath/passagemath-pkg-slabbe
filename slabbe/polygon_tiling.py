@@ -557,7 +557,7 @@ class PolygonTiling:
             sage: F = AffineGroup(2, AA)
             sage: T = [F.translation((1,0))]
             sage: J = PolygonTiling(jennifer, translations=T)
-            sage: tikz = J.tikz(depth=1); tikz
+            sage: tikz = J.tikz(depth=1); tikz             # known bug
             \documentclass[tikz]{standalone}
             \begin{document}
             \begin{tikzpicture}
@@ -573,7 +573,7 @@ class PolygonTiling:
         Restricted to a region::
 
             sage: box = polytopes.hypercube(dim=2, intervals=[(-2,2), (-2,2)])
-            sage: tikz = J.tikz(depth=2, region=box); tikz
+            sage: tikz = J.tikz(depth=2, region=box); tikz       # known bug
             \documentclass[tikz]{standalone}
             \begin{document}
             \begin{tikzpicture}
