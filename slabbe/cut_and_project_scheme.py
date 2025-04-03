@@ -669,7 +669,7 @@ class CutAndProjectScheme(SageObject):
 
             todo
 
-        EXAMPLES::
+        EXAMPLES:
 
         The Penrose hull is determined by its subperiods::
             
@@ -1811,13 +1811,6 @@ class CutAndProjectSchemeGenerator():
             sage: from slabbe import cut_and_project_schemes
             sage: cut_and_project_schemes.self_similar_19_tiles()
             4-to-2 cut and project scheme
-
-        REFERENCES:
-
-        .. [L21] Labbé, Sébastien. Markov Partitions for Toral
-           $\mathbb{Z}^2$-Rotations Featuring Jeandel–Rao Wang Shift and
-           Model Sets, Annales Henri Lebesgue 4 (2021) 283‑324.
-           https://doi.org/10.5802/ahl.73.
 
         """
         from sage.rings.rational_field import QQ

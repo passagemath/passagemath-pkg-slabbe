@@ -72,9 +72,6 @@ REFERENCES:
    Iterated Function Systems. Geometriae Dedicata, 9 août 2020.
    https://doi.org/10.1007/s10711-020-00560-4
 
-.. [BG13] Michael Baake, Uwe Grimm. Aperiodic order. Vol. 1. Vol. 149.
-   Encyclopedia of Mathematics and its Applications. Cambridge University
-   Press, Cambridge, 2013. http://www.ams.org/mathscinet-getitem?mr=3136260.
 
 .. [BFG19] Michael Baake, Natalie Priebe Frank, Uwe Grimm. Three variations on a
    theme by Fibonacci. 
