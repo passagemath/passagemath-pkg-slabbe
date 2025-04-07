@@ -3,6 +3,9 @@
 TODO
 ====
 
+- code "Mathematical specification of hitomezashi designs" by Seaton and Hayes,
+  2023
+
 Update the package using setuptools and pyproject.toml
 ------------------------------------------------------
 
