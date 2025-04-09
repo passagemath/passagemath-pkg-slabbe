@@ -7,7 +7,7 @@ doctest this file with "sage -t hdr_doctest.sage".
 It is always safe to delete this file; it is not used in typesetting your
 document.
 
-Sage commandline, line 1037::
+Sage commandline, line 1046::
 
 sage: version()
 'SageMath version ..., Release Date: ...'
@@ -15,7 +15,7 @@ sage: import importlib.metadata
 sage: importlib.metadata.version("slabbe")
 '...'
 
-Sage commandline, line 2369::
+Sage commandline, line 2389::
 
 sage: K.<sqrt5> = NumberField(x^2-5, embedding=2.2)
 sage: alpha = sqrt5*3/110 + 75/22
@@ -24,7 +24,7 @@ sage: continued_fraction(alpha)
 sage: alpha.n()
 3.47007458120454
 
-Sage commandline, line 2388::
+Sage commandline, line 2408::
 
 sage: from slabbe import PolyhedronExchangeTransformation as PET
 sage: base = diagonal_matrix((1+alpha,1))
@@ -36,7 +36,7 @@ Polyhedron Exchange Transformation of
 Polyhedron partition of 2 atoms with 2 letters
 with translations {0: (-1, 0), 1: (3/110*sqrt5 + 75/22, 0)}
 
-Sage commandline, line 2407::
+Sage commandline, line 2427::
 
 sage: Tind,s = T.induced_transformation(ieq=[alpha-3,-1,0])
 sage: Tind
@@ -46,7 +46,7 @@ with translations {0: (-1, 0), 1: (3/110*sqrt5 + 9/22, 0)}
 sage: s
 {0: [0], 1: [1, 0, 0, 0]}
 
-Sage commandline, line 2422::
+Sage commandline, line 2442::
 
 sage: D = diagonal_matrix((-1/(alpha-3),1))
 sage: Tindzoom = D * Tind
@@ -55,13 +55,13 @@ Polyhedron Exchange Transformation of
 Polyhedron partition of 2 atoms with 2 letters
 with translations {0: (-1/6*sqrt5 + 5/2, 0), 1: (-1, 0)}
 
-Sage commandline, line 2434::
+Sage commandline, line 2454::
 
     sage: beta = Tindzoom.translations()[0][0]
     sage: continued_fraction(beta)
     [2; 7, (1, 5)*]
 
-Sage commandline, line 2482::
+Sage commandline, line 2502::
 
     sage: def preimage(sequence):
     ....:     from collections import defaultdict
@@ -70,33 +70,36 @@ Sage commandline, line 2482::
     ....:         d[a].append(n)
     ....:     return dict(d)
 
-Sage commandline, line 2492::
+Sage commandline, line 2512::
 
-    sage: def draw_sequence_on_circle(sequence, frequency):
+    sage: def draw_sequence_on_circle(sequence, frequency, keys=None):
     ....:     d = preimage(sequence)
-    ....:     color_dict = dict(zip(d.keys(), rainbow(len(d))))
+    ....:     keys = sorted(d.keys()) if keys is None else keys
+    ....:     c_dict = dict(zip(keys, rainbow(len(keys))))
+    ....:     markers = "+x><^vDH_|os*,dh12345678"
+    ....:     m_dict = dict(zip(keys, markers))
     ....:     G = Graphics()
     ....:     for a in d:
     ....:         L = [e^(2*pi*I*frequency*n) for n in d[a]]
-    ....:         G += points(L, color=color_dict[a], legend_label=a)
+    ....:         G += points(L, color=c_dict[a], legend_label=a, marker=m_dict[a], pointsize=30)
     ....:     title = "Frequency = {:.5f}".format(frequency.n())
     ....:     G += circle((0,0), 1, linestyle="dotted", alpha=.5, color="gray", title=title)
     ....:     return G
 
-Sage commandline, line 2515::
+Sage commandline, line 2539::
 
     sage: L = ["even","odd"] * 6
     sage: preimage(L)
     {'even': [0, 2, 4, 6, 8, 10], 'odd': [1, 3, 5, 7, 9, 11]}
 
-Sage commandline, line 2526::
+Sage commandline, line 2550::
 
     sage: G1 = draw_sequence_on_circle(["even","odd"]*10, sqrt(3))
     sage: G2 = draw_sequence_on_circle(["even","odd"]*10, 1/2+1/200)
     sage: G3 = draw_sequence_on_circle(["even","odd"]*10, 1/2)
     sage: G = graphics_array([G1,G2,G3])
 
-Sage commandline, line 2548::
+Sage commandline, line 2572::
 
     sage: F = words.FibonacciWord(['even','odd'])
     sage: F[:15]
@@ -105,7 +108,7 @@ Sage commandline, line 2548::
     sage: GFibo2 = draw_sequence_on_circle(F[:100], frequency=(1+sqrt(5))/2)
     sage: GFibo = graphics_array([GFibo1,GFibo2])
 
-Sage commandline, line 3541::
+Sage commandline, line 3565::
 
 sage: from slabbe.arXiv_1903_06137 import jeandel_rao_tiles
 sage: from slabbe.arXiv_1903_06137 import geometric_edges_shapes
@@ -115,7 +118,7 @@ sage: draw_H, draw_V = geometric_edges_shapes()
 sage: tikz = tiling.tikz(draw_H=draw_H,draw_V=draw_V, id=True, label=False,
 ....:                  scale="1,very thick", font=r"\bfseries")
 
-Sage commandline, line 4967::
+Sage commandline, line 5042::
 
     sage: from slabbe.matrix_cocycle import cocycles
     sage: c = cocycles.Cassaigne()
@@ -126,7 +129,7 @@ Sage commandline, line 4967::
     sage: ctikz5 = c.tikz_n_cylinders(5, labels=False, scale=3)
     sage: ctikz6 = c.tikz_n_cylinders(6, labels=False, scale=3)
 
-Sage commandline, line 5027::
+Sage commandline, line 5102::
 
 sage: from slabbe.mult_cont_frac import Cassaigne
 sage: c = Cassaigne()
@@ -143,27 +146,29 @@ sage: w = c.s_adic_word((1,e,pi))
 sage: w
 word: 2323213232323132323213232321323231323232...
 
-Sage commandline, line 5259::
+Sage commandline, line 5334::
 
     sage: c1 = WordMorphism("1->1,2->13,3->2")
     sage: c2 = WordMorphism("1->2,2->13,3->3")
     sage: c12 = c1*c2
-    sage: c12_left_image = c12.rauzy_fractal_plot()
-    sage: c12_right_image = c12.rauzy_fractal_plot(exchange=True)
+    sage: c12_left_image = c12.rauzy_fractal_plot(n=1000, point_size=80)
+    sage: c12_right_image = c12.rauzy_fractal_plot(n=1000, point_size=80, exchange=True)
 
-Sage commandline, line 5525::
+Sage commandline, line 5600::
 
     sage: import urllib
     sage: url = "https://members.loria.fr/EJeandel/research/100.txt"
     sage: content = urllib.request.urlopen(url).read()
-    sage: Jeandel100x100 = [line.decode() for line in content.splitlines()]
-    sage: Jeandel100x100[35][:80]
+    sage: Jeandel100 = [line.decode() for line in content.splitlines()]
+    sage: Jeandel100[35][:80]
     '73a43a3873a2873a43a3873a2873873a2873a43a3873a2873a43a2873a2873873a2873a43a3873a2'
-    sage: GJR35 = draw_sequence_on_circle(Jeandel100x100[35], frequency=(1+sqrt(5))/2)
-    sage: GJR36 = draw_sequence_on_circle(Jeandel100x100[36], frequency=(1+sqrt(5))/2)
-    sage: GJR = graphics_array([GJR35, GJR36])
+    sage: keys = "0123456789a"
+    sage: GJR35 = draw_sequence_on_circle(Jeandel100[35], frequency=(1+sqrt(5))/2, keys=keys)
+    sage: GJR36 = draw_sequence_on_circle(Jeandel100[36], frequency=(1+sqrt(5))/2, keys=keys)
+    sage: GJR58 = draw_sequence_on_circle(Jeandel100[58], frequency=(1+sqrt(5))/2, keys=keys)
+    sage: GJR = graphics_array([GJR35, GJR36, GJR58])
 
-Sage commandline, line 5554::
+Sage commandline, line 5638::
 
 sage: from collections import defaultdict
 sage: def preimage2d(rectangular_pattern):
@@ -179,62 +184,64 @@ sage: def frac(x):
 ....:     return x - floor(x)
 sage: def draw_pattern_on_torus(pattern, M):
 ....:     d = preimage2d(pattern)
-....:     color_dict = dict(zip(d.keys(), rainbow(len(d))))
+....:     c_dict = dict(zip(d.keys(), rainbow(len(d))))
+....:     markers = "+x><^vDH_|os*,dh12345678"
+....:     m_dict = dict(zip(d.keys(), markers))
 ....:     G = Graphics()
 ....:     for a in d:
 ....:         L = [M*vector((i,j)) for (i,j) in d[a]]
 ....:         fracL = [(frac(x),frac(y)) for (x,y) in L]
-....:         G += points(fracL, color=color_dict[a], legend_label=a)
+....:         G += points(fracL, color=c_dict[a], legend_label=a, marker=m_dict[a])
 ....:     return G
 
-Sage commandline, line 5579::
+Sage commandline, line 5665::
 
 sage: preimage2d([[1,2,3],[5,5,5]])
 {1: [(0, 1)], 2: [(1, 1)], 3: [(2, 1)], 5: [(0, 0), (1, 0), (2, 0)]}
 sage: frac(pi)
 pi - 3
 
-Sage commandline, line 5588::
+Sage commandline, line 5674::
 
 sage: z = polygen(QQ, "z")
 sage: K.<phi> = NumberField(z^2-z-1, embedding=RR(1.6))
 sage: phi.n(digits=80)
 1.6180339887498948482045868343656381177203091798057628621354486227052604628189024
 
-Sage commandline, line 5606::
+Sage commandline, line 5692::
 
     sage: M1 = matrix.column([(100,0), (0,100)])
-    sage: G1 = draw_pattern_on_torus(Jeandel100x100, M1.inverse())
+    sage: G1 = draw_pattern_on_torus(Jeandel100, M1.inverse())
 
-Sage commandline, line 5622::
+Sage commandline, line 5708::
 
     sage: M2 = matrix.column([(phi,0), (0,100)])
-    sage: G2 = draw_pattern_on_torus(Jeandel100x100, M2.inverse())
+    sage: G2 = draw_pattern_on_torus(Jeandel100, M2.inverse())
 
-Sage commandline, line 5636::
+Sage commandline, line 5722::
 
     sage: M3 = matrix.column([(phi,0), (0,phi+3)])
-    sage: G3 = draw_pattern_on_torus(Jeandel100x100, M3.inverse())
+    sage: G3 = draw_pattern_on_torus(Jeandel100, M3.inverse())
 
-Sage commandline, line 5650::
+Sage commandline, line 5736::
 
     sage: M4 = matrix.column([(phi,0), (1,phi+3)])
-    sage: G4 = draw_pattern_on_torus(Jeandel100x100, M4.inverse())
+    sage: G4 = draw_pattern_on_torus(Jeandel100, M4.inverse())
 
-Sage commandline, line 7271::
+Sage commandline, line 7340::
 
     sage: from slabbe import WangTileSet
     sage: tiles = "3222 4221 4230 4042 4140 0040 1000 1101 2111 2022 2122"
     sage: tiles = [tuple(tile) for tile in tiles.split()]
     sage: slide50 = WangTileSet(tiles)
 
-Sage commandline, line 7291::
+Sage commandline, line 7360::
 
     sage: tiles = "2214 0424 1404 0222 1222 2223 2304 0400 0001 1112 1011"
     sage: tiles = [tuple(tile) for tile in tiles.split()]
     sage: TY = WangTileSet(tiles)
 
-Sage commandline, line 7304::
+Sage commandline, line 7373::
 
 sage: TY.is_equivalent_up_to_isometry(slide50, certificate=True)
 (True,
@@ -243,20 +250,20 @@ sage: TY.is_equivalent_up_to_isometry(slide50, certificate=True)
  {'0': '0', '1': '1', '2': '2'},
  Substitution 2d: {0: [[1]], 1: [[3]], 2: [[4]], 3: [[9]], 4: [[10]], 5: [[0]], 6: [[2]], 7: [[5]], 8: [[6]], 9: [[8]], 10: [[7]]}))
 
-Sage commandline, line 7386::
+Sage commandline, line 7458::
 
     sage: from slabbe import cut_and_project_schemes
     sage: c = cut_and_project_schemes.Penrose()
     sage: c.is_determined_by_subperiods()
     True
 
-Sage commandline, line 7394::
+Sage commandline, line 7466::
 
     sage: c = cut_and_project_schemes.AmmannBeenker()
     sage: c.is_determined_by_subperiods()
     False
 
-Sage commandline, line 7401::
+Sage commandline, line 7473::
 
     sage: c = cut_and_project_schemes.JeandelRao()
     sage: c.is_determined_by_subperiods()
