@@ -1415,7 +1415,7 @@ class Substitution2d(object):
 
         return sV,pVd
 
-    def stone_inflation_shapes(self):
+    def stone_inflation_shapes(self, p=None):
         r"""
         Return a dictionary of letters of the domain alphabet associated to
         pairs ``(width, height)`` describing the rectangular shape
@@ -1427,6 +1427,8 @@ class Substitution2d(object):
         INPUT:
 
         - ``self`` -- expansive and primitive 2d substitution
+        - ``p`` -- ``None`` or `p`-norm used to normalize the heights and
+          width vectors
 
         OUTPUT:
 
@@ -1452,6 +1454,12 @@ class Substitution2d(object):
              2: (1.00000000000000, 1.61803398874989),
              3: (1.61803398874989, 1.61803398874989)}
 
+        ::
+
+            sage: rootX, rootY, stone_shapes = s.stone_inflation_shapes(p=oo)
+            sage: stone_shapes
+            {0: (rootX - 1, rootY - 1), 1: (1, rootY - 1), 2: (rootX - 1, 1), 3: (1, 1)}
+
         """
         if not self.codomain_alphabet() <= self.domain_alphabet():
             raise ValueError("codomain alphabet (='{}') is not a subset of the"
@@ -1463,11 +1471,15 @@ class Substitution2d(object):
 
         sV,pVd = self.vertical_structure_substitution()
         rootY, heights = perron_left_eigenvector_in_number_field(sV.incidence_matrix(), 'rootY')
+        if not p is None:
+            heights /= heights.norm(p)
         heigths_dict = dict(zip(sV.codomain().alphabet(), heights))
         heigths_dict = {k:heigths_dict[v] for k,v in pVd.items()}
 
         sH,pHd = self.horizontal_structure_substitution()
         rootX, widths = perron_left_eigenvector_in_number_field(sH.incidence_matrix(), 'rootX')
+        if not p is None:
+            widths /= widths.norm(p)
         widths_dict = dict(zip(sH.codomain().alphabet(), widths))
         widths_dict = {k:widths_dict[v] for k,v in pHd.items()}
 

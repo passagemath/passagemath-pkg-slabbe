@@ -248,26 +248,26 @@ class GraphDirectedIteratedFunctionSystem(object):
                   [a 0]     [0]
             x |-> [0 a] x + [0]
             edge (1,2):
-                  [a 0]     [a]
+                  [a 0]     [1]
             x |-> [0 a] x + [0]
             edge (2,3):
                   [a 0]     [0]
             x |-> [0 a] x + [0]
             edge (2,1):
                   [a 0]     [0]
-            x |-> [0 a] x + [a]
+            x |-> [0 a] x + [1]
             edge (3,3):
                   [a 0]     [0]
             x |-> [0 a] x + [0]
             edge (3,1):
                   [a 0]     [0]
-            x |-> [0 a] x + [a]
+            x |-> [0 a] x + [1]
             edge (3,2):
-                  [a 0]     [a]
+                  [a 0]     [1]
             x |-> [0 a] x + [0]
             edge (3,0):
-                  [a 0]     [a]
-            x |-> [0 a] x + [a]
+                  [a 0]     [1]
+            x |-> [0 a] x + [1]
 
         We can provide the rectangular shapes associated to each letter
         (useful when they are not properly defined automatically)::
@@ -286,7 +286,8 @@ class GraphDirectedIteratedFunctionSystem(object):
         from sage.rings.qqbar import number_field_elements_from_algebraics, AA
 
         if inflation is None or stone_inflation_shapes is None:
-            rootX, rootY, stone_inflation_shapes = s.stone_inflation_shapes()
+            from sage.rings.infinity import Infinity as oo
+            rootX, rootY, stone_inflation_shapes = s.stone_inflation_shapes(oo)
             KX = rootX.parent()
             KY = rootY.parent()
             numbers = [AA(rootX), AA(rootY)]
