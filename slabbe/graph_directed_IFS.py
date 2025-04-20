@@ -804,7 +804,8 @@ class GraphDirectedIteratedFunctionSystem(object):
                     cycle = cycle[:-1]
                     yield (cycle, self.periodic_point(cycle))
 
-    def plot(self, S=None, n_iterations=1, projection=None, vertices=None):
+    def plot(self, S=None, n_iterations=1, projection=None, vertices=None,
+            size=10):
         r"""
         Return a graphic image of the IFS after few iterations
 
@@ -818,6 +819,8 @@ class GraphDirectedIteratedFunctionSystem(object):
           to 2-dimensional space
         - ``vertices`` -- list (default: ``None``), list of vertices to
           plot
+        - ``size`` -- real (default: ``10``), how big the point is (i.e.,
+          area in points^2=(1/72 inch)^2)
 
         OUTPUT:
 
@@ -891,7 +894,8 @@ class GraphDirectedIteratedFunctionSystem(object):
             P = ifs[v]
             if not self._module.dimension() == 2:
                 P = [projection*p for p in P]
-            G += points(P, color=vertex_to_color[v], legend_label=str(v))
+            G += points(P, color=vertex_to_color[v], legend_label=str(v),
+                    size=size)
         return G
 
 def galois_conjugate(f):
