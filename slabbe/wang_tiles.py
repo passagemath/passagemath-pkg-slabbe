@@ -2617,6 +2617,10 @@ class WangTileSolver(object):
     - ``preassigned_tiles`` -- None or dict of tiles preassigned to some
       positions
     - ``color`` -- None or dict
+    - ``cyclic_horizontally`` -- boolean (supported only for the
+        reduction to SAT)
+    - ``cyclic_vertically`` -- boolean (supported only for the
+        reduction to SAT)
 
     EXAMPLES::
 
@@ -2664,7 +2668,8 @@ class WangTileSolver(object):
         [[1, 1, 1], [1, 1, 1], [1, 1, 1]]
     """
     def __init__(self, tiles, width, height, preassigned_color=None,
-            preassigned_tiles=None, color=None):
+            preassigned_tiles=None, color=None, cyclic_horizontally=False,
+            cyclic_vertically=False):
         r"""
         See class for documentation.
 
@@ -2701,6 +2706,8 @@ class WangTileSolver(object):
             preassigned_tiles = {}
         self._preassigned_tiles = preassigned_tiles
         self._color = color
+        self._cyclic_horizontally = cyclic_horizontally
+        self._cyclic_vertically = cyclic_vertically  
 
         assert all(0 <= j < self._width for (j,k) in self._preassigned_tiles)
         assert all(0 <= k < self._height for (j,k) in self._preassigned_tiles)
@@ -3432,6 +3439,10 @@ class WangTileSolver(object):
         r"""
         Return the SAT solver.
 
+        INPUT:
+
+        - ``solver`` -- string
+
         EXAMPLES::
 
             sage: from slabbe import WangTileSolver
@@ -3455,20 +3466,21 @@ class WangTileSolver(object):
         (var_to_tile_pos,
          tile_pos_to_var) = self.sat_variable_to_tile_position_bijection()
 
+        X = self._width
+        Y = self._height
+
         # at least one tile at each position (j,k)
         # (exactly one if one could use a xor clause)
-        for j in range(self._width):
-            for k in range(self._height):
-                constraint = [tile_pos_to_var[(i,j,k)] for i in indices]
-                s.add_clause(constraint)
+        for (j,k) in itertools.product(range(X),range(Y)):
+            constraint = [tile_pos_to_var[(i,j,k)] for i in indices]
+            s.add_clause(constraint)
 
         # no two tiles at the same position (j,k)
-        for j in range(self._width):
-            for k in range(self._height):
-                for i1,i2 in itertools.combinations(indices, 2):
-                    constraint = [-tile_pos_to_var[(i1,j,k)], 
-                                  -tile_pos_to_var[(i2,j,k)]]
-                    s.add_clause(constraint)
+        for (j,k) in itertools.product(range(X),range(Y)):
+            for i1,i2 in itertools.combinations(indices, 2):
+                constraint = [-tile_pos_to_var[(i1,j,k)], 
+                              -tile_pos_to_var[(i2,j,k)]]
+                s.add_clause(constraint)
 
         # preassigned tiles at position (j,k)
         for j,k in self._preassigned_tiles:
@@ -3476,23 +3488,23 @@ class WangTileSolver(object):
             constraint = [tile_pos_to_var[(i,j,k)]]
             s.add_clause(constraint)
 
-        # matching vertical colors
-        for j in range(self._width-1):
-            for k in range(self._height):
-                for i1,i2 in itertools.product(indices, repeat=2):
-                    if tiles[i1][0] != tiles[i2][2]:
-                        constraint = [-tile_pos_to_var[(i1,j,k)], 
-                                      -tile_pos_to_var[(i2,j+1,k)]]
-                        s.add_clause(constraint)
+        # matching color of tile edges orthogonal to vector e1
+        range_X = range(X) if self._cyclic_horizontally else range(X-1)
+        for (j,k) in itertools.product(range_X,range(Y)):
+            for i1,i2 in itertools.product(indices, repeat=2):
+                if tiles[i1][0] != tiles[i2][2]:
+                    constraint = [-tile_pos_to_var[(i1,j,k)], 
+                                  -tile_pos_to_var[(i2,(j+1)%X,k)]]
+                    s.add_clause(constraint)
 
-        # matching horizontal colors
-        for j in range(self._width):
-            for k in range(self._height-1):
-                for i1,i2 in itertools.product(indices, repeat=2):
-                    if tiles[i1][1] != tiles[i2][3]:
-                        constraint = [-tile_pos_to_var[(i1,j,k)], 
-                                      -tile_pos_to_var[(i2,j,k+1)]]
-                        s.add_clause(constraint)
+        # matching color of tile edges orthogonal to vector e2
+        range_Y = range(Y) if self._cyclic_vertically else range(Y-1)
+        for (j,k) in itertools.product(range(X),range_Y):
+            for i1,i2 in itertools.product(indices, repeat=2):
+                if tiles[i1][1] != tiles[i2][3]:
+                    constraint = [-tile_pos_to_var[(i1,j,k)], 
+                                  -tile_pos_to_var[(i2,j,(k+1)%Y)]]
+                    s.add_clause(constraint)
 
         # matching preassigned color constraints
         legend = {0:'right',1:'top',2:'left',3:'bottom'}
@@ -3917,7 +3929,7 @@ class WangTiling(object):
             sage: tiling = WangTiling(table, tiles)
             sage: img = tiling.to_image()
             sage: img
-            <PIL.Image.Image image mode=RGB size=3x4 at ...>
+            <PIL.Image.Image image mode=RGB size=3x4>
 
         Resize the result when too small::
 
@@ -3929,7 +3941,7 @@ class WangTiling(object):
             sage: color_dict = {0:[255,255,255], 1:[0,0,0]}
             sage: img = tiling.to_image(color_dict)
             sage: img
-            <PIL.Image.Image image mode=RGB size=3x4 at ...>
+            <PIL.Image.Image image mode=RGB size=3x4>
 
         """
         if color_dict is None:
