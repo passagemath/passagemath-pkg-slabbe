@@ -1292,7 +1292,8 @@ class WangTileSet(object):
         return WangTileSet(tiles)
 
     def solver(self, width, height, preassigned_color=None,
-            preassigned_tiles=None, color=None):
+            preassigned_tiles=None, color=None, cyclic_horizontally=False,
+            cyclic_vertically=False):
         r"""
         Return the Wang tile solver of this Wang tile set inside a
         rectangle of given width and height.
@@ -1307,6 +1308,10 @@ class WangTileSet(object):
         - ``preassigned_tiles`` -- None or dict of tiles preassigned to some
           positions
         - ``color`` -- None or dict
+        - ``cyclic_horizontally`` -- boolean (supported only for the
+            reduction to SAT)
+        - ``cyclic_vertically`` -- boolean (supported only for the
+            reduction to SAT)
 
         EXAMPLES::
 
@@ -1353,7 +1358,9 @@ class WangTileSet(object):
         return WangTileSolver(self._tiles, width, height,
                 preassigned_color=preassigned_color,
                 preassigned_tiles=preassigned_tiles,
-                color=color)
+                color=color,
+                cyclic_vertically=cyclic_vertically,
+                cyclic_horizontally=cyclic_horizontally)
 
     def tiles_allowing_surrounding(self, radius, solver=None, ncpus=None, verbose=False):
         r"""
