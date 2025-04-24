@@ -98,7 +98,7 @@ def to_image(self, width=1000):
         sage: t = words.ThueMorseWord()
         sage: img = to_image(t[:10000], width=100)
         sage: img
-        <PIL.Image.Image image mode=RGB size=100x100 at 0x...>
+        <PIL.Image.Image image mode=RGB size=100x100...>
         sage: img.show()    # not tested
 
     ::
