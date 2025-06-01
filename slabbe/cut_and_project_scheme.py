@@ -1328,7 +1328,8 @@ class ModelSet(SageObject):
 
         return G
 
-    def plot_in_physical_space(self, physical_window, pointsize=20):
+    def plot_in_physical_space(self, physical_window, pointsize=20,
+            ambiant_coordinates=False):
         r"""
         Return a Graphics representing the model set restricted to a window
         in the physical space
@@ -1337,6 +1338,7 @@ class ModelSet(SageObject):
 
         - ``physical_window`` -- polyhedron
         - ``pointsize`` -- integer (default:20)
+        - ``ambiant_coordinates`` -- bool (default:``False``)
 
         EXAMPLES::
 
@@ -1373,6 +1375,25 @@ class ModelSet(SageObject):
             polynomial x^2 - 2 with zeta80 = 1.414213562373095? cannot be coerced to a real
             field
 
+        ::
+
+            sage: v = vector(QQ,(1,e.n(digits=4),pi.n(digits=4)))
+            sage: c = cut_and_project_schemes.DiscretePlane(v)
+            sage: m = c.canonical_model_set(shift=-vector((1,1,1))/100)
+            sage: W = polytopes.hypercube(2, intervals=[(-3,3), (-2,2)])
+            sage: kwds = dict(color='black', horizontal_alignment='left', rotation=0)
+            sage: G = m.plot_in_physical_space(W, ambiant_coordinates=kwds)
+            sage: G.show(figsize=5, axes=False)          # not tested
+
+        ::
+
+            sage: c = cut_and_project_schemes.Penrose()
+            sage: m = c.canonical_model_set(shift=-vector((1,1,1,1,1))/100)
+            sage: W = polytopes.hypercube(2, intervals=[(-3,5), (-2,3)])
+            sage: kwds = dict(color='black', horizontal_alignment='left', rotation=20)
+            sage: G = m.plot_in_physical_space(W, ambiant_coordinates=kwds)
+            sage: G.show(figsize=8, axes=False)          # not tested
+
         TESTS::
 
             sage: m = model_sets.Fibonacci()
@@ -1396,6 +1417,15 @@ class ModelSet(SageObject):
 
         L = self.cut_and_project(physical_window)
         G = point(L, size=pointsize)
+
+        if ambiant_coordinates:
+            from sage.plot.text import text
+            L = self.cut(physical_window)
+            cap = self.cut_and_project_scheme()
+            M = cap.physical_space_projection()
+            for p in L:
+                Mp = M*p
+                G += text(str(p), Mp, **ambiant_coordinates)
 
         M = cap.physical_space_projection()
         for (p,q) in self.cut_edges(physical_window):
@@ -1825,6 +1855,44 @@ class CutAndProjectSchemeGenerator():
         pi = matrix(K, [[1, 1, 0, 0], [0, 0, 1, 1]])
         pi_int = matrix(K, [[~phi**2, -~phi, 0, 0], [0, 0, ~phi**2, -~phi]])
         return CutAndProjectScheme(K, pi, pi_int)
+
+    def DiscretePlane(self, normal_vector, algorithm='degree2'):
+        r"""
+        Return the Penrose cut and project scheme
+
+        INPUT:
+
+        - ``algorithm`` -- string (default:``'degree2'``), valid options are:
+
+          - ``'degree2'`` -- computations are made in the number field of
+            degree 2
+
+        EXAMPLES::
+
+            sage: from slabbe import cut_and_project_schemes
+            sage: cut_and_project_schemes.DiscretePlane((1,2,3))
+            3-to-2 cut and project scheme
+
+        """
+        from sage.rings.rational_field import QQ
+        from sage.rings.real_mpfr import RR
+        from sage.rings.polynomial.polynomial_ring import polygen
+        from sage.rings.number_field.number_field import NumberField
+        from sage.matrix.constructor import matrix
+        from sage.symbolic.constants import pi
+        from sage.functions.trig import cos, sin
+
+        if algorithm == 'degree2':
+            # unit vectors are algebraic numbers of degree 4
+            z = polygen(QQ, 'z')
+            K = NumberField(z**2 - 3, 'a', embedding=RR(1.7))
+            entries = [(cos(2*pi*n/3+pi/2), sin(2*pi*n/3+pi/2)) for n in range(3)]
+            projection_phys = matrix.column(K, entries)
+            projection_int = matrix([normal_vector])
+            return CutAndProjectScheme(K, projection_phys, projection_int)
+
+        else:
+            raise ValueError(f'algorithm(={algorithm}) unknown')
 
 class ModelSetGenerator():
     r"""
