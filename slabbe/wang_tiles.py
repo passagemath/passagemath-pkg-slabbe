@@ -2796,7 +2796,8 @@ class WangTileSet(object):
                 else:
                     return True
 
-    def is_aperiodic_candidate(self, stop=None, verbose=False, solver=None, certificate=True):
+    def is_aperiodic_candidate(self, stop=None, verbose=False, solver=None,
+            certificate=False):
         r"""
         Return False if a periodic configuration is found or if some finite
         2d rectangular box admit no tiling.
