@@ -2608,6 +2608,254 @@ class WangTileSet(object):
 
         return H
 
+    def is_periodic(self, stop=None, start=2, solver=None, certificate=False, verbose=False):
+        r"""
+
+        INPUT:
+
+        - ``stop`` -- integer
+        - ``start`` -- integer (default:``2``), sum of the sizes of the
+          rectangular box
+        - ``solver`` -- string or None (default: ``None``), 
+          ``'dancing_links'`` or the name of a MILP solver in Sage like
+          ``'GLPK'``, ``'Coin'``, ``'cplex'`` or ``'Gurobi'`` or the name
+          of a SAT solver in SageMath
+        - ``certificate`` -- bool (default:``False``)
+        - ``verbose`` -- bool (default:``False``)
+
+        EXAMPLES::
+
+            sage: from slabbe import WangTileSet
+            sage: tiles = [(0,0,0,0), (1,1,1,1), (2,2,2,2)]
+            sage: T = WangTileSet(tiles)
+            sage: T.is_periodic(5, certificate=True)
+            (True, (1, 1))
+
+        Jeandel-Rao::
+
+            sage: tiles = [(2,4,2,1), (2,2,2,0), (1,1,3,1), (1,2,3,2), (3,1,3,3),
+            ....: (0,1,3,1), (0,0,0,1), (3,1,0,2), (0,2,1,2), (1,2,1,4), (3,3,1,2)]
+            sage: T = WangTileSet(tiles)
+            sage: T.is_periodic(5, certificate=True) is None
+            True
+
+        """
+        from sage.combinat.integer_lists.invlex import IntegerListsLex
+        it = itertools.count(start) if stop is None else range(start, stop)
+        for n in it:
+            if verbose:
+                print('Trying n=x+y={}'.format(n))
+            for X_Y in IntegerListsLex(n=n, length=2, min_part=1):
+                if verbose:
+                    print('Trying to tile (cyclically) a box of size (x,y)={}: '.format(X_Y), end='')
+
+                width, height = X_Y
+                solver = self.solver(width, height,
+                    cyclic_vertically=True,
+                    cyclic_horizontally=True)
+                sat_solver = solver.sat_solver(solver='glucose')
+                solution = sat_solver()
+
+                del sat_solver
+
+                if solution:
+                    if verbose:
+                        print('solution found!')
+                    if certificate:
+                        return True, tuple(X_Y)
+                    else:
+                        return True
+                else:
+                    if verbose:
+                        print('no solution')
+
+
+    def is_periodic_parallel(self, stop=None, solver=None,
+            certificate=False, verbose=False, ncpus=8):
+        r"""
+
+        INPUT:
+
+        - ``stop`` -- integer
+        - ``solver`` -- string or None (default: ``None``), 
+          ``'dancing_links'`` or the name of a MILP solver in Sage like
+          ``'GLPK'``, ``'Coin'``, ``'cplex'`` or ``'Gurobi'`` or the name
+          of a SAT solver in SageMath
+        - ``certificate`` -- bool (default:``False``)
+        - ``verbose`` -- bool (default:``False``)
+        - ``ncpus`` -- integer (default:``8``)
+
+        EXAMPLES::
+
+            sage: from slabbe import WangTileSet
+            sage: tiles = [(0,0,0,0), (1,1,1,1), (2,2,2,2)]
+            sage: T = WangTileSet(tiles)
+            sage: T.is_periodic_parallel(5, certificate=True)
+            (True, (1, 1))
+
+        Jeandel-Rao::
+
+            sage: tiles = [(2,4,2,1), (2,2,2,0), (1,1,3,1), (1,2,3,2), (3,1,3,3),
+            ....: (0,1,3,1), (0,0,0,1), (3,1,0,2), (0,2,1,2), (1,2,1,4), (3,3,1,2)]
+            sage: T = WangTileSet(tiles)
+            sage: T.is_periodic_parallel(5, certificate=True) is None
+            True
+
+        """
+        from sage.combinat.integer_lists.invlex import IntegerListsLex
+        from sage.parallel.decorate import parallel
+
+        if not solver in ['glucose', None]:
+            raise NotImplementedError(f"when solver(={solver})")
+
+        @parallel(ncpus=ncpus)
+        def find_cyclic_tiling(box):
+            width, height = box
+            solver = self.solver(width, height,
+                cyclic_vertically=True,
+                cyclic_horizontally=True)
+            sat_solver = solver.sat_solver(solver='glucose')
+            solution = sat_solver()
+            del sat_solver
+            return solution
+
+        it = itertools.count(2) if stop is None else range(2, stop)
+
+        boxes = (box for n in it
+                     for box in IntegerListsLex(n=n, length=2, min_part=1))
+
+        for (args,kwds),result in find_cyclic_tiling(boxes):
+            (arg,) = args
+            if verbose:
+                print('Trying to tile (cyclically) a box of size (x,y)={}: '.format(arg), end='')
+
+            if result:
+                if verbose:
+                    print('solution found!')
+                if certificate:
+                    return True, tuple(arg)
+                else:
+                    return True
+            else:
+                if verbose:
+                    print('no solution')
+
+
+    def is_finite(self, stop=None, start=1, solver=None, certificate=False, verbose=False):
+        r"""
+
+        INPUT:
+
+        - ``stop`` -- integer
+        - ``start`` -- integer (default: ``1``)
+        - ``solver`` -- string or None (default: ``None``), 
+          ``'dancing_links'`` or the name of a MILP solver in Sage like
+          ``'GLPK'``, ``'Coin'``, ``'cplex'`` or ``'Gurobi'`` or the name
+          of a SAT solver in SageMath
+        - ``certificate`` -- bool (default:``False``)
+        - ``verbose`` -- bool (default:``False``)
+
+        EXAMPLES::
+
+            sage: from slabbe import WangTileSet
+            sage: tiles = [(0,0,1,0), (1,1,2,1), (2,0,2,2)]
+            sage: T = WangTileSet(tiles)
+            sage: T.is_finite(5, certificate=True)
+            (True, (3, 3))
+
+        Jeandel-Rao::
+
+            sage: tiles = [(2,4,2,1), (2,2,2,0), (1,1,3,1), (1,2,3,2), (3,1,3,3),
+            ....: (0,1,3,1), (0,0,0,1), (3,1,0,2), (0,2,1,2), (1,2,1,4), (3,3,1,2)]
+            sage: T = WangTileSet(tiles)
+            sage: T.is_finite(5, certificate=True) is None
+            True
+
+        """
+        it = itertools.count(start) if stop is None else range(start, stop)
+        for n in it:
+            width = height = n
+            X_Y = (n, n)
+            if verbose:
+                print('Trying to tile a box of size (x,y)={}: '.format(X_Y), end='')
+
+            solver = self.solver(width, height,
+                cyclic_vertically=False,
+                cyclic_horizontally=False)
+            sat_solver = solver.sat_solver(solver='glucose')
+            solution = sat_solver()
+            del sat_solver
+            if solution:
+                if verbose:
+                    print('solution found')
+            else:
+                if verbose:
+                    print('no solution found!')
+                if certificate:
+                    return True, X_Y
+                else:
+                    return True
+
+    def is_aperiodic_candidate(self, stop=None, verbose=False, solver=None, certificate=True):
+        r"""
+        Return False if a periodic configuration is found or if some finite
+        2d rectangular box admit no tiling.
+
+        INPUT:
+
+        - ``stop`` -- integer
+        - ``solver`` -- string or None (default: ``None``), 
+          ``'dancing_links'`` or the name of a MILP solver in Sage like
+          ``'GLPK'``, ``'Coin'``, ``'cplex'`` or ``'Gurobi'`` or the name
+          of a SAT solver in SageMath
+        - ``certificate`` -- bool (default:``False``)
+        - ``verbose`` -- bool (default:``False``)
+
+        EXAMPLES::
+
+            sage: from slabbe import WangTileSet
+            sage: tiles = [(0,0,1,0), (1,1,2,1), (2,0,2,2)]
+            sage: T = WangTileSet(tiles)
+            sage: T.is_aperiodic_candidate(5, certificate=True)
+            (False, 'is_finite', (True, (3, 3)))
+
+        ::
+
+            sage: tiles = [(0,0,0,0), (1,1,1,1), (2,2,2,2)]
+            sage: T = WangTileSet(tiles)
+            sage: T.is_aperiodic_candidate(5, certificate=True)
+            (False, 'is_periodic', (True, (1, 1)))
+
+        Jeandel-Rao::
+
+            sage: tiles = [(2,4,2,1), (2,2,2,0), (1,1,3,1), (1,2,3,2), (3,1,3,3),
+            ....: (0,1,3,1), (0,0,0,1), (3,1,0,2), (0,2,1,2), (1,2,1,4), (3,3,1,2)]
+            sage: T = WangTileSet(tiles)
+            sage: T.is_aperiodic_candidate(5, certificate=True)
+            (True, None, None)
+        """
+        from sage.parallel.decorate import parallel
+
+        @parallel(ncpus=2)
+        def call_method(method):
+            F = getattr(self, method) 
+            return F(stop=stop,verbose=verbose,solver=solver,certificate=certificate)
+
+        methods = ['is_periodic', 'is_finite']
+        #methods = ['is_periodic_parallel', 'is_finite']
+        for ((args,kwds),result) in call_method(methods):
+            (arg,) = args
+            if result:
+                if certificate:
+                    return False, arg, result
+                else:
+                    return False
+
+        if certificate:
+            return True, None, None
+        else:
+            return True
+
 class WangTileSolver(object):
     r"""
     Wang tile solver inside a rectangle of given width and height.
