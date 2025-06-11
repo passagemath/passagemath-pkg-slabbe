@@ -389,9 +389,13 @@ class PETsCoding(object):
         return sorted(candidate_patterns-valid_patterns)
 
 
-    def to_wang_tiles(self):
+    def to_wang_tiles(self, use_str=False):
         r"""
         Recover the Wang tile sets associated to the atoms of the partition.
+
+        INPUT:
+
+        - ``use_str`` -- bool (default:``False``)
 
         EXAMPLES::
 
@@ -405,7 +409,7 @@ class PETsCoding(object):
             sage: RUe1 = PET.toral_translation(Gamma0, vector((phi^-2,0)))
             sage: RUe2 = PET.toral_translation(Gamma0, vector((0,phi^-2)))
             sage: X_PU_RU = PETsCoding((RUe1,RUe2), PU)
-            sage: TU = X_PU_RU.to_wang_tiles()
+            sage: TU = X_PU_RU.to_wang_tiles(use_str=True)
             sage: TU
             Wang tile set of cardinality 19
 
@@ -462,7 +466,10 @@ class PETsCoding(object):
         alphabet = sorted(self._partition.alphabet())
         tiles = [(color_right[a],color_top[a],color_left[a],color_bottom[a])
                  for a in alphabet]
-        tiles = [tuple(str(b) for b in tile) for tile in tiles]
+        if use_str:
+            tiles = [tuple(str(b) for b in tile) for tile in tiles]
+        else:
+            tiles = [tuple(tile) for tile in tiles]
         from slabbe import WangTileSet
         return WangTileSet(tiles)
 
