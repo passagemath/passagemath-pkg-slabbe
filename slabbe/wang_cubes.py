@@ -194,6 +194,38 @@ class WangCubeSet(object):
         usetikzlibrary = "matrix,fit".split(',')
         return TikzPicture('\n'.join(lines), usetikzlibrary=usetikzlibrary)
 
+    def table(self, ncols=3):
+        r"""
+        EXAMPLES::
+
+            sage: from slabbe import WangCubeSet
+            sage: cubes = [(i,i,i,i,i,i) for i in range(7)]
+            sage: cubes.append((0,1,2,3,4,5))
+            sage: T = WangCubeSet(cubes)
+            sage: t = T.table()
+        """
+        def cube_to_array(id, cube):
+            lines = []
+            lines.append(fr"{{\bf\#{id}}}:")
+            lines.append(r"\left(\begin{array}{ccc}")
+            lines.append(fr"{cube[0]} & {cube[1]} & {cube[2]} \\")
+            lines.append(fr"{cube[3]} & {cube[4]} & {cube[5]}")
+            lines.append(r"\end{array}\right)")
+            return lines
+
+        lines = []
+        lines.append(fr"\begin{{array}}{{{'c'*ncols}}}")
+        for i,(key,cube) in enumerate(self.cubes().items()):
+            lines.extend(cube_to_array(key, cube))
+            if i % ncols == ncols-1:
+                lines.append(r'\\')
+            else:
+                lines.append(r'&')
+        if len(self) % ncols != 0:
+            lines.append(r'\\')
+        lines.append(r'\end{array}')
+        return '\n'.join(lines)
+
     @cached_method
     def sat_variable_to_cube_position_bijection(self, box):
         r"""
