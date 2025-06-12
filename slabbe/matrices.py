@@ -51,17 +51,16 @@ def projection_matrix(dim_from=3, dim_to=2):
     from sage.rings.real_mpfr import RR
     sqrt3 = sqrt(3)
     if dim_from == 3 and dim_to == 2:
-        return matrix(2,[-sqrt3,sqrt3,0,-1,-1,2],base_ring=RR)/2
+        return matrix(RR,2,[-sqrt3,sqrt3,0,-1,-1,2])/2
     elif dim_from == 2 and dim_to == 3:
-        return matrix(3,[-sqrt3,-1,sqrt3,-1,0,2],base_ring=RR)/3
+        return matrix(RR,3,[-sqrt3,-1,sqrt3,-1,0,2])/3
     elif dim_from == 4 and dim_to == 2:
-        return matrix(2,[-sqrt3,sqrt3,0,1,-1,-1,2,0],base_ring=RR)/2
+        return matrix(RR,2,[-sqrt3,sqrt3,0,1,-1,-1,2,0])/2
     elif dim_from == 4 and dim_to == 3:
         sqrt2 = sqrt(2)
-        return matrix([(1,-1,0,0), 
+        return matrix(RR,[(1,-1,0,0), 
                        (0,0,1,-1),
-                       (-1/sqrt2,-1/sqrt2,1/sqrt2,1/sqrt2)],
-                       base_ring=RR)
+                       (-1/sqrt2,-1/sqrt2,1/sqrt2,1/sqrt2)])
     else:
         s = "for input dim_from={} and dim_to={}"
         raise NotImplementedError(s.format(dim_from, dim_to))
