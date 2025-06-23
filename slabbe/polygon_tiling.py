@@ -732,10 +732,16 @@ def pentagon_from_lengths_and_angles(a, b, c, d, e, A, B, C, D, E, VS):
     The first vertices is (0,0) then (a,0) and after that, the other vertices clockwise.
 
     EXAMPLES::
+
         sage: from slabbe.polygon_tiling import pentagon_from_lengths_and_angles
         sage: from sage.rings.real_mpfr import RR
         sage: from sage.symbolic.constants import pi
         sage: t = pentagon_from_lengths_and_angles(1,1,1,1,1,pi/3,pi/3,pi/3,pi/3,pi/3, RR^2)
+
+    AUTHORS:
+
+        - Léandre Naudin, ENS ULM Student, internship at LaBRI, June 2025
+    
     """
     from sage.functions.trig import cos, sin
     from sage.symbolic.constants import pi
@@ -770,15 +776,19 @@ class PentagonalTilings:
         - ``A, C, D`` -- angles in radians
         - ``ring`` -- (optional) base ring (default: RealField)
 
-        EXAMPLES::
-
-            sage: from slabbe.polygon_tiling import pentagonal_tilings
-            sage: t = pentagonal_tilings.type_1(15,10,10,5*pi/4,3*pi/4,pi/2)
-
         .. NOTE::
 
             Length constraints: None
             Angle constraints: B + C = pi, A + D + E = 2*pi
+
+        EXAMPLES::
+
+            sage: from slabbe.polygon_tiling import pentagonal_tilings
+            sage: t = pentagonal_tilings.type_1(15,10,10,5*pi/4,3*pi/4,pi/2)
+        
+        AUTHORS:
+
+        - Léandre Naudin, ENS ULM Student, internship at LaBRI, June 2025
         """
         from sage.functions.trig import cos, sin
         from sage.symbolic.constants import pi
