@@ -715,7 +715,7 @@ def rotation_180(VS, p):
 
 def pentagon_from_lengths_and_angles(a, b, c, d, e, A, B, C, D, E, VS):
     """
-    Construct the vertices of a pentagon from given side lengths and angles.
+    Return the list of the vertices of a pentagon from given side lengths and angles.
 
     INPUT:
 
