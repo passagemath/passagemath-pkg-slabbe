@@ -5099,11 +5099,11 @@ class WangTilesGenerator:
             sage: T
             Wang tile set of cardinality 10
 
-        This set can tile a 90 x 90 rectangle (found in 1min 32s with
-        glucose/kissat) and admits no cyclic rectangle of size less than 45::
+        This set can tile a 100 x 100 rectangle (found in 9min 47s with
+        glucose) and admits no cyclic rectangle of size less than 45::
 
-            sage: T.is_finite(start=90, stop=91, solver='kissat')  # not tested (1min 32s)
-            sage: T.is_periodic_parallel(start=40, stop=45)        # not tested (3min 32s)
+            sage: T.is_finite(start=100, stop=101, solver='glucose')  # not tested (9min 47s)
+            sage: T.is_periodic_parallel(start=40, stop=45)           # not tested (3min 32s)
 
         Here we check this up to 10::
 
