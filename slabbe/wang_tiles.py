@@ -2670,7 +2670,7 @@ class WangTileSet(object):
                         print('no solution')
 
 
-    def is_periodic_parallel(self, stop=None, solver=None,
+    def is_periodic_parallel(self, stop=None, start=2, solver=None,
             certificate=False, verbose=False, ncpus=8):
         r"""
 
@@ -2719,7 +2719,7 @@ class WangTileSet(object):
             del sat_solver
             return solution
 
-        it = itertools.count(2) if stop is None else range(2, stop)
+        it = itertools.count(start) if stop is None else range(start, stop)
 
         boxes = (box for n in it
                      for box in IntegerListsLex(n=n, length=2, min_part=1))
@@ -2796,8 +2796,8 @@ class WangTileSet(object):
                 else:
                     return True
 
-    def is_aperiodic_candidate(self, stop=None, verbose=False, solver=None,
-            certificate=False):
+    def is_aperiodic_candidate(self, stop=None, start=1, verbose=False,
+            solver=None, certificate=False):
         r"""
         Return False if a periodic configuration is found or if some finite
         2d rectangular box admit no tiling.
@@ -2805,6 +2805,7 @@ class WangTileSet(object):
         INPUT:
 
         - ``stop`` -- integer
+        - ``start`` -- integer (default: ``1``)
         - ``solver`` -- string or None (default: ``None``), 
           ``'dancing_links'`` or the name of a MILP solver in Sage like
           ``'GLPK'``, ``'Coin'``, ``'cplex'`` or ``'Gurobi'`` or the name
@@ -2840,7 +2841,7 @@ class WangTileSet(object):
         @parallel(ncpus=2)
         def call_method(method):
             F = getattr(self, method) 
-            return F(stop=stop,verbose=verbose,solver=solver,certificate=certificate)
+            return F(stop=stop,start=start,verbose=verbose,solver=solver,certificate=certificate)
 
         methods = ['is_periodic', 'is_finite']
         #methods = ['is_periodic_parallel', 'is_finite']
@@ -5081,6 +5082,44 @@ class WangTilesGenerator:
     r"""
     Generator of well-known sets of Wang tiles.
     """
+    def JeandelRao_10_tiles(self):
+        r"""
+        Return the set of 10 Wang tiles which is not aperiodic but
+        which was the hard case to deal with in the proof that there is
+        no aperiodic set of Wang tile of size <= 10 tiles [JR21]_.
+
+        See slides 54/71 in the presentation made by Emmanuel Jeandel
+        at GDR-IM 2016 meeting:
+        https://lipn.univ-paris13.fr/GDR-IM-2016/SLIDES/jeandel.pdf
+
+        EXAMPLES::
+
+            sage: from slabbe import wang_tiles
+            sage: T = wang_tiles.JeandelRao_10_tiles()
+            sage: T
+            Wang tile set of cardinality 10
+
+        This set can tile a 90 x 90 rectangle (found in 1min 32s with
+        glucose/kissat) and admits no cyclic rectangle of size less than 45::
+
+            sage: T.is_finite(start=90, stop=91, solver='kissat')  # not tested (1min 32s)
+            sage: T.is_periodic_parallel(start=40, stop=45)        # not tested (3min 32s)
+
+        Here we check this up to 10::
+
+            sage: T.is_aperiodic_candidate(stop=10)     # long time (5s)
+            True
+
+        """
+        # G = gray
+        # O = orange
+        # B = black
+        # W = white
+        tiles = ['GOBO', 'BGGW', 'GOGB',
+                 'OOWO', 'WWWO', 'BOBB',
+                 'OWOO', 'WBOO', 'WOOG', 'OBWW']
+        return WangTileSet(tiles)
+
     def JeandelRao(self):
         r"""
         Return the set of 11 Jeandel-Rao Wang tiles according to [JR21]_.
