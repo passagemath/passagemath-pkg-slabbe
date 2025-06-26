@@ -713,6 +713,215 @@ def rotation_180(VS, p):
     R = F([-1,0,0,-1])
     return T * R * T.inverse()
 
+def rotation(point, center, angle, VS):
+    r"""
+    Rotate a point around a center by a given angle.
+
+    INPUT:
+
+    - ``point`` -- a pair (x, y), the point to rotate
+    - ``center`` -- a pair (x, y), the center of rotation
+    - ``angle`` -- real number, angle in radians
+    - ``VS`` -- vector space
+
+    OUTPUT:
+
+    - a rotated point in ``VS``
+
+    EXAMPLES::
+
+        sage: from slabbe.polygon_tiling import rotation
+        sage: r = rotation((1, 0), (0, 0), pi/2, RR^2)
+        sage: r
+        (0.000000000000000, 1.00000000000000)
+
+    AUTHORS:
+
+        - Léandre Naudin, ENS ULM Student, internship at LaBRI, June 2025
+
+    """
+    from sage.functions.trig import cos,sin
+    x, y = point
+    cx, cy = center
+    dx, dy = x - cx, y - cy
+    rx = dx * cos(angle) - dy * sin(angle)
+    ry = dx * sin(angle) + dy * cos(angle)
+    return VS((rx + cx, ry + cy))
+
+def translation(point, vector, VS):
+    r"""
+    Translate a point by a given vector.
+
+    INPUT:
+
+    - ``point`` -- a pair (x, y)
+    - ``vector`` -- a pair (ux, uy)
+    - ``VS`` -- vector space
+
+    OUTPUT:
+
+    - a translated point in ``VS``
+
+    EXAMPLES::
+
+        sage: from slabbe.polygon_tiling import translation
+        sage: t = translation((1, 2), (3, 4), RR^2)
+        sage: t
+        (4.00000000000000, 6.00000000000000)
+
+    AUTHORS:
+
+        - Léandre Naudin, ENS ULM Student, internship at LaBRI, June 2025
+
+    """
+    x, y = point
+    ux, uy = vector
+    return VS((x + ux, y + uy))
+
+def reflection_about_line(point, base, direction, VS):
+    r"""
+    Reflect a point through an affine line defined by a base point and a direction vector.
+
+    INPUT:
+
+    - ``point`` -- a pair, point to reflect
+    - ``base`` -- a pair, a point on the line
+    - ``direction`` -- direction vector of the line (non-zero)
+    - ``VS`` -- vector space
+
+    OUTPUT:
+
+    - the reflected point in ``VS``
+
+    EXAMPLES::
+
+        sage: from slabbe.polygon_tiling import reflection_about_line
+        sage: reflection = reflection_about_line((2, 0), (0, 0), (1, 0), RR^2)
+        sage: reflection
+        (2.00000000000000, 0.000000000000000)
+
+    AUTHORS:
+
+        - Léandre Naudin, ENS ULM Student, internship at LaBRI, June 2025
+
+    """
+    ax, ay = point
+    px, py = base
+    ux, uy = direction
+    apx = ax - px
+    apy = ay - py
+    norm_u2 = ux**2 + uy**2
+    if norm_u2 == 0:
+        raise ValueError("Direction vector cannot be zero.")
+    dot = apx * ux + apy * uy
+    proj_x = px + (dot / norm_u2) * ux
+    proj_y = py + (dot / norm_u2) * uy
+    sym_x = 2 * proj_x - ax
+    sym_y = 2 * proj_y - ay
+    return VS((sym_x, sym_y))
+
+def find_rota(X, num_cote1, num_cote2, preserve_orientation, pentagone, VS):
+    r"""
+    Find the image of point X under a sequence of rotations and translations
+    so that a given edge is glued onto another, possibly followed by a reflection
+    or central symmetry.
+
+    INPUT:
+
+    - ``X`` -- the point to transform
+    - ``num_cote1`` -- int, source edge number (EA=0, AB=1, etc.)
+    - ``num_cote2`` -- int, target edge number
+    - ``preserve_orientation`` -- bool, whether to preserve orientation or not
+    - ``pentagone`` -- tuple ``(points, angles)`` with ordered vertices and internal angles
+    - ``VS`` -- vector space
+
+    OUTPUT:
+
+    - ``(Y, points)`` -- image point and transformed pentagon
+
+    EXAMPLES::
+
+        sage: from slabbe.polygon_tiling import find_rota
+        sage: from slabbe.polygon_tiling import pentagon_from_lengths_and_angles
+        sage: penta = pentagon_from_lengths_and_angles(1,1,1,1,1,pi/3,pi/3,pi/3,pi/3,pi/3, RR^2)
+        sage: r = find_rota((0,0), 0, 2, True, (penta, [pi/3]*5), RR^2)
+        sage: r
+        ((-0.500000000000000, 0.866025403784439),
+        [(-0.500000000000000, 0.866025403784439),
+        (0.500000000000000, 0.866025403784439),
+        (0.000000000000000, 0.000000000000000),
+        (-0.500000000000000, 0.866025403784439),
+        (0.500000000000000, 0.866025403784439)])
+
+    AUTHORS:
+
+        - Léandre Naudin, ENS ULM Student, internship at LaBRI, June 2025
+
+    """
+    from sage.symbolic.constants import pi
+    points = list(pentagone[0])
+    angles = pentagone[1]
+    Y = X
+    num_cote = num_cote1
+    while num_cote != num_cote2:
+        points = [rotation(p, points[num_cote], -(pi - angles[num_cote]), VS) for p in points]
+        Y = rotation(Y, points[num_cote], -(pi - angles[num_cote]), VS)
+        num_cote = (num_cote + 1) % 5
+
+    u = (
+        pentagone[0][num_cote1][0] - points[num_cote2][0],
+        pentagone[0][num_cote1][1] - points[num_cote2][1]
+    )
+    points = [translation(p, u, VS) for p in points]
+    Y = translation(Y, u, VS)
+
+    if preserve_orientation:
+        ux = points[num_cote2][0] - points[(num_cote2 - 1) % 5][0]
+        uy = points[num_cote2][1] - points[(num_cote2 - 1) % 5][1]
+        direction = (ux, uy)
+        points = [reflection_about_line(p, points[num_cote2], direction, VS) for p in points]
+        Y = reflection_about_line(Y, points[num_cote2], direction, VS)
+    else:
+        center = (
+            (points[num_cote2][0] + points[(num_cote2 - 1) % 5][0]) / 2,
+            (points[num_cote2][1] + points[(num_cote2 - 1) % 5][1]) / 2
+        )
+        points = [rotation(p, center, pi, VS) for p in points]
+        Y = rotation(Y, center, pi, VS)
+
+    return (Y, points)
+
+
+def get_iso(num_cote1, num_cote2, preserve_orientation, pentagone, VS):
+    r"""
+    Return a transformation function associated to a gluing configuration.
+
+    INPUT:
+
+    - ``num_cote1`` -- int
+    - ``num_cote2`` -- int
+    - ``preserve_orientation`` -- bool
+    - ``pentagone`` -- tuple ``(points, angles)`` with ordered vertices and internal angles
+    - ``VS`` -- vector space
+
+    OUTPUT:
+
+    - a function mapping a point using the glued transformation
+
+    EXAMPLES::
+
+        sage: from slabbe.polygon_tiling import get_iso
+        sage: from slabbe.polygon_tiling import pentagon_from_lengths_and_angles
+        sage: penta = pentagon_from_lengths_and_angles(1,1,1,1,1,pi/3,pi/3,pi/3,pi/3,pi/3, RR^2)
+        sage: f = get_iso(0, 2, False, (penta, [pi/3]*5), RR^2)
+
+    AUTHORS:
+
+        - Léandre Naudin, ENS ULM Student, internship at LaBRI, June 2025
+
+    """
+    return lambda x: find_rota(x, num_cote1, num_cote2, preserve_orientation, pentagone, VS)[0]
+
 def pentagon_from_lengths_and_angles(a, b, c, d, e, A, B, C, D, E, VS):
     """
     Return the list of the vertices of a pentagon from given side lengths and angles.
