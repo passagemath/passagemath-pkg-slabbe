@@ -717,26 +717,30 @@ def pentagon_from_lengths_and_angles(a, b, c, d, e, A, B, C, D, E, VS):
     """
     Return the list of the vertices of a pentagon from given side lengths and angles.
 
+    The first vertices is (0,0) then (a,0) and after that, and the angles
+    are used to determine the direction of each subsequent side.
+    The vertices are ordered anticlockwise.
+
     INPUT:
 
-    - ``a, b, c, d, e`` -- side lengths
-    - ``A, B, C, D, E`` -- angles in radians
+    - ``a, b, c, d, e`` -- real numbers, side lengths
+    - ``A, B, C, D, E`` -- real numbers, angles in radians
     - ``VS`` -- vector space, the parent of the output vertices
 
     OUTPUT:
 
     - list of 5 points representing the pentagon vertices [p0, p1, p2, p3, p4]
 
-    The side ``a`` is from vertex ``p0`` to ``p1``, and the angles are used to
-    determine the direction of each subsequent side. 
-    The first vertices is (0,0) then (a,0) and after that, the other vertices clockwise.
-
     EXAMPLES::
 
         sage: from slabbe.polygon_tiling import pentagon_from_lengths_and_angles
-        sage: from sage.rings.real_mpfr import RR
-        sage: from sage.symbolic.constants import pi
         sage: t = pentagon_from_lengths_and_angles(1,1,1,1,1,pi/3,pi/3,pi/3,pi/3,pi/3, RR^2)
+        sage: t
+        [(0.000000000000000, 0.000000000000000),
+         (1.00000000000000, 0.000000000000000),
+         (0.500000000000000, 0.866025403784439),
+         (0.000000000000000, 0.000000000000000),
+         (1.00000000000000, 0.000000000000000)]
 
     AUTHORS:
 
@@ -765,7 +769,6 @@ def pentagon_from_lengths_and_angles(a, b, c, d, e, A, B, C, D, E, VS):
     return [p0, p1, p2, p3, p4]
 
 class PentagonalTilings:
-
     def type_1(self, a, b, c, A, C, D, ring=None):
         r"""
         Return a type 1 pentagonal tiling.
@@ -785,6 +788,10 @@ class PentagonalTilings:
 
             sage: from slabbe.polygon_tiling import pentagonal_tilings
             sage: t = pentagonal_tilings.type_1(15,10,10,5*pi/4,3*pi/4,pi/2)
+            sage: t
+            Tiling by the polygon [(0.000000000000000, 0.000000000000000),
+            (15.0000000000000, 0.000000000000000), (7.92893218813452, 7.07106781186548), 
+            (-2.07106781186548, 7.07106781186548), (-2.07106781186548, -2.07106781186547)]
         
         AUTHORS:
 
