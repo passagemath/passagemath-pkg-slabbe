@@ -713,148 +713,77 @@ def rotation_180(VS, p):
     R = F([-1,0,0,-1])
     return T * R * T.inverse()
 
-def rotation(point, center, angle):
+
+def get_isometry_sending_edges(source, target, orientation_preserving, VS):
     r"""
-    Rotate a point around a center by a given angle.
+    Return the unique isometry mapping the source edge of a pentagon onto the target edge,
+    optionally reversing the orientation, as a sage affine transformation.
+
+    This isometry is uniquely determined by the requirement that it maps the specified edge
+    onto the target edge, and either preserves or reverses the orientation
+    depending on the given flag.
 
     INPUT:
 
-    - ``point`` -- a vector, the point to rotate
-    - ``center`` -- a vector, the center of rotation
-    - ``angle`` -- real number, angle in radians
-
+    - ``source_edge`` -- pair of vector
+    - ``target_edge`` -- pair of vector
+    - ``orientation_preserving`` -- bool
+    - ``VS`` -- vector space
+    
     OUTPUT:
 
-    - a rotated point (same vector space as inputs)
+    - element of ``F`` representing the affine transformation where ``F`` is the affine group of ``VS``
 
     EXAMPLES::
 
-        sage: from slabbe.polygon_tiling import rotation
-        sage: V = RR^2
-        sage: rotation(V((1, 0)), V((0, 0)), pi/2)
-        (0.000000000000000, 1.00000000000000)
+        sage: from slabbe.polygon_tiling import get_isometry_sending_edges
+        sage: V = RR**2
+        sage: s_0 = V((1,0))
+        sage: s_1 = V((2,0))
+        sage: t_0 = V((0,1))
+        sage: t_1 = V((0,2))
+        sage: s = (s_0, s_1)
+        sage: t = (t_0, t_1)
+        sage: f = get_isometry_sending_edges(s, t, True, V)
+        sage: f
+              [6.12323399573677e-17    -1.00000000000000]     [-6.12323399573677e-17]
+        x |-> [    1.00000000000000 6.12323399573677e-17] x + [    0.000000000000000]
+        sage: 
 
     AUTHORS:
 
         - Léandre Naudin, ENS ULM Student, internship at LaBRI, June 2025
 
     """
-    from sage.functions.trig import cos, sin
-    from sage.all import vector
+    from sage.functions.trig import atan2, cos, sin
+    F = AffineGroup(VS)
 
-    d = point - center
-    rot = vector([d[0] * cos(angle) - d[1] * sin(angle),
-                  d[0] * sin(angle) + d[1] * cos(angle)])
-    return center + rot
+    s_0, s_1 = source
+    t_0, t_1 = target
 
+    s_vec = s_1 - s_0
+    t_vec = t_1 - t_0
 
-def reflection_in_a_line(point, base, direction):
-    r"""
-    Reflect a point through an affine line defined by a base point and a direction vector.
+    theta_s = atan2(s_vec[1], s_vec[0])
+    theta_t = atan2(t_vec[1], t_vec[0])
 
-    INPUT:
-
-    - ``point`` -- vector, point to reflect
-    - ``base`` -- vector, a point on the line
-    - ``direction`` -- direction vector of the line (non-zero)
-
-    OUTPUT:
-
-    - the reflected point (same vector space as inputs)
-
-    EXAMPLES::
-
-        sage: from slabbe.polygon_tiling import reflection_in_a_line
-        sage: V = RR^2
-        sage: reflection_in_a_line(V((2, 0)), V((0, 0)), V((1, 0)))
-        (2.00000000000000, 0.000000000000000)
-
-    AUTHORS:
-
-        - Léandre Naudin, ENS ULM Student, internship at LaBRI, June 2025
-
-    """
-
-    ap = point - base
-    norm_u2 = direction.norm()**2
-    if norm_u2 == 0:
-        raise ValueError(f"Direction vector (={direction}) cannot be zero.")
-    dot = ap.dot_product(direction)
-    proj = base + (dot / norm_u2) * direction
-    sym = 2 * proj - point
-    return sym
-
-def align_pentagon_edge_and_transform(X, source_edge, target_edge, orientation_preserving, pentagon, VS):
-    r"""
-    Compute the image of a point X and a pentagon under a single isometry 
-    (composition of rotations, translations and possibly a reflection or central symmetry),
-    mapping the source edge onto the target edge, either preserving or reversing the orientation.
-
-    INPUT:
-
-    - ``X`` -- a point to transform (tuple or vector)
-    - ``source_edge`` -- int, source edge number (EA=0, AB=1, etc.)
-    - ``target_edge`` -- int, target edge number
-    - ``orientation_preserving`` -- bool, whether to preserve orientation
-    - ``pentagon`` -- a tuple ``(pentagon, angles)`` where:
-        - ``pentagon`` is a list of 5 points (vertices) ordered along the boundary
-        - ``angles`` is a list of 5 internal angles at each vertex
-    - ``VS`` -- a vector space
-
-    OUTPUT:
-
-    - a tuple:
-        - ``Y`` -- the image of ``X`` after the transformations
-        - ``new_pentagon`` -- the transformed pentagon as a list of 5 points
-
-    EXAMPLES::
-
-        sage: from slabbe.polygon_tiling import align_pentagon_edge_and_transform
-        sage: from slabbe.polygon_tiling import pentagon_from_lengths_and_angles
-        sage: penta = pentagon_from_lengths_and_angles(1,1,1,1,1,pi/3,pi/3,pi/3,pi/3,pi/3, RR^2)
-        sage: r = align_pentagon_edge_and_transform((0,0), 0, 2, True, (penta, [pi/3]*5), RR^2)
-        sage: r
-        ((-0.500000000000000, 0.866025403784438),
-        [(-0.500000000000000, 0.866025403784438),
-        (0.500000000000000, 0.866025403784438),
-        (0.000000000000000, 0.000000000000000),
-        (-0.500000000000000, 0.866025403784438),
-        (0.500000000000000, 0.866025403784438)])
-
-    AUTHORS:
-
-        - Léandre Naudin, ENS ULM Student, internship at LaBRI, June 2025
-
-    """
-    from sage.symbolic.constants import pi
-    from sage.all import vector
-
-    X = VS(X)
-    points = [VS(p) for p in pentagon[0]]
-    angles = pentagon[1]
-    Y = X
-    num_cote = source_edge
-    while num_cote != target_edge:
-        points = [rotation(p, points[num_cote], -(pi - angles[num_cote])) for p in points]
-        Y = rotation(Y, points[num_cote], -(pi - angles[num_cote]))
-        num_cote = (num_cote + 1) % 5
-
-    u = VS(pentagon[0][source_edge]) - points[target_edge] 
-    points = [p + u for p in points]
-    Y = Y + u
+    trans_s = F.translation(-s_0)
+    rot_s = F([cos(-theta_s), -sin(-theta_s), sin(-theta_s), cos(-theta_s)])
 
     if orientation_preserving:
-        direction = points[target_edge] - points[(target_edge - 1) % 5]
-        points = [reflection_in_a_line(p, points[target_edge], direction) for p in points]
-        Y = reflection_in_a_line(Y, points[target_edge], direction)
+        refl = F.one()
     else:
-        center = (points[target_edge] + points[(target_edge - 1) % 5]) / 2
-        points = [rotation(p, center, pi) for p in points]
-        Y = rotation(Y, center, pi)
+        refl = F([1, 0, 0, -1])
 
-    return (Y.n(), [p.n() for p in points])
+    rot_t = F([cos(theta_t), -sin(theta_t), sin(theta_t), cos(theta_t)])
+    trans_t = F.translation(t_0)
 
-def get_isometry_aligning_edges(source_edge, target_edge, orientation_preserving, pentagon, VS):
+    iso = trans_t * rot_t * refl * rot_s * trans_s
+
+    return iso
+
+
+def get_isometry_mapping_pentagon_edges(id_target, id_source, pentagon_flipping, pentagon, VS):
     r"""
     Return the unique isometry mapping the source edge of a pentagon onto the target edge,
     optionally reversing the orientation, as a function acting on points.
@@ -865,72 +794,39 @@ def get_isometry_aligning_edges(source_edge, target_edge, orientation_preserving
 
     INPUT:
 
-    - ``source_edge`` -- int
-    - ``target_edge`` -- int
-    - ``orientation_preserving`` -- bool
-    - ``pentagon`` -- tuple ``(points, angles)`` with ordered vertices and internal angles
+    - ``id_source`` -- int
+    - ``id_target`` -- int
+    - ``pentagon_flipping`` -- bool
+    - ``pentagon`` is a list of 5 points (vertices) ordered along the boundary
     - ``VS`` -- vector space
 
     OUTPUT:
 
-    - a function mapping a point using the glued transformation
+    - a member of the affine group of ``VS``
 
     EXAMPLES::
 
-        sage: from slabbe.polygon_tiling import get_isometry_aligning_edges
+        sage: from slabbe.polygon_tiling import get_isometry_mapping_pentagon_edges
         sage: from slabbe.polygon_tiling import pentagon_from_lengths_and_angles
         sage: penta = pentagon_from_lengths_and_angles(1,1,1,1,1,pi/3,pi/3,pi/3,pi/3,pi/3, RR^2)
-        sage: f = get_isometry_aligning_edges(0, 2, False, (penta, [pi/3]*5), RR^2)
+        sage: f = get_isometry_mapping_pentagon_edges(0, 2, False, penta, RR^2)
 
     AUTHORS:
 
         - Léandre Naudin, ENS ULM Student, internship at LaBRI, June 2025
 
     """
-    return lambda x: align_pentagon_edge_and_transform(x, source_edge, target_edge, orientation_preserving, pentagon, VS)[0]
 
-def affine_map_from_function(f, VS, F, ring):
-    r"""
-    Convert a function on vectors into an affine transformation in the affine group.
+    orientation_preserving = not pentagon_flipping
+    s = (pentagon[(id_source - 1) % 5], pentagon[(id_source) % 5])
+    t = (pentagon[(id_target - 1) % 5], pentagon[(id_target) % 5])
 
-    INPUT:
 
-    - ``f`` -- a function from points to points
-    - ``VS`` -- vector space
-    - ``F`` -- affine group on ``VS``
-    - ``ring`` -- base ring
-
-    OUTPUT:
-
-    - element of ``F`` representing the affine transformation
-
-    EXAMPLES::
-
-        sage: from slabbe.polygon_tiling import affine_map_from_function, get_isometry_aligning_edges, pentagon_from_lengths_and_angles
-        sage: VS = RR^2
-        sage: F = AffineGroup(VS)
-        sage: penta = pentagon_from_lengths_and_angles(1,1,1,1,1, pi/3,pi/3,pi/3,pi/3,pi/3, RR^2)
-        sage: f = get_isometry_aligning_edges(0, 1, True, (penta, [pi/3]*5), VS)
-        sage: f_type = affine_map_from_function(f, VS, F, RR)
-
-    AUTHORS:
-
-        - Léandre Naudin, ENS ULM Student, internship at LaBRI, June 2025
-
-    """
-    from sage.matrix.constructor import matrix
-
-    p0 = VS((0, 0))
-    p1 = VS((1, 0))
-    p2 = VS((0, 1))
-    f0 = VS(f(p0))
-    f1 = VS(f(p1))
-    f2 = VS(f(p2))
-    off = f0
-    a1 = f1 - off
-    a2 = f2 - off
-    A = matrix(ring, [a1, a2]).transpose()
-    return F(A, off)
+    r = rotation_180(VS, (t[0] + t[1]) / 2)
+    if orientation_preserving:
+        return r * get_isometry_sending_edges(s, t, orientation_preserving, VS)
+    else:
+        return get_isometry_sending_edges(s, t, orientation_preserving, VS)
 
 def pentagon_from_lengths_and_angles(a, b, c, d, e, A, B, C, D, E, VS):
     """
