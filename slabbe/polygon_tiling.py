@@ -746,9 +746,8 @@ def get_isometry_sending_edges(source, target, orientation_preserving, VS):
         sage: t = (t_0, t_1)
         sage: f = get_isometry_sending_edges(s, t, True, V)
         sage: f
-              [6.12323399573677e-17    -1.00000000000000]     [-6.12323399573677e-17]
-        x |-> [    1.00000000000000 6.12323399573677e-17] x + [    0.000000000000000]
-        sage: 
+              [0.000000000000000 -1.00000000000000]     [0.000000000000000]
+        x |-> [ 1.00000000000000 0.000000000000000] x + [0.000000000000000]
 
     AUTHORS:
 
