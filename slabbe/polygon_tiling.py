@@ -714,14 +714,13 @@ def rotation_180(VS, p):
     return T * R * T.inverse()
 
 
-def get_isometry_sending_edges(source, target, orientation_preserving, VS):
+def isometry_from_edge_to_edge(source, target, orientation_preserving, VS):
     r"""
-    Return the unique isometry mapping the source edge of a pentagon onto the target edge,
-    optionally reversing the orientation, as a sage affine transformation.
+    Return the unique isometry mapping the source edge onto the target edge,
+    optionally reversing the orientation, as an affine transformation.
 
     This isometry is uniquely determined by the requirement that it maps the specified edge
-    onto the target edge, and either preserves or reverses the orientation
-    depending on the given flag.
+    onto the target edge, and either preserves or reverses the orientation.
 
     INPUT:
 
@@ -732,11 +731,11 @@ def get_isometry_sending_edges(source, target, orientation_preserving, VS):
     
     OUTPUT:
 
-    - element of ``F`` representing the affine transformation where ``F`` is the affine group of ``VS``
+    - an affine transformation in the affine group of the vector space ``VS``
 
     EXAMPLES::
 
-        sage: from slabbe.polygon_tiling import get_isometry_sending_edges
+        sage: from slabbe.polygon_tiling import isometry_from_edge_to_edge
         sage: V = RR**2
         sage: s_0 = V((1,0))
         sage: s_1 = V((2,0))
@@ -744,7 +743,7 @@ def get_isometry_sending_edges(source, target, orientation_preserving, VS):
         sage: t_1 = V((0,2))
         sage: s = (s_0, s_1)
         sage: t = (t_0, t_1)
-        sage: f = get_isometry_sending_edges(s, t, True, V)
+        sage: f = isometry_from_edge_to_edge(s, t, True, V)
         sage: f
               [0.000000000000000 -1.00000000000000]     [0.000000000000000]
         x |-> [ 1.00000000000000 0.000000000000000] x + [0.000000000000000]
@@ -755,10 +754,10 @@ def get_isometry_sending_edges(source, target, orientation_preserving, VS):
 
     """
     from sage.functions.trig import atan2, cos, sin
-    F = AffineGroup(VS)
-
     s_0, s_1 = source
     t_0, t_1 = target
+
+    F = AffineGroup(VS)
 
     s_vec = s_1 - s_0
     t_vec = t_1 - t_0
@@ -766,66 +765,56 @@ def get_isometry_sending_edges(source, target, orientation_preserving, VS):
     theta_s = atan2(s_vec[1], s_vec[0])
     theta_t = atan2(t_vec[1], t_vec[0])
 
-    trans_s = F.translation(-s_0)
-    rot_s = F([cos(-theta_s), -sin(-theta_s), sin(-theta_s), cos(-theta_s)])
+    trans_s = F.translation(s_0)
+    trans_t = F.translation(t_0)
+    rot_s = F([cos(theta_s), -sin(theta_s), sin(theta_s), cos(theta_s)])
+    rot_t = F([cos(theta_t), -sin(theta_t), sin(theta_t), cos(theta_t)])
 
     if orientation_preserving:
         refl = F.one()
     else:
         refl = F([1, 0, 0, -1])
 
-    rot_t = F([cos(theta_t), -sin(theta_t), sin(theta_t), cos(theta_t)])
-    trans_t = F.translation(t_0)
+    return trans_t * rot_t * refl * rot_s.inverse() * trans_s.inverse()
 
-    iso = trans_t * rot_t * refl * rot_s * trans_s
-
-    return iso
-
-
-def get_isometry_mapping_pentagon_edges(id_target, id_source, pentagon_flipping, pentagon, VS):
+def isometry_pentagon_edge_to_edge(pentagon, id_target, id_source, orientation_preserving, vector_space):
     r"""
-    Return the unique isometry mapping the source edge of a pentagon onto the target edge,
-    optionally reversing the orientation, as a function acting on points.
-
-    This isometry is uniquely determined by the requirement that it maps the specified edge
-    of the pentagon onto the target edge, and either preserves or reverses the orientation
-    depending on the given flag.
+    Return the unique isometry mapping an edge of a pentagon (source edge) onto another edge (target edge),    
+    optionally reversing the orientation.
 
     INPUT:
 
-    - ``id_source`` -- int
-    - ``id_target`` -- int
-    - ``pentagon_flipping`` -- bool
+    - ``id_source`` -- int, between 0 and 4, identifying an edge of the pentagon
+    - ``id_target`` -- int, between 0 and 4, identifying an edge of the pentagon
+    - ``orientation_preserving`` -- bool
     - ``pentagon`` is a list of 5 points (vertices) ordered along the boundary
-    - ``VS`` -- vector space
+    - ``vector_space`` -- vector space
 
     OUTPUT:
 
-    - a member of the affine group of ``VS``
+    - an element of the affine group of ``VS``
 
     EXAMPLES::
 
-        sage: from slabbe.polygon_tiling import get_isometry_mapping_pentagon_edges
+        sage: from slabbe.polygon_tiling import isometry_pentagon_edge_to_edge
         sage: from slabbe.polygon_tiling import pentagon_from_lengths_and_angles
         sage: penta = pentagon_from_lengths_and_angles(1,1,1,1,1,pi/3,pi/3,pi/3,pi/3,pi/3, RR^2)
-        sage: f = get_isometry_mapping_pentagon_edges(0, 2, False, penta, RR^2)
+        sage: f = isometry_pentagon_edge_to_edge(penta, 0, 2, False, RR^2)
 
     AUTHORS:
 
         - Léandre Naudin, ENS ULM Student, internship at LaBRI, June 2025
 
     """
-
-    orientation_preserving = not pentagon_flipping
+    
     s = (pentagon[(id_source - 1) % 5], pentagon[(id_source) % 5])
     t = (pentagon[(id_target - 1) % 5], pentagon[(id_target) % 5])
 
-
-    r = rotation_180(VS, (t[0] + t[1]) / 2)
     if orientation_preserving:
-        return r * get_isometry_sending_edges(s, t, orientation_preserving, VS)
+        return isometry_from_edge_to_edge(s, (t[1], t[0]), orientation_preserving, vector_space)
     else:
-        return get_isometry_sending_edges(s, t, orientation_preserving, VS)
+        return isometry_from_edge_to_edge(s, t, orientation_preserving, vector_space)
+
 
 def pentagon_from_lengths_and_angles(a, b, c, d, e, A, B, C, D, E, VS):
     """
