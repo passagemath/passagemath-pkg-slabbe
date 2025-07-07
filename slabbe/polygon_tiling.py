@@ -714,7 +714,7 @@ def rotation_180(VS, p):
     return T * R * T.inverse()
 
 
-def isometry_from_edge_to_edge(source, target, orientation_preserving, VS):
+def isometry_from_edge_to_edge(source, target, orientation_preserving=True, vector_space=None):
     r"""
     Return the unique isometry mapping the source edge onto the target edge,
     optionally reversing the orientation, as an affine transformation.
@@ -726,8 +726,8 @@ def isometry_from_edge_to_edge(source, target, orientation_preserving, VS):
 
     - ``source_edge`` -- pair of vector
     - ``target_edge`` -- pair of vector
-    - ``orientation_preserving`` -- bool
-    - ``VS`` -- vector space
+    - ``orientation_preserving`` -- bool (default:``True``)
+    - ``vector_space`` -- vector space (default:``None``), if ``None`` it uses ``RR^2``
     
     OUTPUT:
 
@@ -754,16 +754,21 @@ def isometry_from_edge_to_edge(source, target, orientation_preserving, VS):
 
     """
     from sage.functions.trig import atan2, cos, sin
+
+    if vector_space is None:
+        from sage.rings.real_mpfr import RR
+        dimension = len(s_0)
+        vector_space = RR**dimension
+    F = AffineGroup(vector_space)
+
     s_0, s_1 = source
     t_0, t_1 = target
 
-    F = AffineGroup(VS)
+    s_x, s_y = s_1 - s_0
+    t_x, t_y = t_1 - t_0
 
-    s_vec = s_1 - s_0
-    t_vec = t_1 - t_0
-
-    theta_s = atan2(s_vec[1], s_vec[0])
-    theta_t = atan2(t_vec[1], t_vec[0])
+    theta_s = atan2(s_y, s_x)
+    theta_t = atan2(t_y, t_x)
 
     trans_s = F.translation(s_0)
     trans_t = F.translation(t_0)
@@ -777,18 +782,18 @@ def isometry_from_edge_to_edge(source, target, orientation_preserving, VS):
 
     return trans_t * rot_t * refl * rot_s.inverse() * trans_s.inverse()
 
-def isometry_pentagon_edge_to_edge(pentagon, id_target, id_source, orientation_preserving, vector_space):
+def isometry_pentagon_edge_to_edge(pentagon, id_target, id_source, orientation_preserving=True, vector_space=None):
     r"""
     Return the unique isometry mapping an edge of a pentagon (source edge) onto another edge (target edge),    
     optionally reversing the orientation.
 
     INPUT:
 
-    - ``id_source`` -- int, between 0 and 4, identifying an edge of the pentagon
-    - ``id_target`` -- int, between 0 and 4, identifying an edge of the pentagon
-    - ``orientation_preserving`` -- bool
     - ``pentagon`` is a list of 5 points (vertices) ordered along the boundary
-    - ``vector_space`` -- vector space
+    - ``id_target`` -- int, between 0 and 4, identifying an edge of the pentagon
+    - ``id_source`` -- int, between 0 and 4, identifying an edge of the pentagon
+    - ``orientation_preserving`` -- bool (default:``True``)
+    - ``vector_space`` -- vector space (default:``None``), if ``None`` it uses ``RR^2``
 
     OUTPUT:
 
