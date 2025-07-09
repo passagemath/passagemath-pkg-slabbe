@@ -724,14 +724,14 @@ def isometry_from_edge_to_edge(source, target, orientation_preserving=True, vect
 
     INPUT:
 
-    - ``source_edge`` -- pair of vector
-    - ``target_edge`` -- pair of vector
+    - ``source_edge`` -- pair of vectors
+    - ``target_edge`` -- pair of vectors
     - ``orientation_preserving`` -- bool (default:``True``)
     - ``vector_space`` -- vector space (default:``None``), if ``None`` it uses ``RR^2``
     
     OUTPUT:
 
-    - an affine transformation in the affine group of the vector space ``VS``
+    - an affine transformation in the affine group of the vector space ``vector_space``
 
     EXAMPLES::
 
@@ -805,6 +805,10 @@ def isometry_pentagon_edge_to_edge(pentagon, id_target, id_source, orientation_p
         sage: from slabbe.polygon_tiling import pentagon_from_lengths_and_angles
         sage: penta = pentagon_from_lengths_and_angles(1,1,1,1,1,pi/3,pi/3,pi/3,pi/3,pi/3, RR^2)
         sage: f = isometry_pentagon_edge_to_edge(penta, 0, 2, False, RR^2)
+        sage: f
+              [ 0.500000000000000 -0.866025403784439]     [0.500000000000000]
+            x |-> [-0.866025403784438 -0.500000000000000] x + [0.866025403784438]
+
 
     AUTHORS:
 
