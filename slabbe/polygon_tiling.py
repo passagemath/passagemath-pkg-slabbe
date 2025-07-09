@@ -713,6 +713,118 @@ def rotation_180(VS, p):
     R = F([-1,0,0,-1])
     return T * R * T.inverse()
 
+
+def isometry_from_edge_to_edge(source, target, orientation_preserving=True, vector_space=None):
+    r"""
+    Return the unique isometry mapping the source edge onto the target edge,
+    optionally reversing the orientation, as an affine transformation.
+
+    This isometry is uniquely determined by the requirement that it maps the specified edge
+    onto the target edge, and either preserves or reverses the orientation.
+
+    INPUT:
+
+    - ``source_edge`` -- pair of vectors
+    - ``target_edge`` -- pair of vectors
+    - ``orientation_preserving`` -- bool (default:``True``)
+    - ``vector_space`` -- vector space (default:``None``), if ``None`` it uses ``RR^2``
+    
+    OUTPUT:
+
+    - an affine transformation in the affine group of the vector space ``vector_space``
+
+    EXAMPLES::
+
+        sage: from slabbe.polygon_tiling import isometry_from_edge_to_edge
+        sage: V = RR**2
+        sage: s_0 = V((1,0))
+        sage: s_1 = V((2,0))
+        sage: t_0 = V((0,1))
+        sage: t_1 = V((0,2))
+        sage: s = (s_0, s_1)
+        sage: t = (t_0, t_1)
+        sage: f = isometry_from_edge_to_edge(s, t, True, V)
+        sage: f
+              [0.000000000000000 -1.00000000000000]     [0.000000000000000]
+        x |-> [ 1.00000000000000 0.000000000000000] x + [0.000000000000000]
+
+    AUTHORS:
+
+        - Léandre Naudin, ENS ULM Student, internship at LaBRI, June 2025
+
+    """
+    from sage.functions.trig import atan2, cos, sin
+
+    if vector_space is None:
+        from sage.rings.real_mpfr import RR
+        dimension = len(s_0)
+        vector_space = RR**dimension
+    F = AffineGroup(vector_space)
+
+    s_0, s_1 = source
+    t_0, t_1 = target
+
+    s_x, s_y = s_1 - s_0
+    t_x, t_y = t_1 - t_0
+
+    theta_s = atan2(s_y, s_x)
+    theta_t = atan2(t_y, t_x)
+
+    trans_s = F.translation(s_0)
+    trans_t = F.translation(t_0)
+    rot_s = F([cos(theta_s), -sin(theta_s), sin(theta_s), cos(theta_s)])
+    rot_t = F([cos(theta_t), -sin(theta_t), sin(theta_t), cos(theta_t)])
+
+    if orientation_preserving:
+        refl = F.one()
+    else:
+        refl = F([1, 0, 0, -1])
+
+    return trans_t * rot_t * refl * rot_s.inverse() * trans_s.inverse()
+
+def isometry_pentagon_edge_to_edge(pentagon, id_target, id_source, orientation_preserving=True, vector_space=None):
+    r"""
+    Return the unique isometry mapping an edge of a pentagon (source edge) onto another edge (target edge),    
+    optionally reversing the orientation.
+
+    INPUT:
+
+    - ``pentagon`` is a list of 5 points (vertices) ordered along the boundary
+    - ``id_target`` -- int, between 0 and 4, identifying an edge of the pentagon
+    - ``id_source`` -- int, between 0 and 4, identifying an edge of the pentagon
+    - ``orientation_preserving`` -- bool (default:``True``)
+    - ``vector_space`` -- vector space (default:``None``), if ``None`` it uses ``RR^2``
+
+    OUTPUT:
+
+    - an element of the affine group of ``VS``
+
+    EXAMPLES::
+
+        sage: from slabbe.polygon_tiling import isometry_pentagon_edge_to_edge
+        sage: from slabbe.polygon_tiling import pentagon_from_lengths_and_angles
+        sage: penta = pentagon_from_lengths_and_angles(1,1,1,1,1,pi/3,pi/3,pi/3,pi/3,pi/3, RR^2)
+        sage: f = isometry_pentagon_edge_to_edge(penta, 0, 2, False, RR^2)
+        sage: f
+              [ 0.500000000000000 -0.866025403784439]     [0.500000000000000]
+            x |-> [-0.866025403784438 -0.500000000000000] x + [0.866025403784438]
+
+
+    AUTHORS:
+
+        - Léandre Naudin, ENS ULM Student, internship at LaBRI, June 2025
+
+    """
+    
+    s = (pentagon[(id_source - 1) % 5], pentagon[(id_source) % 5])
+    t = (pentagon[(id_target - 1) % 5], pentagon[(id_target) % 5])
+
+    if orientation_preserving:
+        return isometry_from_edge_to_edge(s, (t[1], t[0]), orientation_preserving, vector_space)
+    else:
+        return isometry_from_edge_to_edge(s, t, orientation_preserving, vector_space)
+
+
 def pentagon_from_lengths_and_angles(a, b, c, d, e, A, B, C, D, E, VS):
     """
     Return the list of the vertices of a pentagon from given side lengths and angles.
