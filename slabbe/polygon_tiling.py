@@ -962,6 +962,94 @@ class PentagonalTilings:
 
         return PolygonTiling(p, patch, translations, ring=ring)
 
+    def type_2(self, a, b, B, C, E, ring=None):
+        r"""
+        Return a type 2 pentagonal tiling.
+
+        INPUT:
+
+        - ``a, b`` -- side lengths
+        - ``B, C, E`` -- angles in radians
+        - ``ring`` -- (optional) base ring (default: RealField)
+
+        .. NOTE::
+
+            Length constraints: b = d
+            Angle constraints: D = pi - B
+
+        EXAMPLES::
+
+            sage: from slabbe.polygon_tiling import pentagonal_tilings
+            sage: t = pentagonal_tilings.type_2(5,4,3*pi/4,2*pi/4,7*pi/8)
+            sage: t
+            Tiling by the polygon [(0.000000000000000, 0.000000000000000), 
+            (5.00000000000000, 0.000000000000000), (7.82842712474619, 2.82842712474619), 
+            (-4.70710678118657, 15.3639610306790), (-4.70710678118657, 11.3639610306790)]
+
+
+        AUTHORS:
+
+        - Léandre Naudin, ENS ULM Student, internship at LaBRI, June 2025
+
+        """
+        from sage.functions.trig import cos, sin
+        from sage.symbolic.constants import pi
+        from sage.symbolic.ring import var
+        from sage.symbolic.relation import solve
+        from sage.rings.real_mpfr import RR
+
+        if ring is None:
+            ring = RR
+
+        D = pi - B
+        A = 3 * pi - E - B - C - D
+        d = b
+        c, e = var('c e')
+        VS = ring**2
+
+        # Construction du pentagone
+        vA = VS((0, 0))
+        vB = vA + a * VS((1, 0))
+        theta1 = pi - B
+        vC = vB + b * VS((cos(theta1), sin(theta1)))
+        theta2 = theta1 + pi - C
+        vD = vC + c * VS((cos(theta2), sin(theta2)))
+        theta3 = theta2 + pi - D
+        vE = vD + d * VS((cos(theta3), sin(theta3)))
+        theta4 = theta3 + pi - E
+        vF = vE + e * VS((cos(theta4), sin(theta4)))
+
+        solutions = solve([vF[0] == 0, vF[1] == 0], c, e, solution_dict=True, domain='real')
+        assert solutions, "No solution possible"
+
+        sol = solutions[0]
+        assert sol[c] > 0 and sol[e] > 0, "Negative length"
+
+        p = pentagon_from_lengths_and_angles(
+            a, b, ring(sol[c]), d, ring(sol[e]),
+            A, B, C, D, E, VS
+        )
+
+        F = AffineGroup(VS)
+
+        g_type = isometry_pentagon_edge_to_edge(p, 2, 4, False, VS)
+        
+        centre = (p[0] + g_type(p[2])) / 2
+
+        a_type = rotation_180(VS, centre)
+        b_type = a_type * g_type
+
+
+        patch = [F.one(), g_type, a_type, b_type]
+
+        
+        # Translations
+        t1 = F.translation(patch[1](p[4]) - patch[3](p[0]))
+        t2 = F.translation(patch[2](p[3]) - patch[3](p[1]))
+        translations = [t1, t2]
+        
+        return PolygonTiling(p, patch, translations, ring=ring)
+
     def type_3(self, c, d):
         r"""
         Return a type 3 pentagonal tiling.
@@ -1029,6 +1117,93 @@ class PentagonalTilings:
 
         return PolygonTiling(pentagon, patch, translations)
 
+    def type_4(self, a, A, C, ring=None):
+        r"""
+        Return a type 4 pentagonal tiling.
+
+        INPUT:
+
+        - ``a`` -- length of side a
+        - ``A`` -- angle at vertex A
+        - ``C`` -- angle at vertex C
+        - ``ring`` -- (optional) base ring (default: RealField)
+
+        .. NOTE::
+
+            Length constraints: a = b, c = d
+            Angle constraints: B = D = pi/2
+
+        EXAMPLES::
+
+            sage: from slabbe.polygon_tiling import pentagonal_tilings
+            sage: t = pentagonal_tilings.type_4(1,pi/2+pi/12,3*pi/4)
+            sage: t
+            Tiling by the polygon [(0.000000000000000, 0.000000000000000), 
+            (1.00000000000000, 0.000000000000000), (1.00000000000000, 1.00000000000000), 
+            (0.366025403784439, 1.63397459621556), (-0.267949192431121, 1.00000000000000)]
+
+        AUTHORS:
+
+        - Léandre Naudin, ENS ULM Student, internship at LaBRI, June 2025
+
+        """
+        from sage.functions.trig import cos, sin
+        from sage.symbolic.constants import pi
+        from sage.symbolic.ring import var
+        from sage.symbolic.relation import solve
+        from sage.rings.real_mpfr import RR
+
+        if ring is None:
+            ring = RR
+
+        B = pi / 2
+        D = pi / 2
+        E = 3 * pi - (A + B + C + D)
+        b = a
+        c, e = var('c e')
+        VS = ring**2
+
+        # Construct pentagon step by step
+        vA = VS((0, 0))
+        vB = vA + a * VS((1, 0))
+        theta1 = pi - B
+        vC = vB + b * VS((cos(theta1), sin(theta1)))
+        theta2 = theta1 + pi - C
+        vD = vC + c * VS((cos(theta2), sin(theta2)))
+        theta3 = theta2 + pi - D
+        vE = vD + c * VS((cos(theta3), sin(theta3)))
+        theta4 = theta3 + pi - E
+        vF = vE + e * VS((cos(theta4), sin(theta4)))
+
+        solutions = solve([vF[0] == 0, vF[1] == 0], c, e, solution_dict=True, domain='real')
+        assert solutions, "No solution possible"
+
+        sol = solutions[0]
+        assert sol[c] > 0 and sol[e] > 0, "Negative length"
+
+        p = pentagon_from_lengths_and_angles(
+            a, b,
+            ring(sol[c]), ring(sol[c]), ring(sol[e]),
+            A, B, C, D, E, VS
+        )
+
+        F = AffineGroup(VS)
+
+        g_type = isometry_pentagon_edge_to_edge(p, 2, 1, True, VS)
+
+        centre = p[1]
+        a_type = rotation_180(VS, centre)
+        b_type = a_type * g_type
+
+        patch = [F.one(), g_type, a_type, b_type]
+
+        # Translations
+        t1 = F.translation(patch[2](p[3]) - p[3])
+        t2 = F.translation(patch[1](p[3]) - p[3])
+        translations = [t1, t2]
+
+        return PolygonTiling(p, patch, translations, ring=ring)
+
     def type_5(self, a, c, B):
         r"""
         Return a type 5 pentagonal tiling.
@@ -1093,7 +1268,6 @@ class PentagonalTilings:
         translations = [t1, t2]
 
         return PolygonTiling(pentagon, patch, translations)
-
 
     def type_6(self, a, c, A, B):
         r"""
@@ -1174,7 +1348,6 @@ class PentagonalTilings:
         assert c == d
 
         return p
-
 
     def type_7(self, a, B, ring=None, check=False):
         r"""
@@ -1280,6 +1453,83 @@ class PentagonalTilings:
 
         return p
 
+    def type_8(self, a, ring=None):
+        r"""
+        Return a type 8 pentagonal tiling.
+
+        INPUT:
+
+        - ``a`` -- length of side a
+        - ``ring`` -- (optional) base ring (default: RealField)
+
+        .. NOTE::
+
+            Implemented only in the equilateral case.
+
+            Length constraints: a = b = c = d = e
+
+            Angle constraints:
+                B = C = pi - E
+                A = D = pi/2 + E/2
+                E = arccos((sqrt(13) - 3)/4)
+
+        EXAMPLES::
+
+            sage: from slabbe.polygon_tiling import pentagonal_tilings
+            sage: t = pentagonal_tilings.type_8(1)
+            sage: t
+            Tiling by the polygon [(0.000000000000000, 0.000000000000000), 
+            (1.00000000000000, 0.000000000000000), (1.15138781886600, 0.988474444939775),
+            (0.197224362268005, 1.28776042538819), (-0.651387818865997, 0.758744956775990)]
+
+        AUTHORS:
+
+        - Léandre Naudin, ENS ULM Student, internship at LaBRI, June 2025
+
+        """
+        from sage.misc.functional import sqrt
+        from sage.functions.trig import cos, sin, arccos
+        from sage.symbolic.constants import pi
+        from sage.rings.real_mpfr import RR
+
+        if ring is None:
+            ring = RR
+
+        VS = ring**2
+
+        E = arccos((sqrt(13) - 3)/4)
+        B = C = pi - E
+        A = D = pi/2 + E/2
+        b = c = d = e = a
+
+        p = pentagon_from_lengths_and_angles(a, b, c, d, e, A, B, C, D, E, VS)
+        F = AffineGroup(VS)
+
+        # patch
+        tie_type = isometry_pentagon_edge_to_edge(p, 4, 4, False, VS)
+        next_type = isometry_pentagon_edge_to_edge(p, 3, 2, False, VS)
+        bas_next_type = isometry_pentagon_edge_to_edge(p, 4, 4, False, VS)
+        hg_type = isometry_pentagon_edge_to_edge(p, 2, 0, True, VS)
+        gb_type = isometry_pentagon_edge_to_edge(p, 1, 0, True, VS)
+
+        patch = [
+            F.one(),
+            tie_type,
+            tie_type * next_type,
+            tie_type * next_type * bas_next_type,
+            tie_type * hg_type,
+            tie_type * hg_type * tie_type,
+            gb_type,
+            gb_type * tie_type
+        ]
+
+        # translations
+        t1 = F.translation(gb_type(p[3]) - (tie_type * hg_type)(p[2]))
+        t2 = F.translation(p[0] - (tie_type * hg_type * tie_type)(p[1]))
+        translations = [t1, t2]
+
+        return PolygonTiling(p, patch, translations, ring=ring)
+
     def type_10(self, c, e, B):
         r"""
         Return a type 10 pentagonal tiling.
@@ -1366,6 +1616,89 @@ class PentagonalTilings:
         assert (2*(C+D)/pi).n() == 3, (2*(C+D)/pi).n()
 
         return p
+
+    def type_11(self, d, C, ring=None):
+        r"""
+        Return a type 11 pentagonal tiling.
+
+        INPUT:
+
+        - ``d`` -- length of side d
+        - ``C`` -- angle of vertex C
+        - ``ring`` -- (optional) base ring (default: RealField)
+
+        .. NOTE::
+
+            Length constraints: c = d, e = (c - b)/2
+            Angle constraints: A = pi/2, E = pi - C, B = (2*pi - C)/2
+
+        EXAMPLES::
+
+            sage: from slabbe.polygon_tiling import pentagonal_tilings
+            sage: t = pentagonal_tilings.type_11(1,4*pi/12)
+            sage: t
+            Tiling by the polygon [(0.000000000000000, 0.000000000000000),
+            (1.29903810567666, 0.000000000000000), (1.73205080756888, 0.250000000000000), 
+            (0.866025403784438, 0.750000000000000), (-8.88178419700125e-16, 0.250000000000000)]
+
+
+        AUTHORS:
+
+        - Léandre Naudin, ENS ULM Student, internship at LaBRI, June 2025
+
+        """
+        from sage.functions.trig import cos, sin
+        from sage.symbolic.constants import pi
+        from sage.symbolic.ring import var
+        from sage.symbolic.relation import solve
+        from sage.rings.real_mpfr import RR
+
+        if ring is None:
+            ring = RR
+
+        A = pi / 2
+        E = pi - C
+        B = (2 * pi - C) / 2    
+        D = 3 * pi - (A + B + C + E)
+        c = d
+
+        a, b = var('a b')
+        VS = ring**2
+
+        vA = VS((0, 0)) 
+        vB = vA + a * VS((1, 0))
+        theta1 = pi - B
+        vC = vB + b * VS((cos(theta1), sin(theta1)))
+        theta2 = theta1 + pi - C
+        vD = vC + c * VS((cos(theta2), sin(theta2)))
+        theta3 = theta2 + pi - D
+        vE = vD + d * VS((cos(theta3), sin(theta3)))
+        theta4 = theta3 + pi - E
+        vF = vE + ((c - b) / 2) * VS((cos(theta4), sin(theta4)))
+
+        solutions = solve([vF[0] == 0, vF[1] == 0], b, a, solution_dict=True, domain='real')
+        assert solutions, "No solution possible"
+
+        sol = solutions[0]
+        assert sol[b] > 0 and sol[a] > 0 and ((c - sol[b]) / 2) > 0, "Negative length"
+
+        p = pentagon_from_lengths_and_angles(ring(sol[a]), ring(sol[b]), c, d, ((c - sol[b]) / 2), A, B, C, D, E, VS)
+        F = AffineGroup(VS)
+
+        tie_type = isometry_pentagon_edge_to_edge(p, 1, 1, False, VS)
+        rota = rotation_180(VS, (tie_type(p[1]) + tie_type(p[2])) / 2)
+        suite_type = isometry_pentagon_edge_to_edge(p, 4, 3, True, VS)
+        suite_tot_type = tie_type * suite_type
+        rota2 = rotation_180(VS, (suite_tot_type(p[3]) + suite_tot_type(p[4])) / 2)
+
+        patch = [F.one(), tie_type, rota, rota * tie_type, suite_tot_type,
+                suite_tot_type * tie_type, rota2 * suite_tot_type, rota2 * suite_tot_type * tie_type]
+
+        t1 = F.translation(suite_tot_type(p[4]) - rota * tie_type(p[3]))
+        t2 = F.translation(suite_tot_type * tie_type(p[2]) - rota2 * suite_tot_type * tie_type(p[1]))
+        translations = [t1, t2]
+
+        return PolygonTiling(p, patch, translations, ring=ring)
 
     def type_15(self, a):
         r"""
