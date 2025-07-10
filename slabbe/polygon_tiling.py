@@ -719,8 +719,9 @@ def isometry_from_edge_to_edge(source, target, orientation_preserving=True, vect
     Return the unique isometry mapping the source edge onto the target edge,
     optionally reversing the orientation, as an affine transformation.
 
-    This isometry is uniquely determined by the requirement that it maps the specified edge
-    onto the target edge, and either preserves or reverses the orientation.
+    This isometry is uniquely determined by the requirement that it maps
+    the specified edge onto the target edge, and either preserves or
+    reverses the orientation.
 
     INPUT:
 
@@ -782,10 +783,12 @@ def isometry_from_edge_to_edge(source, target, orientation_preserving=True, vect
 
     return trans_t * rot_t * refl * rot_s.inverse() * trans_s.inverse()
 
-def isometry_pentagon_edge_to_edge(pentagon, id_target, id_source, orientation_preserving=True, vector_space=None):
+def isometry_pentagon_edge_to_edge(pentagon, id_target, id_source,
+        orientation_preserving=True, vector_space=None):
     r"""
-    Return the unique isometry mapping an edge of a pentagon (source edge) onto another edge (target edge),    
-    optionally reversing the orientation.
+    Return the unique isometry mapping an edge of a pentagon (source edge)
+    onto another edge (target edge), optionally reversing the
+    orientation.
 
     INPUT:
 
@@ -806,16 +809,14 @@ def isometry_pentagon_edge_to_edge(pentagon, id_target, id_source, orientation_p
         sage: penta = pentagon_from_lengths_and_angles(1,1,1,1,1,pi/3,pi/3,pi/3,pi/3,pi/3, RR^2)
         sage: f = isometry_pentagon_edge_to_edge(penta, 0, 2, False, RR^2)
         sage: f
-              [ 0.500000000000000 -0.866025403784439]     [0.500000000000000]
+                  [ 0.500000000000000 -0.866025403784439]     [0.500000000000000]
             x |-> [-0.866025403784438 -0.500000000000000] x + [0.866025403784438]
-
 
     AUTHORS:
 
         - Léandre Naudin, ENS ULM Student, internship at LaBRI, June 2025
 
     """
-    
     s = (pentagon[(id_source - 1) % 5], pentagon[(id_source) % 5])
     t = (pentagon[(id_target - 1) % 5], pentagon[(id_target) % 5])
 
