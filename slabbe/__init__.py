@@ -4,7 +4,10 @@ from __future__ import absolute_import, print_function
 #from __future__ import division, absolute_import, print_function, unicode_literals
 
 # For sphinx to work, we first need to import the sage library
-import sage.all_cmdline
+try:
+    import sage.all_cmdline
+except ImportError:
+    import sage.all__sagemath_modules
 
 from sage.misc.latex import latex
 latex.add_to_preamble('\\usepackage{tikz}')
