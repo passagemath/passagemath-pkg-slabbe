@@ -1193,8 +1193,6 @@ def has_graph_decomposition(self, G, induced=False, certificate=False):
         else:
             return (has_solution, solution)
 
-<<<<<<< Updated upstream
-=======
 def optimal_cutout_path(self):
     r"""
     Compute the optimal path for doing a cutout of the graph.
@@ -1255,5 +1253,4 @@ def optimal_cutout_path(self):
             paths[-1].append(i)
 
     return paths
->>>>>>> Stashed changes
 
