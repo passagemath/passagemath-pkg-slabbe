@@ -1193,4 +1193,67 @@ def has_graph_decomposition(self, G, induced=False, certificate=False):
         else:
             return (has_solution, solution)
 
+<<<<<<< Updated upstream
+=======
+def optimal_cutout_path(self):
+    r"""
+    Compute the optimal path for doing a cutout of the graph.
+
+    This method returns a list of ordered vertices forming
+    an Eulerian circuit, possibly after adding edges
+    to make the graph Eulerian (via a minimum-weight
+    perfect matching of the odd-degree vertices).
+
+    The output is made to be the same format as eulerian_paths
+
+    INPUT:
+
+    - ``self`` -- an undirected graph with multiedges=True
+
+    OUTPUT:
+
+    - list of list of ordered vertices
+
+    EXAMPLES::
+
+        sage: from slabbe.graph import optimal_cutout_path
+        sage: G = Graph({(0,0):[(1,0)], (1,0):[(1,1)], (1,1):[(0,1)], (0,1):[(0,0)]}, multiedges=True)
+        sage: optimal_cutout_path(G)
+        [[(1, 0), (0, 0), (0, 1), (1, 1)]]
+
+        sage: M = Graph(multiedges=True)
+        sage: v0 = (0,0)
+        sage: v1 = (1,0)
+        sage: v2 = (2,0)
+        sage: v3 = (1,1)
+        sage: v4 = (0,1)
+        sage: v5 = (2,1)
+        sage: M.add_edges([(v0,v1), (v1,v2), (v2,v3), (v3,v4), (v4,v5), (v5,v0), (v0,v3), (v1,v4)])
+        sage: optimal_cutout_path(M)
+        [[(0, 0), (2, 1)], [(1, 1), (0, 1), (1, 0), (2, 0), (1, 1)], [(1, 0)]]
+
+
+    AUTHORS:
+
+        - Léandre Naudin, ENS ULM Student, internship at LaBRI, June 2025
+
+    """
+    odd_vertices = [v for v in self.vertices() if self.degree(v) % 2 == 1]
+
+    if odd_vertices:
+        matching = minimal_perfect_matching(odd_vertices)
+
+        for u, v in matching:
+            self.add_edge(u, v, label='added')
+
+    paths = [[]]
+    for i, j, label in self.eulerian_circuit():
+        if label == 'added':
+            if len(paths[-1]) != 0:
+                paths.append([])
+        else:
+            paths[-1].append(i)
+
+    return paths
+>>>>>>> Stashed changes
 
