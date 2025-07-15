@@ -985,11 +985,9 @@ class PentagonalTilings:
             (5.00000000000000, 0.000000000000000), (7.82842712474619, 2.82842712474619), 
             (-4.70710678118657, 15.3639610306790), (-4.70710678118657, 11.3639610306790)]
 
-
         AUTHORS:
 
         - Léandre Naudin, ENS ULM Student, internship at LaBRI, June 2025
-
         """
         from sage.functions.trig import cos, sin
         from sage.symbolic.constants import pi
@@ -1006,7 +1004,6 @@ class PentagonalTilings:
         c, e = var('c e')
         VS = ring**2
 
-        # Construction du pentagone
         vA = VS((0, 0))
         vB = vA + a * VS((1, 0))
         theta1 = pi - B
@@ -1019,10 +1016,12 @@ class PentagonalTilings:
         vF = vE + e * VS((cos(theta4), sin(theta4)))
 
         solutions = solve([vF[0] == 0, vF[1] == 0], c, e, solution_dict=True, domain='real')
-        assert solutions, "No solution possible"
-
+        if not solutions:
+            raise ValueError("No solution possible for given parameters")
+        
         sol = solutions[0]
-        assert sol[c] > 0 and sol[e] > 0, "Negative length"
+        if sol[c] <= 0 or sol[e] <= 0:
+            raise ValueError("Computed side lengths are non-positive")
 
         p = pentagon_from_lengths_and_angles(
             a, b, ring(sol[c]), d, ring(sol[e]),
@@ -1030,23 +1029,17 @@ class PentagonalTilings:
         )
 
         F = AffineGroup(VS)
+        iso_edge_2_4 = isometry_pentagon_edge_to_edge(p, 2, 4, False, VS)
+        centre = (p[0] + iso_edge_2_4(p[2])) / 2
+        rot_180 = rotation_180(VS, centre)
+        composed_iso = rot_180 * iso_edge_2_4
 
-        g_type = isometry_pentagon_edge_to_edge(p, 2, 4, False, VS)
-        
-        centre = (p[0] + g_type(p[2])) / 2
+        patch = [F.one(), iso_edge_2_4, rot_180, composed_iso]
 
-        a_type = rotation_180(VS, centre)
-        b_type = a_type * g_type
-
-
-        patch = [F.one(), g_type, a_type, b_type]
-
-        
-        # Translations
         t1 = F.translation(patch[1](p[4]) - patch[3](p[0]))
         t2 = F.translation(patch[2](p[3]) - patch[3](p[1]))
         translations = [t1, t2]
-        
+
         return PolygonTiling(p, patch, translations, ring=ring)
 
     def type_3(self, c, d):
@@ -1144,7 +1137,6 @@ class PentagonalTilings:
         AUTHORS:
 
         - Léandre Naudin, ENS ULM Student, internship at LaBRI, June 2025
-
         """
         from sage.functions.trig import cos, sin
         from sage.symbolic.constants import pi
@@ -1162,7 +1154,6 @@ class PentagonalTilings:
         c, e = var('c e')
         VS = ring**2
 
-        # Construct pentagon step by step
         vA = VS((0, 0))
         vB = vA + a * VS((1, 0))
         theta1 = pi - B
@@ -1175,10 +1166,12 @@ class PentagonalTilings:
         vF = vE + e * VS((cos(theta4), sin(theta4)))
 
         solutions = solve([vF[0] == 0, vF[1] == 0], c, e, solution_dict=True, domain='real')
-        assert solutions, "No solution possible"
-
+        if not solutions:
+            raise ValueError("No solution possible for given parameters")
+        
         sol = solutions[0]
-        assert sol[c] > 0 and sol[e] > 0, "Negative length"
+        if sol[c] <= 0 or sol[e] <= 0:
+            raise ValueError("Computed side lengths are non-positive")
 
         p = pentagon_from_lengths_and_angles(
             a, b,
@@ -1187,16 +1180,13 @@ class PentagonalTilings:
         )
 
         F = AffineGroup(VS)
-
-        g_type = isometry_pentagon_edge_to_edge(p, 2, 1, True, VS)
-
+        iso_edge_2_1 = isometry_pentagon_edge_to_edge(p, 2, 1, True, VS)
         centre = p[1]
-        a_type = rotation_180(VS, centre)
-        b_type = a_type * g_type
+        rot_180 = rotation_180(VS, centre)
+        composed_iso = rot_180 * iso_edge_2_1
 
-        patch = [F.one(), g_type, a_type, b_type]
+        patch = [F.one(), iso_edge_2_1, rot_180, composed_iso]
 
-        # Translations
         t1 = F.translation(patch[2](p[3]) - p[3])
         t2 = F.translation(patch[1](p[3]) - p[3])
         translations = [t1, t2]
@@ -1484,7 +1474,6 @@ class PentagonalTilings:
         AUTHORS:
 
         - Léandre Naudin, ENS ULM Student, internship at LaBRI, June 2025
-
         """
         from sage.misc.functional import sqrt
         from sage.functions.trig import cos, sin, arccos
@@ -1504,27 +1493,24 @@ class PentagonalTilings:
         p = pentagon_from_lengths_and_angles(a, b, c, d, e, A, B, C, D, E, VS)
         F = AffineGroup(VS)
 
-        # patch
-        tie_type = isometry_pentagon_edge_to_edge(p, 4, 4, False, VS)
-        next_type = isometry_pentagon_edge_to_edge(p, 3, 2, False, VS)
-        bas_next_type = isometry_pentagon_edge_to_edge(p, 4, 4, False, VS)
-        hg_type = isometry_pentagon_edge_to_edge(p, 2, 0, True, VS)
-        gb_type = isometry_pentagon_edge_to_edge(p, 1, 0, True, VS)
+        iso_4_4 = isometry_pentagon_edge_to_edge(p, 4, 4, False, VS)
+        iso_3_2 = isometry_pentagon_edge_to_edge(p, 3, 2, False, VS)
+        iso_2_0_hg = isometry_pentagon_edge_to_edge(p, 2, 0, True, VS)
+        iso_1_0_gb = isometry_pentagon_edge_to_edge(p, 1, 0, True, VS)
 
         patch = [
             F.one(),
-            tie_type,
-            tie_type * next_type,
-            tie_type * next_type * bas_next_type,
-            tie_type * hg_type,
-            tie_type * hg_type * tie_type,
-            gb_type,
-            gb_type * tie_type
+            iso_4_4,
+            iso_4_4 * iso_3_2,
+            iso_4_4 * iso_3_2 * iso_4_4,
+            iso_4_4 * iso_2_0_hg,
+            iso_4_4 * iso_2_0_hg * iso_4_4,
+            iso_1_0_gb,
+            iso_1_0_gb * iso_4_4
         ]
 
-        # translations
-        t1 = F.translation(gb_type(p[3]) - (tie_type * hg_type)(p[2]))
-        t2 = F.translation(p[0] - (tie_type * hg_type * tie_type)(p[1]))
+        t1 = F.translation(iso_1_0_gb(p[3]) - (iso_4_4 * iso_2_0_hg)(p[2]))
+        t2 = F.translation(p[0] - (iso_4_4 * iso_2_0_hg * iso_4_4)(p[1]))
         translations = [t1, t2]
 
         return PolygonTiling(p, patch, translations, ring=ring)
@@ -1637,14 +1623,12 @@ class PentagonalTilings:
             sage: t = pentagonal_tilings.type_11(1,4*pi/12)
             sage: t
             Tiling by the polygon [(0.000000000000000, 0.000000000000000),
-            (1.29903810567666, 0.000000000000000), (1.73205080756888, 0.250000000000000), 
+            (1.29903810567666, 0.000000000000000), (1.73205080756888, 0.250000000000000),
             (0.866025403784438, 0.750000000000000), (-8.88178419700125e-16, 0.250000000000000)]
-
 
         AUTHORS:
 
         - Léandre Naudin, ENS ULM Student, internship at LaBRI, June 2025
-
         """
         from sage.functions.trig import cos, sin
         from sage.symbolic.constants import pi
@@ -1657,14 +1641,14 @@ class PentagonalTilings:
 
         A = pi / 2
         E = pi - C
-        B = (2 * pi - C) / 2    
+        B = (2 * pi - C) / 2
         D = 3 * pi - (A + B + C + E)
         c = d
 
         a, b = var('a b')
         VS = ring**2
 
-        vA = VS((0, 0)) 
+        vA = VS((0, 0))
         vB = vA + a * VS((1, 0))
         theta1 = pi - B
         vC = vB + b * VS((cos(theta1), sin(theta1)))
@@ -1676,25 +1660,38 @@ class PentagonalTilings:
         vF = vE + ((c - b) / 2) * VS((cos(theta4), sin(theta4)))
 
         solutions = solve([vF[0] == 0, vF[1] == 0], b, a, solution_dict=True, domain='real')
-        assert solutions, "No solution possible"
+        if not solutions:
+            raise ValueError("No solution found")
 
         sol = solutions[0]
-        assert sol[b] > 0 and sol[a] > 0 and ((c - sol[b]) / 2) > 0, "Negative length"
+        if sol[b] <= 0 or sol[a] <= 0 or ((c - sol[b]) / 2) <= 0:
+            raise ValueError("Negative or invalid side length in solution")
 
-        p = pentagon_from_lengths_and_angles(ring(sol[a]), ring(sol[b]), c, d, ((c - sol[b]) / 2), A, B, C, D, E, VS)
+        p = pentagon_from_lengths_and_angles(
+            ring(sol[a]), ring(sol[b]), c, d, ((c - sol[b]) / 2),
+            A, B, C, D, E, VS
+        )
+
         F = AffineGroup(VS)
+        iso_1_1 = isometry_pentagon_edge_to_edge(p, 1, 1, False, VS)
+        rot1 = rotation_180(VS, (iso_1_1(p[1]) + iso_1_1(p[2])) / 2)
+        iso_4_3 = isometry_pentagon_edge_to_edge(p, 4, 3, True, VS)
+        chain = iso_1_1 * iso_4_3
+        rot2 = rotation_180(VS, (chain(p[3]) + chain(p[4])) / 2)
 
-        tie_type = isometry_pentagon_edge_to_edge(p, 1, 1, False, VS)
-        rota = rotation_180(VS, (tie_type(p[1]) + tie_type(p[2])) / 2)
-        suite_type = isometry_pentagon_edge_to_edge(p, 4, 3, True, VS)
-        suite_tot_type = tie_type * suite_type
-        rota2 = rotation_180(VS, (suite_tot_type(p[3]) + suite_tot_type(p[4])) / 2)
+        patch = [
+            F.one(),
+            iso_1_1,
+            rot1,
+            rot1 * iso_1_1,
+            chain,
+            chain * iso_1_1,
+            rot2 * chain,
+            rot2 * chain * iso_1_1
+        ]
 
-        patch = [F.one(), tie_type, rota, rota * tie_type, suite_tot_type,
-                suite_tot_type * tie_type, rota2 * suite_tot_type, rota2 * suite_tot_type * tie_type]
-
-        t1 = F.translation(suite_tot_type(p[4]) - rota * tie_type(p[3]))
-        t2 = F.translation(suite_tot_type * tie_type(p[2]) - rota2 * suite_tot_type * tie_type(p[1]))
+        t1 = F.translation(chain(p[4]) - rot1 * iso_1_1(p[3]))
+        t2 = F.translation(chain * iso_1_1(p[2]) - rot2 * chain * iso_1_1(p[1]))
         translations = [t1, t2]
 
         return PolygonTiling(p, patch, translations, ring=ring)
