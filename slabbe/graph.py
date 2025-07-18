@@ -952,7 +952,7 @@ def eulerian_paths(G):
     paths = [L[starts[i]:starts[i+1]] for i in range(len(starts)-1)]
     return [path[1:] for path in paths]
 
-def minimal_eulerian_paths(G, cost=None):
+def minimal_eulerian_paths_old(G, cost=None):
     r"""
     Return a sequence of paths covering all edges of the graph exactly
     once and minimizing the distance between the end and start of the next
@@ -993,9 +993,9 @@ def minimal_eulerian_paths(G, cost=None):
          (3, 2, None),
          (2, 1, None),
          (1, 0, None)]
-        sage: from slabbe.graph import minimal_eulerian_paths
+        sage: from slabbe.graph import minimal_eulerian_paths_old
         sage: cost = lambda u,v : abs(v-u)
-        sage: minimal_eulerian_paths(G, cost)
+        sage: minimal_eulerian_paths_old(G, cost)
         [[(2, 1), (1, 0), (0, 4), (4, 2), (2, 3), (3, 0)]]
 
     The following has four odd degree vertices. Thus, it has
@@ -1008,7 +1008,7 @@ def minimal_eulerian_paths(G, cost=None):
         sage: G.eulerian_circuit(path=True)
         False
         sage: cost = lambda u,v : abs(v-u)
-        sage: minimal_eulerian_paths(G, cost)       # known bug
+        sage: minimal_eulerian_paths_old(G, cost)       # known bug
         [[(4, 2), (2, 3), (3, 0), (0, 4), (4, 1), (1, 2)], [(1, 0)]]
 
     TODO:
@@ -1193,7 +1193,7 @@ def has_graph_decomposition(self, G, induced=False, certificate=False):
         else:
             return (has_solution, solution)
 
-def optimal_cutout_path(self):
+def minimal_eulerian_paths(self, cost=None):
     r"""
     Compute the optimal path for doing a cutout of the graph.
 
@@ -1202,11 +1202,13 @@ def optimal_cutout_path(self):
     to make the graph Eulerian (via a minimum-weight
     perfect matching of the odd-degree vertices).
 
-    The output is made to be the same format as eulerian_paths
+    The output is made to be the same format as eulerian_paths.
 
     INPUT:
 
-    - ``self`` -- an undirected graph with multiedges=True
+    - ``self`` -- an undirected graph
+    - ``cost`` -- function (vertices x vertices -> R) or ``None``.
+      If ``None``, uses Euclidean distance between points.
 
     OUTPUT:
 
@@ -1214,9 +1216,9 @@ def optimal_cutout_path(self):
 
     EXAMPLES::
 
-        sage: from slabbe.graph import optimal_cutout_path
+        sage: from slabbe.graph import minimal_eulerian_paths
         sage: G = Graph({(0,0):[(1,0)], (1,0):[(1,1)], (1,1):[(0,1)], (0,1):[(0,0)]}, multiedges=True)
-        sage: optimal_cutout_path(G)
+        sage: minimal_eulerian_paths(G)
         [[(1, 0), (0, 0), (0, 1), (1, 1)]]
 
         sage: M = Graph(multiedges=True)
@@ -1227,25 +1229,33 @@ def optimal_cutout_path(self):
         sage: v4 = (0,1)
         sage: v5 = (2,1)
         sage: M.add_edges([(v0,v1), (v1,v2), (v2,v3), (v3,v4), (v4,v5), (v5,v0), (v0,v3), (v1,v4)])
-        sage: optimal_cutout_path(M)
+        sage: minimal_eulerian_paths(M)
         [[(0, 0), (2, 1)], [(1, 1), (0, 1), (1, 0), (2, 0), (1, 1)], [(1, 0)]]
 
+        sage: G = Graph([(0,1), (1,2), (0,3), (3,2), (0,4), (4,2), (1,4)])
+        sage: cost = lambda u,v : abs(v-u)
+        sage: minimal_eulerian_paths(G, cost)
+        [[0], [2, 4, 1, 2, 3], [1]]
 
     AUTHORS:
 
-        - Léandre Naudin, ENS ULM Student, internship at LaBRI, June 2025
+    - Léandre Naudin, ENS ULM Student, internship at LaBRI, June 2025
 
     """
-    odd_vertices = [v for v in self.vertices() if self.degree(v) % 2 == 1]
+    if not self.allows_multiple_edges():
+        G = Graph(self, multiedges=True, immutable=False)
+    else:
+        G = self.copy(immutable=False)
+
+    odd_vertices = [v for v in G.vertices() if G.degree(v) % 2 == 1]
 
     if odd_vertices:
-        matching = minimal_perfect_matching(odd_vertices)
-
+        matching = minimal_perfect_matching(odd_vertices, cost=cost)
         for u, v in matching:
-            self.add_edge(u, v, label='added')
+            G.add_edge(u, v, label='added')
 
     paths = [[]]
-    for i, j, label in self.eulerian_circuit():
+    for i, j, label in G.eulerian_circuit():
         if label == 'added':
             if len(paths[-1]) != 0:
                 paths.append([])
