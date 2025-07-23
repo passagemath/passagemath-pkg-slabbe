@@ -952,7 +952,7 @@ def eulerian_paths(G):
     paths = [L[starts[i]:starts[i+1]] for i in range(len(starts)-1)]
     return [path[1:] for path in paths]
 
-def minimal_eulerian_paths_old(G, cost=None):
+def minimal_eulerian_paths(G, cost=None):
     r"""
     Return a sequence of paths covering all edges of the graph exactly
     once and minimizing the distance between the end and start of the next
@@ -993,9 +993,9 @@ def minimal_eulerian_paths_old(G, cost=None):
          (3, 2, None),
          (2, 1, None),
          (1, 0, None)]
-        sage: from slabbe.graph import minimal_eulerian_paths_old
+        sage: from slabbe.graph import minimal_eulerian_paths
         sage: cost = lambda u,v : abs(v-u)
-        sage: minimal_eulerian_paths_old(G, cost)
+        sage: minimal_eulerian_paths(G, cost)
         [[(2, 1), (1, 0), (0, 4), (4, 2), (2, 3), (3, 0)]]
 
     The following has four odd degree vertices. Thus, it has
@@ -1008,7 +1008,7 @@ def minimal_eulerian_paths_old(G, cost=None):
         sage: G.eulerian_circuit(path=True)
         False
         sage: cost = lambda u,v : abs(v-u)
-        sage: minimal_eulerian_paths_old(G, cost)       # known bug
+        sage: minimal_eulerian_paths(G, cost)       # known bug
         [[(4, 2), (2, 3), (3, 0), (0, 4), (4, 1), (1, 2)], [(1, 0)]]
 
     TODO:
@@ -1193,7 +1193,7 @@ def has_graph_decomposition(self, G, induced=False, certificate=False):
         else:
             return (has_solution, solution)
 
-def minimal_eulerian_paths(self, cost=None):
+def optimal_eulerian_paths(self, cost=None):
     r"""
     Compute the optimal path for doing a cutout of the graph.
 
@@ -1216,9 +1216,9 @@ def minimal_eulerian_paths(self, cost=None):
 
     EXAMPLES::
 
-        sage: from slabbe.graph import minimal_eulerian_paths
+        sage: from slabbe.graph import optimal_eulerian_paths
         sage: G = Graph({(0,0):[(1,0)], (1,0):[(1,1)], (1,1):[(0,1)], (0,1):[(0,0)]}, multiedges=True)
-        sage: minimal_eulerian_paths(G)
+        sage: optimal_eulerian_paths(G)
         [[(1, 0), (0, 0), (0, 1), (1, 1)]]
 
         sage: M = Graph(multiedges=True)
@@ -1229,13 +1229,13 @@ def minimal_eulerian_paths(self, cost=None):
         sage: v4 = (0,1)
         sage: v5 = (2,1)
         sage: M.add_edges([(v0,v1), (v1,v2), (v2,v3), (v3,v4), (v4,v5), (v5,v0), (v0,v3), (v1,v4)])
-        sage: minimal_eulerian_paths(M)
-        [[(0, 0), (2, 1)], [(1, 1), (0, 1), (1, 0), (2, 0), (1, 1)], [(1, 0)]]
+        sage: optimal_eulerian_paths(M)
+        [[(1, 0), (0, 0), (2, 1), (0, 1)], [(1, 1), (0, 1), (1, 0), (2, 0), (1, 1), (0, 0)]]
 
         sage: G = Graph([(0,1), (1,2), (0,3), (3,2), (0,4), (4,2), (1,4)])
         sage: cost = lambda u,v : abs(v-u)
-        sage: minimal_eulerian_paths(G, cost)
-        [[0], [2, 4, 1, 2, 3], [1]]
+        sage: optimal_eulerian_paths(G, cost)
+        [[1, 0, 4], [2, 4, 1, 2, 3, 0]]
 
     AUTHORS:
 
@@ -1247,20 +1247,42 @@ def minimal_eulerian_paths(self, cost=None):
     else:
         G = self.copy(immutable=False)
 
-    odd_vertices = [v for v in G.vertices() if G.degree(v) % 2 == 1]
+    if G.is_eulerian():
 
-    if odd_vertices:
-        matching = minimal_perfect_matching(odd_vertices, cost=cost)
-        for u, v in matching:
-            G.add_edge(u, v, label='added')
+        paths = [[]]
+        for i,j, _ in G.eulerian_circuit():
+            paths[0].append(i)
+        
+        return paths 
+    
+    else:
+        odd_vertices = [v for v in G.vertices() if G.degree(v) % 2 == 1]
 
-    paths = [[]]
-    for i, j, label in G.eulerian_circuit():
-        if label == 'added':
-            if len(paths[-1]) != 0:
-                paths.append([])
-        else:
-            paths[-1].append(i)
+        if odd_vertices:
+            matching = minimal_perfect_matching(odd_vertices, cost=cost)
+            for u, v in matching:
+                G.add_edge(u, v, label='added')
+        
+        circuit = G.eulerian_circuit()
 
-    return paths
+        paths = [[]]
+        last = None
+        for i, j, label in circuit:
+            if label == 'added':
+                if len(paths[-1]) != 0:
+                    if last != None:
+                        paths[-1].append(last)
+                    paths.append([])
+            else:
+                paths[-1].append(i)
+            last = j
+        
+        if circuit[0][2] == 'added':
+            paths[-1].append(last)
+
+        if circuit[0][2] != 'added' and circuit[-1][2] != 'added':
+            l = paths.pop()
+            paths[0] = l + paths[0]
+
+        return paths
 
