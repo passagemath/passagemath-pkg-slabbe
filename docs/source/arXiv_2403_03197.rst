@@ -1,0 +1,12 @@
+.. nodoctest
+
+Code for `arXiv:2403.03197`__
+=============================
+
+.. automodule:: slabbe.arXiv_2403_03197
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   
+__ https://arxiv.org/abs/2403.03197
+
