@@ -431,18 +431,18 @@ class PolygonTiling:
             sage: T = [F.translation((1,0))]
             sage: J = PolygonTiling(jennifer, translations=T)
             sage: J.eulerian_paths(depth=1)
-            [[(-1, 0), ..., (0, 0), (-1, 0)]]
+            [[(-1, 0), ..., (1, 0), (0, 0)]]
 
         Restricted to a region::
 
             sage: box = polytopes.hypercube(dim=2, intervals=[(-2,2), (-2,2)])
             sage: J.eulerian_paths(depth=2, region=box)
-            [[(-2, 0), (-2, 1), ..., (-1, 0), (-2, 0)]]
+            [[(-2, 0), (-2, 1), ..., (0, 0), (-1, 0)]]
 
         """
-        from slabbe.graph import eulerian_paths
+        from slabbe.graph import optimal_eulerian_paths
         G = self.graph(depth=depth, region=region, round=round)
-        return eulerian_paths(G)
+        return optimal_eulerian_paths(G)
 
     def vertices(self, depth, region=None):
         r"""

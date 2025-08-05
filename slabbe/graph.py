@@ -1193,4 +1193,96 @@ def has_graph_decomposition(self, G, induced=False, certificate=False):
         else:
             return (has_solution, solution)
 
+def optimal_eulerian_paths(self, cost=None):
+    r"""
+    Compute the optimal path for doing a cutout of the graph.
+
+    This method returns a list of ordered vertices forming
+    an Eulerian circuit, possibly after adding edges
+    to make the graph Eulerian (via a minimum-weight
+    perfect matching of the odd-degree vertices).
+
+    The output is made to be the same format as eulerian_paths.
+
+    INPUT:
+
+    - ``self`` -- an undirected graph
+    - ``cost`` -- function (vertices x vertices -> R) or ``None``.
+      If ``None``, uses Euclidean distance between points.
+
+    OUTPUT:
+
+    - list of list of ordered vertices
+
+    EXAMPLES::
+
+        sage: from slabbe.graph import optimal_eulerian_paths
+        sage: G = Graph({(0,0):[(1,0)], (1,0):[(1,1)], (1,1):[(0,1)], (0,1):[(0,0)]}, multiedges=True)
+        sage: optimal_eulerian_paths(G)
+        [[(1, 0), (0, 0), (0, 1), (1, 1)]]
+
+        sage: M = Graph(multiedges=True)
+        sage: v0 = (0,0)
+        sage: v1 = (1,0)
+        sage: v2 = (2,0)
+        sage: v3 = (1,1)
+        sage: v4 = (0,1)
+        sage: v5 = (2,1)
+        sage: M.add_edges([(v0,v1), (v1,v2), (v2,v3), (v3,v4), (v4,v5), (v5,v0), (v0,v3), (v1,v4)])
+        sage: optimal_eulerian_paths(M)
+        [[(1, 0), (0, 0), (2, 1), (0, 1)], [(1, 1), (0, 1), (1, 0), (2, 0), (1, 1), (0, 0)]]
+
+        sage: G = Graph([(0,1), (1,2), (0,3), (3,2), (0,4), (4,2), (1,4)])
+        sage: cost = lambda u,v : abs(v-u)
+        sage: optimal_eulerian_paths(G, cost)
+        [[1, 0, 4], [2, 4, 1, 2, 3, 0]]
+
+    AUTHORS:
+
+    - Léandre Naudin, ENS ULM Student, internship at LaBRI, June 2025
+
+    """
+    if not self.allows_multiple_edges():
+        G = Graph(self, multiedges=True, immutable=False)
+    else:
+        G = self.copy(immutable=False)
+
+    if G.is_eulerian():
+
+        paths = [[]]
+        for i,j, _ in G.eulerian_circuit():
+            paths[0].append(i)
+        
+        return paths 
+    
+    else:
+        odd_vertices = [v for v in G.vertices() if G.degree(v) % 2 == 1]
+
+        if odd_vertices:
+            matching = minimal_perfect_matching(odd_vertices, cost=cost)
+            for u, v in matching:
+                G.add_edge(u, v, label='added')
+        
+        circuit = G.eulerian_circuit()
+
+        paths = [[]]
+        last = None
+        for i, j, label in circuit:
+            if label == 'added':
+                if len(paths[-1]) != 0:
+                    if last != None:
+                        paths[-1].append(last)
+                    paths.append([])
+            else:
+                paths[-1].append(i)
+            last = j
+        
+        if circuit[0][2] == 'added':
+            paths[-1].append(last)
+
+        if circuit[0][2] != 'added' and circuit[-1][2] != 'added':
+            l = paths.pop()
+            paths[0] = l + paths[0]
+
+        return paths
 
