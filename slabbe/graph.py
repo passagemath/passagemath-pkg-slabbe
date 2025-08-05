@@ -1217,9 +1217,12 @@ def optimal_eulerian_paths(self, cost=None):
     EXAMPLES::
 
         sage: from slabbe.graph import optimal_eulerian_paths
-        sage: G = Graph({(0,0):[(1,0)], (1,0):[(1,1)], (1,1):[(0,1)], (0,1):[(0,0)]}, multiedges=True)
-        sage: optimal_eulerian_paths(G)
+        sage: data = {(0,0):[(1,0)], (1,0):[(1,1)], (1,1):[(0,1)], (0,1):[(0,0)]}
+        sage: G = Graph(data, multiedges=True)
+        sage: optimal_eulerian_paths(G)             # random
         [[(1, 0), (0, 0), (0, 1), (1, 1)]]
+
+    ::
 
         sage: M = Graph(multiedges=True)
         sage: v0 = (0,0)
@@ -1228,9 +1231,12 @@ def optimal_eulerian_paths(self, cost=None):
         sage: v3 = (1,1)
         sage: v4 = (0,1)
         sage: v5 = (2,1)
-        sage: M.add_edges([(v0,v1), (v1,v2), (v2,v3), (v3,v4), (v4,v5), (v5,v0), (v0,v3), (v1,v4)])
+        sage: edges = [(v0,v1), (v1,v2), (v2,v3), (v3,v4), (v4,v5), (v5,v0), (v0,v3), (v1,v4)]
+        sage: M.add_edges(edges)
         sage: optimal_eulerian_paths(M)
         [[(1, 0), (0, 0), (2, 1), (0, 1)], [(1, 1), (0, 1), (1, 0), (2, 0), (1, 1), (0, 0)]]
+
+    ::
 
         sage: G = Graph([(0,1), (1,2), (0,3), (3,2), (0,4), (4,2), (1,4)])
         sage: cost = lambda u,v : abs(v-u)
@@ -1248,12 +1254,10 @@ def optimal_eulerian_paths(self, cost=None):
         G = self.copy(immutable=False)
 
     if G.is_eulerian():
-
-        paths = [[]]
+        path = []
         for i,j, _ in G.eulerian_circuit():
-            paths[0].append(i)
-        
-        return paths 
+            path.append(i)
+        return [path]
     
     else:
         odd_vertices = [v for v in G.vertices() if G.degree(v) % 2 == 1]
@@ -1281,8 +1285,8 @@ def optimal_eulerian_paths(self, cost=None):
             paths[-1].append(last)
 
         if circuit[0][2] != 'added' and circuit[-1][2] != 'added':
-            l = paths.pop()
-            paths[0] = l + paths[0]
+            L = paths.pop()
+            paths[0] = L + paths[0]
 
         return paths
 
