@@ -7,23 +7,15 @@ doctest this file with "sage -t article2_doctest.sage".
 It is always safe to delete this file; it is not used in typesetting your
 document.
 
-Sage commandline, line 3912::
+Sage commandline, line 4286::
 
-sage: version()
-'SageMath version ..., Release Date: ...'
-sage: import importlib.metadata
-sage: importlib.metadata.version("slabbe")
-'...'
-
-Sage commandline, line 3925::
-
-sage: n = 3  # try with another integer, the code below works at least for 1 <= n <= 7
+sage: n = 3  # try with another integer
 sage: x = polygen(QQ, "x")
 sage: K.<beta> = NumberField(x^2 - n*x - 1, embedding=RR(n))
 sage: beta.n()
 3.30277563773199
 
-Sage commandline, line 3935::
+Sage commandline, line 4296::
 
 sage: unit_square_ieqs = [[0, 1, 0], [0, 0, 1], [1, -1, 0], [1, 0, -1]]
 sage: def Lambda_inv(a,b,c):
@@ -33,7 +25,7 @@ sage: def Lambda_inv(a,b,c):
 ....:     ieqs.extend([[-1/beta+1-c, beta, 1], [c+1/beta, -beta, -1]])
 ....:     return Polyhedron(ieqs=ieqs)
 
-Sage commandline, line 3946::
+Sage commandline, line 4307::
 
 sage: Vn = [(a,b,c) for a in range(2) for b in range(2) for c in range(n+2) if a<=b<=c]
 sage: Vn
@@ -42,21 +34,21 @@ sage: assert sum(Lambda_inv(*v).volume() for v in Vn) == 1
 sage: Lambda_inv(0,0,n+1).volume()      # one of the atom has empty interior
 0
 
-Sage commandline, line 3956::
+Sage commandline, line 4317::
 
 sage: def vector_to_str(v):
 ....:     return "".join(str(a) for a in v)
 sage: vector_to_str((0,1,4))        # for example
 '014'
 
-Sage commandline, line 3964::
+Sage commandline, line 4325::
 
 sage: lattice_base = identity_matrix(2)
 sage: from slabbe import PolyhedronExchangeTransformation as PET
 sage: Re1 = PET.toral_translation(lattice_base, vector((1/beta,0)))
 sage: Re2 = PET.toral_translation(lattice_base, vector((0,1/beta)))
 
-Sage commandline, line 3972::
+Sage commandline, line 4333::
 
 sage: from slabbe import PolyhedronPartition
 sage: EAST = PolyhedronPartition({vector_to_str(v):Lambda_inv(*v) for v in Vn
@@ -68,14 +60,14 @@ sage: SOUTH = Re2(NORTH)
 sage: G = graphics_array([EAST.plot(),NORTH.plot(), SOUTH.plot(),WEST.plot()])
 sage: G.show(figsize=10)
 
-Sage commandline, line 3989::
+Sage commandline, line 4350::
 
 sage: PEN,dEN = EAST.refinement(NORTH, certificate=True)
 sage: PWS,dWS = WEST.refinement(SOUTH, certificate=True)
 sage: G = graphics_array([PEN.plot(),PWS.plot()])
 sage: G.show(figsize=5)
 
-Sage commandline, line 4004::
+Sage commandline, line 4365::
 
 sage: PWS.is_equal_up_to_relabeling(PEN)
 True
@@ -84,35 +76,35 @@ sage: bijection = P.keys_permutation(PWS)
 sage: bijection[9]     # for example
 16
 
-Sage commandline, line 4014::
+Sage commandline, line 4375::
 
 sage: from slabbe import WangTileSet
 sage: tiles = [dEN[i]+dWS[bijection[i]] for i in sorted(dEN)]
 sage: T3 = WangTileSet(tiles)
 sage: t = T3.tikz(ncolumns=10, scale=1.2)
 
-Sage commandline, line 4030::
+Sage commandline, line 4391::
 
 sage: x_le_beta_inv = [1/beta,-1,0]
 sage: P1,s1 = Re1.induced_partition(x_le_beta_inv, P, substitution_type="row")
 sage: R1e1,_ = Re1.induced_transformation(x_le_beta_inv)
 sage: R1e2,_ = Re2.induced_transformation(x_le_beta_inv)
 
-Sage commandline, line 4037::
+Sage commandline, line 4398::
 
 sage: y_le_beta_inv = [1/beta,0,-1]
 sage: P2,s2 = Re2.induced_partition(y_le_beta_inv, P1, substitution_type="column")
 sage: R2e1,_ = R1e1.induced_transformation(y_le_beta_inv)
 sage: R2e2,_ = R1e2.induced_transformation(y_le_beta_inv)
 
-Sage commandline, line 4046::
+Sage commandline, line 4407::
 
 sage: P2_scaled = (-beta * P2).translate((1,1))
 sage: P3 = Re2(Re1(P2_scaled))
 sage: G = graphics_array([P2_scaled.plot(), P3.plot()])
 sage: G.show(figsize=5)
 
-Sage commandline, line 4057::
+Sage commandline, line 4418::
 
 sage: P.is_equal_up_to_relabeling(P3)
 True
@@ -121,14 +113,22 @@ True
 sage: Re2 == (beta * R2e2).inverse()
 True
 
-Sage commandline, line 4067::
+Sage commandline, line 4428::
 
 sage: from slabbe import Substitution2d
 sage: s3 = Substitution2d.from_permutation(P.keys_permutation(P3))
 sage: s123 = s1*s2*s3
 
-Sage commandline, line 4089::
+Sage commandline, line 4450::
 
 sage: s123_tikz = s123.wang_tikz(domain_tiles=T3, codomain_tiles=T3, ncolumns=6, scale=1.2, label_shift=.15)
+
+Sage commandline, line 4658::
+
+sage: version()
+'SageMath version ..., Release Date: ...'
+sage: import importlib.metadata
+sage: importlib.metadata.version("slabbe")
+'...'
 
 """
