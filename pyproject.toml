@@ -3,7 +3,7 @@ requires = [
     "setuptools>=61.2",
     "Cython>=3",
     "cysignals",
-    "sagemath-environment",  # sage.env
+    "passagemath-environment",  # sage.env
 ]
 build-backend = "setuptools.build_meta"
 
